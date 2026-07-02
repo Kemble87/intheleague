@@ -3,6 +3,7 @@ import { ref, onValue, set } from 'firebase/database'
 import { rtdb } from '../lib/firebase'
 import Fixtures from './Fixtures'
 import Chips from './Chips'
+import Members from './Members'
 
 export default function PoolView({ user, pool, poolId, onBack }) {
   const [picks, setPicks] = useState({})
@@ -48,17 +49,8 @@ export default function PoolView({ user, pool, poolId, onBack }) {
   return (
     <>
       <button className="back" onClick={onBack}>← All pools</button>
-
-      <div className="share-row">
-        <div className="share-row-left">
-          Invite code
-          <div className="share-row-code">{poolId}</div>
-        </div>
-        <button className="share-copy" onClick={() => navigator.clipboard?.writeText(invLink)}>Copy link</button>
-      </div>
-
+      <Members poolId={poolId} pool={pool} userId={user.uid} />
       <Chips poolId={poolId} userId={user.uid} members={members} />
-
       <Fixtures
         poolId={poolId}
         pool={pool}
