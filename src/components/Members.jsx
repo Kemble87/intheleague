@@ -3,9 +3,9 @@ import { doc, updateDoc, deleteField, increment } from 'firebase/firestore'
 import { db } from '../lib/firebase'
 import { initials } from '../lib/helpers'
 
-function MemberRow({ uid, member, isMe, isOrg, canManage, poolId, onTransfer }) {
+function MemberRow({ uid, member, isMe, canManage, poolId, onTransfer }) {
   const [busy, setBusy] = useState(false)
-  const [confirming, setConfirming] = useState(null) // 'remove' | 'transfer'
+  const [confirming, setConfirming] = useState(null)
 
   async function removeMember() {
     setBusy(true)
@@ -33,22 +33,19 @@ function MemberRow({ uid, member, isMe, isOrg, canManage, poolId, onTransfer }) 
         <div style={{ flex:1, minWidth:0 }}>
           <div style={{ fontSize:14, fontWeight:700, color:'#fff', display:'flex', alignItems:'center', gap:6 }}>
             {member.name || 'Unknown'}
-            {isMe && <span style={{ fontSize:10, fontWeight:700, color:'var(--green)', background:'#001a0d', borderRadius:999, padding:'2px 7px', letterSpacing:'.06em' }}>YOU</span>}
-            {member.isOrganiser && <span style={{ fontSize:10, fontWeight:700, color:'#FFD700', background:'#1a1400', borderRadius:999, padding:'2px 7px', letterSpacing:'.06em' }}>ORGANISER</span>}
+            {isMe && <span style={{ fontSize:10, fontWeight:700, color:'var(--green)', background:'#001a0d', borderRadius:999, padding:'2px 7px' }}>YOU</span>}
+            {member.isOrganiser && <span style={{ fontSize:10, fontWeight:700, color:'#FFD700', background:'#1a1400', borderRadius:999, padding:'2px 7px' }}>ORGANISER</span>}
           </div>
-          <div style={{ fontSize:11, color:'#444', marginTop:2 }}>{member.email || ''}</div>
         </div>
         {canManage && !isMe && (
-          <div style={{ display:'flex', gap:6', flexShrink:0 }}>
-            <button
-              onClick={() => setConfirming('remove')}
-              style={{ padding:'6px 12px', background:'none', border:'1px solid #2a0000', borderRadius:8, color:'#ff4444', font:'inherit', fontSize:12, fontWeight:600, cursor:'pointer' }}
-            >Remove</button>
+          <div style={{ display:'flex', gap:6, flexShrink:0 }}>
+            <button onClick={() => setConfirming('remove')} style={{ padding:'6px 12px', background:'none', border:'1px solid #2a0000', borderRadius:8, color:'#ff4444', font:'inherit', fontSize:12, fontWeight:600, cursor:'pointer' }}>
+              Remove
+            </button>
             {!member.isOrganiser && (
-              <button
-                onClick={() => setConfirming('transfer')}
-                style={{ padding:'6px 12px', background:'none', border:'1px solid #222', borderRadius:8, color:'#aaa', font:'inherit', fontSize:12, fontWeight:600, cursor:'pointer' }}
-              >Make organiser</button>
+              <button onClick={() => setConfirming('transfer')} style={{ padding:'6px 12px', background:'none', border:'1px solid #222', borderRadius:8, color:'#aaa', font:'inherit', fontSize:12, fontWeight:600, cursor:'pointer' }}>
+                Make organiser
+              </button>
             )}
           </div>
         )}
@@ -80,11 +77,10 @@ function MemberRow({ uid, member, isMe, isOrg, canManage, poolId, onTransfer }) 
 
 export default function Members({ poolId, pool, userId }) {
   const [open, setOpen] = useState(false)
-  const isOrg = pool.createdBy === userId || pool.members?.[userId]?.isOrganiser
   const members = Object.entries(pool.members || {})
+  const isOrg = pool.createdBy === userId || pool.members?.[userId]?.isOrganiser
 
   async function transferOwnership(newOrgUid) {
-    // Make new user organiser, remove organiser from current user
     await updateDoc(doc(db, 'pools', poolId), {
       [`members.${newOrgUid}.isOrganiser`]: true,
       [`members.${userId}.isOrganiser`]: false,
@@ -94,14 +90,10 @@ export default function Members({ poolId, pool, userId }) {
 
   return (
     <div style={{ marginBottom:20 }}>
-      <button
-        onClick={() => setOpen(o => !o)}
-        style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px', background:'#111', border:'1px solid #1a1a1a', borderRadius:12, color:'#fff', font:'inherit', fontSize:14, fontWeight:700, cursor:'pointer', marginBottom: open ? 0 : 0 }}
-      >
+      <button onClick={() => setOpen(o => !o)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px', background:'#111', border:'1px solid #1a1a1a', borderRadius: open ? '12px 12px 0 0' : 12, color:'#fff', font:'inherit', fontSize:14, fontWeight:700, cursor:'pointer' }}>
         <span>👥 Members · {members.length}</span>
         <span style={{ color:'#444', fontSize:12 }}>{open ? '▲' : '▼'}</span>
       </button>
-
       {open && (
         <div style={{ background:'#0d0d0d', border:'1px solid #1a1a1a', borderTop:'none', borderRadius:'0 0 12px 12px', padding:'0 16px' }}>
           {members.map(([uid, member]) => (
@@ -110,7 +102,6 @@ export default function Members({ poolId, pool, userId }) {
               uid={uid}
               member={member}
               isMe={uid === userId}
-              isOrg={member.isOrganiser || pool.createdBy === uid}
               canManage={isOrg}
               poolId={poolId}
               onTransfer={transferOwnership}
@@ -118,10 +109,7 @@ export default function Members({ poolId, pool, userId }) {
           ))}
           {isOrg && (
             <div style={{ padding:'12px 0' }}>
-              <button
-                onClick={() => navigator.clipboard?.writeText(`${location.href.split('#')[0]}#join-${poolId}`)}
-                style={{ width:'100%', padding:'10px', background:'none', border:'1px solid #222', borderRadius:8, color:'#aaa', font:'inherit', fontSize:13, fontWeight:600, cursor:'pointer' }}
-              >
+              <button onClick={() => navigator.clipboard?.writeText(`${location.href.split('#')[0]}#join-${poolId}`)} style={{ width:'100%', padding:'10px', background:'none', border:'1px solid #222', borderRadius:8, color:'#aaa', font:'inherit', fontSize:13, fontWeight:600, cursor:'pointer' }}>
                 📋 Copy invite link
               </button>
             </div>
