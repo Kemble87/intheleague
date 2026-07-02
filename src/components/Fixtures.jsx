@@ -5,6 +5,22 @@ import { SAMPLE_FIXTURES } from '../lib/constants'
 import { fmtKO, fmtDay, groupDays, countdown, calcPts, abbr, fetchAndStoreFixtures, loadFixtures } from '../lib/helpers'
 import Kit from './Kit'
 
+const TEAM_NAMES = {
+  'Nottingham': 'Nottm Forest',
+  'Nott\'m Forest': 'Nottm Forest',
+  'Manchester City': 'Man City',
+  'Manchester United': 'Man United',
+  'Tottenham Hotspur': 'Spurs',
+  'Newcastle United': 'Newcastle',
+  'West Ham United': 'West Ham',
+  'Crystal Palace': 'Crystal Palace',
+  'Wolverhampton': 'Wolves',
+  'Brighton & Hove Albion': 'Brighton',
+  'Leicester City': 'Leicester',
+  'Ipswich Town': 'Ipswich',
+}
+function teamName(n) { return TEAM_NAMES[n] || n }
+
 function NextToPick({ fixtures, picks, now, onGo }) {
   const next = useMemo(() => {
     if (!fixtures?.length) return null
@@ -21,12 +37,12 @@ function NextToPick({ fixtures, picks, now, onGo }) {
     <div className="ntp">
       <div className="ntp-label">⏱ Next to pick</div>
       <div className="ntp-match">
-        <div className="ntp-team">{next.home}</div>
+        <div className="ntp-team">{teamName(next.home)}</div>
         <div className="ntp-center">
           <span className="ntp-time">{p.weekday} {p.day} {p.month} · {p.hour}:{p.minute}</span>
           <span className="ntp-cd">locks in {cdStr}</span>
         </div>
-        <div className="ntp-team away">{next.away}</div>
+        <div className="ntp-team away">{teamName(next.away)}</div>
       </div>
       <button className="ntp-go" onClick={onGo}>Pick this match →</button>
     </div>
@@ -100,10 +116,10 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, onPick, onRes
       <div className="fx-match">
         <div className="fx-home">
           <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-            <Kit team={fx.home} size={32} />
+            <Kit team={teamName(fx.home)} size={32} />
             <div>
-              <div className="fx-team-name">{fx.home}</div>
-              <div className="fx-team-abbr">{abbr(fx.home)}</div>
+              <div className="fx-team-name">{teamName(fx.home)}</div>
+              <div className="fx-team-abbr">{abbr(teamName(fx.home))}</div>
             </div>
           </div>
         </div>
@@ -115,10 +131,10 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, onPick, onRes
         <div className="fx-away">
           <div style={{ display:'flex', alignItems:'center', gap:8, justifyContent:'flex-end' }}>
             <div style={{ textAlign:'right' }}>
-              <div className="fx-team-name">{fx.away}</div>
-              <div className="fx-team-abbr">{abbr(fx.away)}</div>
+              <div className="fx-team-name">{teamName(fx.away)}</div>
+              <div className="fx-team-abbr">{abbr(teamName(fx.away))}</div>
             </div>
-            <Kit team={fx.away} size={32} flip />
+            <Kit team={teamName(fx.away)} size={32} flip />
           </div>
         </div>
       </div>
