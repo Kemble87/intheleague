@@ -6,6 +6,11 @@
 [build.environment]
   SECRETS_SCAN_SMART_DETECTION_OMIT_VALUES = "AIzaSyDVl4kGIaPJCJoPkW5tIlpfX8Do1Ra0-ZA"
 
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
 [[redirects]]
   from = "/__/auth/*"
   to = "https://intheleage.firebaseapp.com/__/auth/:splat"
