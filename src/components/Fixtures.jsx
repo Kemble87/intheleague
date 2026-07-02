@@ -3,6 +3,7 @@ import { ref, onValue, set, update } from 'firebase/database'
 import { rtdb } from '../lib/firebase'
 import { SAMPLE_FIXTURES } from '../lib/constants'
 import { fmtKO, fmtDay, groupDays, countdown, calcPts, abbr, fetchAndStoreFixtures, loadFixtures } from '../lib/helpers'
+import Kit from './Kit'
 
 function NextToPick({ fixtures, picks, now, onGo }) {
   const next = useMemo(() => {
@@ -98,8 +99,13 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, onPick, onRes
       </div>
       <div className="fx-match">
         <div className="fx-home">
-          <div className="fx-team-name">{fx.home}</div>
-          <div className="fx-team-abbr">{abbr(fx.home)}</div>
+          <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+            <Kit team={fx.home} size={32} />
+            <div>
+              <div className="fx-team-name">{fx.home}</div>
+              <div className="fx-team-abbr">{abbr(fx.home)}</div>
+            </div>
+          </div>
         </div>
         <div className="sc-wrap">
           <input className="sc" inputMode="numeric" value={display?.h ?? ''} placeholder="–" disabled={locked && !isOrg} aria-label={fx.home} onChange={e => onChange('h', e.target.value)} />
@@ -107,8 +113,13 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, onPick, onRes
           <input className="sc" inputMode="numeric" value={display?.a ?? ''} placeholder="–" disabled={locked && !isOrg} aria-label={fx.away} onChange={e => onChange('a', e.target.value)} />
         </div>
         <div className="fx-away">
-          <div className="fx-team-name">{fx.away}</div>
-          <div className="fx-team-abbr">{abbr(fx.away)}</div>
+          <div style={{ display:'flex', alignItems:'center', gap:8, justifyContent:'flex-end' }}>
+            <div style={{ textAlign:'right' }}>
+              <div className="fx-team-name">{fx.away}</div>
+              <div className="fx-team-abbr">{abbr(fx.away)}</div>
+            </div>
+            <Kit team={fx.away} size={32} flip />
+          </div>
         </div>
       </div>
       {(hasRes || locked) && (
