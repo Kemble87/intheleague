@@ -116,10 +116,10 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, onPick, onRes
       </div>
       <div className="fx-match">
         <div className="fx-home">
-          <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-            <Kit team={teamName(fx.home)} size={32} />
+          <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+            <Kit team={teamName(fx.home)} size={24} />
             <div>
-              <div style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:20, color:'#fff', letterSpacing:'.06em', lineHeight:1 }}>{teamName(fx.home)}</div>
+              <div style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:"clamp(14px,4vw,20px)", color:'#fff', letterSpacing:'.06em', lineHeight:1 }}>{teamName(fx.home)}</div>
               <div className="fx-team-abbr">{abbr(teamName(fx.home))}</div>
             </div>
           </div>
@@ -128,28 +128,28 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, onPick, onRes
           <div style={{ width:44, height:56, background:'#060606', border:'1.5px solid #1a1a1a', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
             <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(0deg,rgba(0,0,0,.1) 0px,rgba(0,0,0,.1) 1px,transparent 1px,transparent 3px)', pointerEvents:'none', zIndex:1 }}/>
             {(!locked || isOrg) && <input inputMode="numeric" value={display?.h ?? ''} onChange={e => onChange('h', e.target.value)} disabled={locked && !isOrg} aria-label={fx.home} style={{ position:'absolute', inset:0, opacity:0, cursor: locked&&!isOrg?'not-allowed':'pointer', zIndex:3, fontSize:32, textAlign:'center', background:'none', border:'none', WebkitAppearance:'none' }}/>}
-            <div style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:32, lineHeight:1, position:'relative', zIndex:2,
+            <div style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:'clamp(22px,7vw,32px)', lineHeight:1, position:'relative', zIndex:2,
               color: locked && hasRes ? '#ff6600' : display?.h != null ? '#00ff66' : '#1a0800',
               textShadow: locked && hasRes ? '0 0 8px #ff440066' : display?.h != null ? '0 0 8px #00ff4466' : 'none'
             }}>{display?.h ?? '–'}</div>
           </div>
-          <span style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:22, color:'#2a2a2a', lineHeight:1, padding:'0 1px', marginBottom:2 }}>:</span>
+          <span style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:'clamp(16px,5vw,22px)', color:'#2a2a2a', lineHeight:1, padding:'0 1px', marginBottom:2 }}>:</span>
           <div style={{ width:44, height:56, background:'#060606', border:'1.5px solid #1a1a1a', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
             <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(0deg,rgba(0,0,0,.1) 0px,rgba(0,0,0,.1) 1px,transparent 1px,transparent 3px)', pointerEvents:'none', zIndex:1 }}/>
             {(!locked || isOrg) && <input inputMode="numeric" value={display?.a ?? ''} onChange={e => onChange('a', e.target.value)} disabled={locked && !isOrg} aria-label={fx.away} style={{ position:'absolute', inset:0, opacity:0, cursor: locked&&!isOrg?'not-allowed':'pointer', zIndex:3, fontSize:32, textAlign:'center', background:'none', border:'none', WebkitAppearance:'none' }}/>}
-            <div style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:32, lineHeight:1, position:'relative', zIndex:2,
+            <div style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:'clamp(22px,7vw,32px)', lineHeight:1, position:'relative', zIndex:2,
               color: locked && hasRes ? '#ff6600' : display?.a != null ? '#00ff66' : '#1a0800',
               textShadow: locked && hasRes ? '0 0 8px #ff440066' : display?.a != null ? '0 0 8px #00ff4466' : 'none'
             }}>{display?.a ?? '–'}</div>
           </div>
         </div>
         <div className="fx-away">
-          <div style={{ display:'flex', alignItems:'center', gap:8, justifyContent:'flex-end' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:6, justifyContent:'flex-end' }}>
             <div style={{ textAlign:'right' }}>
-              <div style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:20, color:'#fff', letterSpacing:'.06em', lineHeight:1 }}>{teamName(fx.away)}</div>
+              <div style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:"clamp(14px,4vw,20px)", color:'#fff', letterSpacing:'.06em', lineHeight:1 }}>{teamName(fx.away)}</div>
               <div className="fx-team-abbr">{abbr(teamName(fx.away))}</div>
             </div>
-            <Kit team={teamName(fx.away)} size={32} flip />
+            <Kit team={teamName(fx.away)} size={24} flip />
           </div>
         </div>
       </div>
