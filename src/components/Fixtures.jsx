@@ -4,6 +4,7 @@ import { rtdb } from '../lib/firebase'
 import { SAMPLE_FIXTURES } from '../lib/constants'
 import { fmtKO, fmtDay, groupDays, countdown, calcPts, abbr, fetchAndStoreFixtures, loadFixtures } from '../lib/helpers'
 import Kit from './Kit'
+import PoolHero from './PoolHero'
 
 const TEAM_NAMES = {
   'Nottingham': 'Nottm Forest',
@@ -118,20 +119,34 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, onPick, onRes
           <div style={{ display:'flex', alignItems:'center', gap:8 }}>
             <Kit team={teamName(fx.home)} size={32} />
             <div>
-              <div className="fx-team-name">{teamName(fx.home)}</div>
+              <div style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:20, color:'#fff', letterSpacing:'.06em', lineHeight:1 }}>{teamName(fx.home)}</div>
               <div className="fx-team-abbr">{abbr(teamName(fx.home))}</div>
             </div>
           </div>
         </div>
-        <div className="sc-wrap">
-          <input className="sc" inputMode="numeric" value={display?.h ?? ''} placeholder="–" disabled={locked && !isOrg} aria-label={fx.home} onChange={e => onChange('h', e.target.value)} />
-          <span className="sc-sep">:</span>
-          <input className="sc" inputMode="numeric" value={display?.a ?? ''} placeholder="–" disabled={locked && !isOrg} aria-label={fx.away} onChange={e => onChange('a', e.target.value)} />
+        <div style={{ display:'flex', alignItems:'center', gap:3, padding:'0 6px' }}>
+          <div style={{ width:44, height:56, background:'#060606', border:'1.5px solid #1a1a1a', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
+            <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(0deg,rgba(0,0,0,.1) 0px,rgba(0,0,0,.1) 1px,transparent 1px,transparent 3px)', pointerEvents:'none', zIndex:1 }}/>
+            {(!locked || isOrg) && <input inputMode="numeric" value={display?.h ?? ''} onChange={e => onChange('h', e.target.value)} disabled={locked && !isOrg} aria-label={fx.home} style={{ position:'absolute', inset:0, opacity:0, cursor: locked&&!isOrg?'not-allowed':'pointer', zIndex:3, fontSize:32, textAlign:'center', background:'none', border:'none', WebkitAppearance:'none' }}/>}
+            <div style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:32, lineHeight:1, position:'relative', zIndex:2,
+              color: locked && hasRes ? '#ff6600' : display?.h != null ? '#00ff66' : '#1a0800',
+              textShadow: locked && hasRes ? '0 0 8px #ff440066' : display?.h != null ? '0 0 8px #00ff4466' : 'none'
+            }}>{display?.h ?? '–'}</div>
+          </div>
+          <span style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:22, color:'#2a2a2a', lineHeight:1, padding:'0 1px', marginBottom:2 }}>:</span>
+          <div style={{ width:44, height:56, background:'#060606', border:'1.5px solid #1a1a1a', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
+            <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(0deg,rgba(0,0,0,.1) 0px,rgba(0,0,0,.1) 1px,transparent 1px,transparent 3px)', pointerEvents:'none', zIndex:1 }}/>
+            {(!locked || isOrg) && <input inputMode="numeric" value={display?.a ?? ''} onChange={e => onChange('a', e.target.value)} disabled={locked && !isOrg} aria-label={fx.away} style={{ position:'absolute', inset:0, opacity:0, cursor: locked&&!isOrg?'not-allowed':'pointer', zIndex:3, fontSize:32, textAlign:'center', background:'none', border:'none', WebkitAppearance:'none' }}/>}
+            <div style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:32, lineHeight:1, position:'relative', zIndex:2,
+              color: locked && hasRes ? '#ff6600' : display?.a != null ? '#00ff66' : '#1a0800',
+              textShadow: locked && hasRes ? '0 0 8px #ff440066' : display?.a != null ? '0 0 8px #00ff4466' : 'none'
+            }}>{display?.a ?? '–'}</div>
+          </div>
         </div>
         <div className="fx-away">
           <div style={{ display:'flex', alignItems:'center', gap:8, justifyContent:'flex-end' }}>
             <div style={{ textAlign:'right' }}>
-              <div className="fx-team-name">{teamName(fx.away)}</div>
+              <div style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:20, color:'#fff', letterSpacing:'.06em', lineHeight:1 }}>{teamName(fx.away)}</div>
               <div className="fx-team-abbr">{abbr(teamName(fx.away))}</div>
             </div>
             <Kit team={teamName(fx.away)} size={32} flip />
@@ -202,19 +217,7 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
 
   return (
     <>
-      {/* Pool hero */}
-      <div className="pool-hero">
-        <div className="pool-hero-inner" style={{ background: (pool.sport ? { PL: 'linear-gradient(135deg,#3d0066,#6600aa)', CHAMP: 'linear-gradient(135deg,#003366,#0055aa)', L1: 'linear-gradient(135deg,#002200,#005500)', WC: 'linear-gradient(135deg,#662200,#aa4400)', SN: 'linear-gradient(135deg,#003300,#006600)' }[pool.sport] : 'linear-gradient(135deg,#3d0066,#6600aa)') }}>
-          <div className="pool-hero-sport">{pool.sport} · {pool.name}</div>
-          <div className="pool-hero-name">{pool.name}</div>
-          <div className="pool-hero-stats">
-            <div><div className="phs-num">{totalPts}</div><div className="phs-label">Pts</div></div>
-            <div><div className="phs-num">{exactPts}</div><div className="phs-label">Exact</div></div>
-            <div><div className="phs-num">{totalPicks}/{fixtures.length}</div><div className="phs-label">Picked</div></div>
-            <div><div className="phs-num">{members.length}</div><div className="phs-label">Players</div></div>
-          </div>
-        </div>
-      </div>
+      <PoolHero pool={pool} fixtures={fixtures} picks={picks} results={results} members={members} userId={user.uid} />
 
       <NextToPick fixtures={fixtures} picks={picks} now={now} onGo={() => setTab('picks')} />
 
