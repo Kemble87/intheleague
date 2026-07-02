@@ -1,7 +1,7 @@
 // Primary and secondary colours for PL teams
 export const KIT_COLOURS = {
   // Team name (as it appears from football-data.org shortName) -> [primary, secondary, pattern]
-  'Arsenal':        { home: '#EF0107', away: '#063672', sash: null },
+  'Arsenal':        { home: '#EF0107', away: '#ffffff', sash: null, sleeves: '#ffffff' },
   'Aston Villa':    { home: '#670E36', away: '#95BFE5', sash: null },
   'Bournemouth':    { home: '#DA291C', away: '#000000', sash: 'stripes' },
   'Brentford':      { home: '#E30613', away: '#FFFFFF', sash: 'stripes' },
@@ -15,7 +15,7 @@ export const KIT_COLOURS = {
   'Liverpool':      { home: '#C8102E', away: '#00A398', sash: null },
   'Man City':       { home: '#6CABDD', away: '#FFFFFF', sash: null },
   'Man United':     { home: '#DA291C', away: '#FFFFFF', sash: null },
-  'Newcastle':      { home: '#241F20', away: '#FFFFFF', sash: 'stripes' },
+  'Newcastle':      { home: '#ffffff', away: '#141414', sash: 'stripes' },
   'Nottm Forest':   { home: '#DD0000', away: '#FFFFFF', sash: null },
   'Nottingham':     { home: '#DD0000', away: '#FFFFFF', sash: null },
   'Nott\'m Forest':  { home: '#DD0000', away: '#FFFFFF', sash: null },
