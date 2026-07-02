@@ -17,6 +17,8 @@ export const KIT_COLOURS = {
   'Man United':     { home: '#DA291C', away: '#FFFFFF', sash: null },
   'Newcastle':      { home: '#241F20', away: '#FFFFFF', sash: 'stripes' },
   'Nottm Forest':   { home: '#DD0000', away: '#FFFFFF', sash: null },
+  'Nottingham':     { home: '#DD0000', away: '#FFFFFF', sash: null },
+  'Nott\'m Forest':  { home: '#DD0000', away: '#FFFFFF', sash: null },
   'Southampton':    { home: '#D71920', away: '#130C0E', sash: 'stripes' },
   'Spurs':          { home: '#FFFFFF', away: '#001333', sash: null },
   'Tottenham':      { home: '#FFFFFF', away: '#001333', sash: null },
