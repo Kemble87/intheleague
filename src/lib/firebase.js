@@ -4,7 +4,7 @@ import { getFirestore } from 'firebase/firestore'
 import { getDatabase } from 'firebase/database'
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDVl4kGIaPJCJoPkW5tIlpfX8Do1Ra0-ZA",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: "intheleage.firebaseapp.com",
   databaseURL: "https://intheleage-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "intheleage",
