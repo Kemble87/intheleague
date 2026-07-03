@@ -5,6 +5,7 @@ import { SAMPLE_FIXTURES } from '../lib/constants'
 import { fmtKO, fmtDay, groupDays, countdown, calcPts, abbr, fetchAndStoreFixtures, loadFixtures } from '../lib/helpers'
 import Kit from './Kit'
 import PoolHero from './PoolHero'
+import OrgNudge from './OrgNudge'
 
 const TEAM_NAMES = {
   'Nottingham': 'Nottm Forest',
@@ -283,6 +284,16 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
   return (
     <>
       <PoolHero pool={pool} fixtures={fixtures} picks={picks} results={results} members={members} userId={user.uid} />
+      {isOrg && (
+        <OrgNudge
+          pool={pool}
+          poolId={poolId}
+          members={members}
+          allPicks={allPicks}
+          fixtures={fixtures}
+          results={results}
+        />
+      )}
 
       <NextToPick fixtures={fixtures} picks={picks} now={now} onGo={() => {
         setTab('picks')
