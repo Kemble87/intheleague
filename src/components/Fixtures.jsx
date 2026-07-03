@@ -113,19 +113,15 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, use
         <span className="fx-time">{fmtKO(fx.kickoff)}</span>
         <div className="fx-badges">
           {/* Chip indicators */}
-          {allChips && userId && (() => {
-            const myChips = allChips[userId] || {}
-            const badges = []
-            if (myChips['2x']?.matchday && String(myChips['2x'].matchday) === String(fx.matchday))
-              badges.push(<span key="2x" style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#1a0800', color:'#FFD700', border:'1px solid #FFD70044' }}>2× MD</span>)
-            if (myChips['banker']?.fixtureId === fx.id)
-              badges.push(<span key="bk" style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#000820', color:'#4499FF', border:'1px solid #4499FF44' }}>🏦 3×</span>)
-            if (myChips['hth']?.usedAt && !result?.h)
-              badges.push(<span key="hth" style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#0d001a', color:'#9966FF', border:'1px solid #9966FF44' }}>⏱ HTH</span>)
-            if (myChips['coupon']?.matchday && String(myChips['coupon'].matchday) === String(fx.matchday))
-              badges.push(<span key="cb" style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#001a08', color:'#4CAF50', border:'1px solid #4CAF5044' }}>🎟 Buster</span>)
-            return badges
-          })()}
+          {allChips && userId && (() => { const mc = allChips[userId] || {}; return null })() }
+          {allChips?.[userId]?.['2x']?.matchday && String(allChips[userId]['2x'].matchday) === String(fx.matchday) &&
+            <span style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#1a0800', color:'#FFD700', border:'1px solid #FFD70044' }}>⚡ 2×</span>}
+          {allChips?.[userId]?.['banker']?.fixtureId === fx.id &&
+            <span style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#000820', color:'#4499FF', border:'1px solid #4499FF44' }}>🏦 3×</span>}
+          {allChips?.[userId]?.['hth']?.usedAt && !result?.h &&
+            <span style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#0d001a', color:'#9966FF', border:'1px solid #9966FF44' }}>⏱</span>}
+          {allChips?.[userId]?.['coupon']?.matchday && String(allChips[userId]['coupon'].matchday) === String(fx.matchday) &&
+            <span style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#001a08', color:'#4CAF50', border:'1px solid #4CAF5044' }}>🎟</span>}
           {ct && <span className="pill pill-cd">🔒 {ct}</span>}
           {locked && !hasRes && !isOrg && <span className="pill pill-ko">Kicked off</span>}
           {hasRes && pick?.h != null && <span className={`pill ${p === 3 ? 'pill-p3' : p === 1 ? 'pill-p1' : 'pill-p0'}`}>{p === 3 ? '+3 exact' : p === 1 ? '+1 result' : '0 pts'}</span>}
