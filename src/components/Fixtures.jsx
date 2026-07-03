@@ -118,7 +118,7 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, use
             <span style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#1a0800', color:'#FFD700', border:'1px solid #FFD70044' }}>⚡ 2×</span>}
           {allChips?.[userId]?.['banker']?.fixtureId === fx.id &&
             <span style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#000820', color:'#4499FF', border:'1px solid #4499FF44' }}>🏦 3×</span>}
-          {allChips?.[userId]?.['hth']?.usedAt && !result?.h &&
+          {allChips?.[userId]?.['hth']?.matchday && String(allChips[userId]['hth'].matchday) === String(fx.matchday) && !result?.h &&
             <span style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#0d001a', color:'#9966FF', border:'1px solid #9966FF44' }}>⏱</span>}
           {allChips?.[userId]?.['coupon']?.matchday && String(allChips[userId]['coupon'].matchday) === String(fx.matchday) &&
             <span style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#001a08', color:'#4CAF50', border:'1px solid #4CAF5044' }}>🎟</span>}
