@@ -159,15 +159,17 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
   return (
     <div className="main">
       <div className="dash-hero">
-        <div className="dash-greeting">Hey, <em>{first}</em> 👋</div>
+        <div className="dash-greeting">Hey, <em>{first}</em></div>
         <div className="dash-sub">Pick your scores. Beat your mates.</div>
       </div>
       {pools.length > 0 && (
         <div className="pro-strip">
-          <div className="pro-strip-icon">⚡</div>
+          <div className="pro-strip-icon" style={{ display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M9 1L3 9.5h4L7 15l6-8.5H9L9 1z" stroke="#00E05A" strokeWidth="1.3" strokeLinejoin="round"/></svg>
+          </div>
           <div className="pro-strip-text">
-            <div className="pro-strip-title">Go Pro · £4/month</div>
-            <div className="pro-strip-sub">Unlimited pools · all sports · push notifications</div>
+            <div className="pro-strip-title">Season Pass · £14.99</div>
+            <div className="pro-strip-sub">One payment covers your whole pool · all season</div>
           </div>
           <button className="pro-strip-btn">Upgrade</button>
         </div>
@@ -179,8 +181,7 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
         <>
           {pools.length === 0 && (
             <div className="empty">
-              <div className="empty-em">🏆</div>
-              <div className="empty-title">No pools yet</div>
+                            <div className="empty-title">No pools yet</div>
               <div className="empty-body">Create your first pool or join one a mate has set up.</div>
             </div>
           )}
@@ -188,8 +189,14 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
             const s = SPORTS[pool.sport] || SPORTS.PL
             const mlist = Object.entries(pool.members || {})
             return (
-              <div key={pool.id} className="pool-card" style={{ '--grad': s.grad }} onClick={() => goPool(pool.id)}>
-                <div className="pool-card-grad" style={{ background: s.grad }}>
+              <div key={pool.id} className="pool-card" onClick={() => goPool(pool.id)}>
+                <div className="pool-card-grad" style={{ background: ({
+                  PL:    'linear-gradient(150deg,#12081f 0%,#0d0d0d 60%)',
+                  CHAMP: 'linear-gradient(150deg,#081120 0%,#0d0d0d 60%)',
+                  L1:    'linear-gradient(150deg,#081408 0%,#0d0d0d 60%)',
+                  WC:    'linear-gradient(150deg,#1a0f05 0%,#0d0d0d 60%)',
+                  SN:    'linear-gradient(150deg,#081408 0%,#0d0d0d 60%)',
+                })[pool.sport] || 'linear-gradient(150deg,#12081f 0%,#0d0d0d 60%)' }}>
                   <div className="pool-card-sport">
                     <span className="pool-card-sport-dot" />
                     {s.name}
