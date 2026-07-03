@@ -92,7 +92,10 @@ function MatchdaySummary({ fixtures, picks, results, matchday, allPicks }) {
 
 function FxCard({ fx, pick, result, now, isOrg, members, allPicks, onPick, onResult }) {
   const ko = new Date(fx.kickoff).getTime()
-  const locked = now >= ko
+  const chips = {} // loaded per-user at pool level, passed via prop if needed
+  const matchMins = (now - ko) / 60000
+  const isHalfTime = matchMins >= 45 && matchMins <= 62
+  const locked = now >= ko && !isHalfTime
   const hasRes = result?.h != null && result?.a != null
   const p = calcPts(pick, result)
   const ct = countdown(fx.kickoff, now)
@@ -182,6 +185,7 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
   const [loading, setLoading] = useState(true)
   const [matchday, setMatchday] = useState('ALL')
   const [now, setNow] = useState(Date.now())
+  const [allChips, setAllChips] = useState({})
   const [tab, setTab] = useState('picks')
 
   const isOrg = pool.createdBy === user.uid || pool.members?.[user.uid]?.isOrganiser
@@ -208,10 +212,55 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
   const exactPts = (fixtures || []).filter(f => calcPts(picks[f.id], results[f.id]) === 3).length
   const totalPicks = (fixtures || []).filter(f => picks[f.id]?.h != null).length
 
+  // Apply chip effects to scoring
+  function calcPtsWithChips(uid, fid, pick, result, matchdayNum) {
+    const base = calcPts(pick, result)
+    if (base == null) return null
+    const chips = allChips[uid] || {}
+    let multiplier = 1
+    // 2x chip — doubles all points for chosen matchday
+    if (chips['2x']?.matchday && String(chips['2x'].matchday) === String(matchdayNum)) multiplier *= 2
+    // Banker chip — triples points for chosen fixture
+    if (chips['banker']?.fixtureId === fid) multiplier *= 3
+    return base * multiplier
+  }
+
+  function applyMatchdayChips(uid, matchdayFixtures, ptsArr) {
+    const chips = allChips[uid] || {}
+    // Coupon Buster — rescue worst result for chosen matchday
+    if (chips['coupon']?.matchday) {
+      const mdNum = chips['coupon'].matchday
+      const mdFx = matchdayFixtures.filter(f => String(f.matchday) === String(mdNum))
+      if (mdFx.length > 0) {
+        // Find worst scoring fixture index and upgrade it
+        let worstIdx = -1, worstPts = Infinity
+        ptsArr.forEach((p, i) => { if (p != null && p < worstPts) { worstPts = p; worstIdx = i } })
+        if (worstIdx >= 0 && worstPts < 3) {
+          ptsArr[worstIdx] = Math.min(3, worstPts + (worstPts === 0 ? 1 : 2))
+        }
+      }
+    }
+    return ptsArr
+  }
+
   const board = members.map(([uid, m]) => {
     let p = 0, ex = 0, md = 0
+    // Copycat — use target's picks if chip active
+    const chips = allChips[uid] || {}
+    const copyTargetUid = chips['copycat']?.targetUid
+    const copyMatchday = chips['copycat']?.matchday
     const mp = uid === user.uid ? picks : (allPicks[uid] || {})
-    ;(fixtures || []).forEach(f => { const pk = mp[f.id], rs = results[f.id]; if (pk?.h != null) md++; const s = calcPts(pk, rs); if (s != null) { p += s; if (s === 3) ex++ } })
+    ;(fixtures || []).forEach(f => {
+      // Apply copycat for the chosen matchday
+      let pk = mp[f.id]
+      if (copyTargetUid && String(f.matchday) === String(copyMatchday)) {
+        pk = (allPicks[copyTargetUid] || {})[f.id] || pk
+      }
+      const rs = results[f.id]
+      if (pk?.h != null) md++
+      const s = calcPtsWithChips(uid, f.id, pk, rs, f.matchday)
+      if (s != null) { p += s; if (calcPts(pk, rs) === 3) ex++ }
+    })
     return { uid, name: m.name, pts: p, exact: ex, made: md, isMe: uid === user.uid }
   }).sort((a, b) => b.pts - a.pts || b.exact - a.exact)
 
