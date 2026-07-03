@@ -54,7 +54,9 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
       {/* Full screen overlay */}
       {open && (
         <div style={{
-          position: 'fixed', inset: 0, zIndex: 1000,
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          width: '100vw', height: '100vh',
+          zIndex: 1000,
           display: 'flex', flexDirection: 'column',
           background: '#000',
           animation: 'drawerIn .25s cubic-bezier(.25,.46,.45,.94)',
