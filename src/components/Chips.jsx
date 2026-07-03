@@ -519,14 +519,25 @@ export default function Chips({ poolId, userId, members, fixtures }) {
     else { activate(chip) } // hth activates immediately
   }
 
+  const now = new Date()
   const upcomingMatchdays = [...new Set((fixtures||[])
-    .filter(f => new Date(f.kickoff) > new Date())
+    .filter(f => new Date(f.kickoff) > now)
     .map(f => f.matchday).filter(Boolean)
-  )].sort((a,b) => a-b).slice(0, 10)
+  )].sort((a,b) => a-b).slice(0, 15)
+
+  // If no upcoming (e.g. pre-season), show first 15 matchdays from all fixtures
+  const allMatchdays = [...new Set((fixtures||[])
+    .map(f => f.matchday).filter(Boolean)
+  )].sort((a,b) => a-b).slice(0, 15)
+
+  const displayMatchdays = upcomingMatchdays.length > 0 ? upcomingMatchdays : allMatchdays
 
   const upcomingMatches = (fixtures||[])
-    .filter(f => new Date(f.kickoff) > new Date())
+    .filter(f => new Date(f.kickoff) > now)
     .slice(0, 20)
+
+  // If no upcoming matches, show first 20
+  const displayMatches = upcomingMatches.length > 0 ? upcomingMatches : (fixtures||[]).slice(0, 20)
 
   const teammates = (members||[]).filter(([uid]) => uid !== userId)
 
@@ -574,14 +585,14 @@ export default function Chips({ poolId, userId, members, fixtures }) {
             <div style={{ fontSize:18, fontWeight:800, color:'#fff', marginBottom:6 }}>⚡ Choose your matchday</div>
             <div style={{ fontSize:13, color:'#555', marginBottom:20 }}>Your points for this matchday will be doubled.</div>
             <div style={{ display:'flex', flexDirection:'column', gap:8, maxHeight:'50vh', overflowY:'auto' }}>
-              {upcomingMatchdays.map(md => (
+              {displayMatchdays.map(md => (
                 <button key={md} onClick={() => activate(CHIP_DEFS.find(c=>c.id==='2x'), { matchday: md })}
                   style={{ padding:'14px 16px', background: stepData.matchday===md ? '#0d2b19' : '#1a1a1a', border: stepData.matchday===md ? '1px solid var(--green)' : '1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:15, fontWeight:700, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                   <span>Matchday {md}</span>
                   <span style={{ fontSize:12, color:'#555' }}>2× points</span>
                 </button>
               ))}
-              {upcomingMatchdays.length === 0 && <div style={{ color:'#444', fontSize:14, textAlign:'center', padding:'20px 0' }}>No upcoming matchdays found. Sync fixtures first.</div>}
+              {displayMatchdays.length === 0 && <div style={{ color:'#444', fontSize:14, textAlign:'center', padding:'20px 0' }}>No upcoming matchdays found. Sync fixtures first.</div>}
             </div>
             <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#555', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
           </div>
@@ -596,14 +607,14 @@ export default function Chips({ poolId, userId, members, fixtures }) {
             <div style={{ fontSize:18, fontWeight:800, color:'#fff', marginBottom:6 }}>🏦 Choose your banker match</div>
             <div style={{ fontSize:13, color:'#555', marginBottom:20 }}>Your points on this match will be tripled. Pick wisely.</div>
             <div style={{ display:'flex', flexDirection:'column', gap:8, maxHeight:'50vh', overflowY:'auto' }}>
-              {upcomingMatches.map(f => (
+              {displayMatches.map(f => (
                 <button key={f.id} onClick={() => activate(CHIP_DEFS.find(c=>c.id==='banker'), { fixtureId: f.id, home: f.home, away: f.away })}
                   style={{ padding:'12px 16px', background:'#1a1a1a', border:'1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
                   <span>{f.home} v {f.away}</span>
                   <span style={{ fontSize:11, color:'#555', whiteSpace:'nowrap' }}>MD{f.matchday}</span>
                 </button>
               ))}
-              {upcomingMatches.length === 0 && <div style={{ color:'#444', fontSize:14, textAlign:'center', padding:'20px 0' }}>No upcoming matches found. Sync fixtures first.</div>}
+              {displayMatches.length === 0 && <div style={{ color:'#444', fontSize:14, textAlign:'center', padding:'20px 0' }}>No upcoming matches found. Sync fixtures first.</div>}
             </div>
             <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#555', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
           </div>
@@ -624,7 +635,7 @@ export default function Chips({ poolId, userId, members, fixtures }) {
                 {teammates.map(([uid, m]) => (
                   <button key={uid} onClick={() => {
                     // Copy their picks for the next upcoming matchday
-                    const nextMD = upcomingMatchdays[0]
+                    const nextMD = displayMatchdays[0]
                     activate(CHIP_DEFS.find(c=>c.id==='copycat'), { targetUid: uid, targetName: m.name, matchday: nextMD })
                   }}
                     style={{ padding:'14px 16px', background:'#1a1a1a', border:'1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:15, fontWeight:600, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', gap:12 }}>
@@ -636,6 +647,31 @@ export default function Chips({ poolId, userId, members, fixtures }) {
                 ))}
               </div>
             )}
+            <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#555', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Coupon Buster — Pick matchday */}
+      {chipStep === 'coupon-pick-md' && (
+        <div style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(0,0,0,.95)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-end' }}>
+          <div style={{ width:'100%', maxWidth:480, background:'#111', borderRadius:'20px 20px 0 0', padding:'24px 20px 40px' }}>
+            <div style={{ width:28, height:3, background:'#333', borderRadius:99, margin:'0 auto 20px' }}/>
+            <div style={{ fontSize:18, fontWeight:800, color:'#fff', marginBottom:6 }}>🎟 Choose your matchday</div>
+            <div style={{ fontSize:13, color:'#555', marginBottom:20 }}>Your worst result that matchday gets rescued — upgraded to the next points tier.</div>
+            <div style={{ display:'flex', flexDirection:'column', gap:8, maxHeight:'50vh', overflowY:'auto' }}>
+              {displayMatchdays.length === 0
+                ? <div style={{ color:'#444', fontSize:14, textAlign:'center', padding:'20px 0' }}>No matchdays found. Sync fixtures first.</div>
+                : displayMatchdays.map(md => (
+                  <button key={md}
+                    onClick={() => activate(CHIP_DEFS.find(c => c.id === 'coupon'), { matchday: md })}
+                    style={{ padding:'14px 16px', background:'#1a1a1a', border:'1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:15, fontWeight:700, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                    <span>Matchday {md}</span>
+                    <span style={{ fontSize:12, color:'#555' }}>Worst result rescued</span>
+                  </button>
+                ))
+              }
+            </div>
             <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#555', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
           </div>
         </div>
