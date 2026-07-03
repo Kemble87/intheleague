@@ -58,7 +58,9 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
           width: '100vw', height: '100vh',
           zIndex: 1000,
           display: 'flex', flexDirection: 'column',
-          background: '#000',
+          background: '#0d0d0d',
+          overflowY: 'auto',
+          overflowX: 'hidden',
           animation: 'drawerIn .25s cubic-bezier(.25,.46,.45,.94)',
         }}>
           <style>{`
@@ -99,7 +101,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
           </div>
 
           {/* Scrollable content */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
+          <div style={{ flex: 1, padding: '8px 0' }}>
 
             {/* Switch pool */}
             {pools?.length > 0 && (
