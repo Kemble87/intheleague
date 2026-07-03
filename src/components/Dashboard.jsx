@@ -113,7 +113,7 @@ function JoinModal({ user, onClose, onJoin }) {
   )
 }
 
-export default function Dashboard({ user, onPoolChange }) {
+export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
   const [pools, setPools] = useState([])
   const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
@@ -129,13 +129,13 @@ export default function Dashboard({ user, onPoolChange }) {
   useEffect(() => {
     const q = query(collection(db, 'pools'), where(`members.${user.uid}.joinedAt`, '>=', 0))
     const unsub = onSnapshot(q,
-      s => { setPools(s.docs.map(d => ({ id: d.id, ...d.data() }))); setLoading(false) },
+      s => { const p = s.docs.map(d => ({ id: d.id, ...d.data() })); setPools(p); onPoolsChange?.(p); setLoading(false) },
       () => {
         getDoc(doc(db, 'users', user.uid)).then(s => {
           const codes = s.data()?.pools || []
           if (!codes.length) { setLoading(false); return }
           Promise.all(codes.map(c => getDoc(doc(db, 'pools', c)))).then(snaps => {
-            setPools(snaps.filter(s => s.exists()).map(s => ({ id: s.id, ...s.data() })))
+            const p2 = snaps.filter(s => s.exists()).map(s => ({ id: s.id, ...s.data() })); setPools(p2); onPoolsChange?.(p2)
             setLoading(false)
           })
         })
