@@ -91,7 +91,7 @@ export default function Members({ poolId, pool, userId }) {
   return (
     <div style={{ marginBottom:20 }}>
       <button onClick={() => setOpen(o => !o)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px', background:'#111', border:'1px solid #1a1a1a', borderRadius: open ? '12px 12px 0 0' : 12, color:'#fff', font:'inherit', fontSize:14, fontWeight:700, cursor:'pointer' }}>
-        <span>👥 Members · {members.length}</span>
+        <span>👥 Players · {members.length}</span>
         <span style={{ color:'#444', fontSize:12 }}>{open ? '▲' : '▼'}</span>
       </button>
       {open && (
