@@ -90,7 +90,7 @@ function MatchdaySummary({ fixtures, picks, results, matchday, allPicks }) {
   )
 }
 
-function FxCard({ fx, pick, result, now, isOrg, members, allPicks, onPick, onResult }) {
+function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, userId, onPick, onResult }) {
   const ko = new Date(fx.kickoff).getTime()
   const chips = {} // loaded per-user at pool level, passed via prop if needed
   const matchMins = (now - ko) / 60000
@@ -112,6 +112,20 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, onPick, onRes
       <div className="fx-time-row">
         <span className="fx-time">{fmtKO(fx.kickoff)}</span>
         <div className="fx-badges">
+          {/* Chip indicators */}
+          {allChips && userId && (() => {
+            const myChips = allChips[userId] || {}
+            const badges = []
+            if (myChips['2x']?.matchday && String(myChips['2x'].matchday) === String(fx.matchday))
+              badges.push(<span key="2x" style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#1a0800', color:'#FFD700', border:'1px solid #FFD70044' }}>2× MD</span>)
+            if (myChips['banker']?.fixtureId === fx.id)
+              badges.push(<span key="bk" style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#000820', color:'#4499FF', border:'1px solid #4499FF44' }}>🏦 3×</span>)
+            if (myChips['hth']?.usedAt && !result?.h)
+              badges.push(<span key="hth" style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#0d001a', color:'#9966FF', border:'1px solid #9966FF44' }}>⏱ HTH</span>)
+            if (myChips['coupon']?.matchday && String(myChips['coupon'].matchday) === String(fx.matchday))
+              badges.push(<span key="cb" style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#001a08', color:'#4CAF50', border:'1px solid #4CAF5044' }}>🎟 Buster</span>)
+            return badges
+          })()}
           {ct && <span className="pill pill-cd">🔒 {ct}</span>}
           {locked && !hasRes && !isOrg && <span className="pill pill-ko">Kicked off</span>}
           {hasRes && pick?.h != null && <span className={`pill ${p === 3 ? 'pill-p3' : p === 1 ? 'pill-p1' : 'pill-p0'}`}>{p === 3 ? '+3 exact' : p === 1 ? '+1 result' : '0 pts'}</span>}
@@ -296,6 +310,7 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
               <div className="day-hd">{day.label}</div>
               {day.items.map(f => (
                 <FxCard key={f.id} fx={f} pick={picks[f.id]} result={results[f.id]} now={now} isOrg={isOrg} members={members} allPicks={allPicks}
+                  allChips={allChips} userId={user.uid}
                   onPick={(s, v) => onSavePick(f.id, s, v)}
                   onResult={(s, v) => onSaveResult(f.id, s, v)}
                 />
