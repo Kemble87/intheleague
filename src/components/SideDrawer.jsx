@@ -10,6 +10,14 @@ const SCORING_RULES = [
   { pts: 0, label: 'Wrong', eg: 'Pick 2–1, result is 0–1', color: '#444' },
 ]
 
+const CHIP_RULES = [
+  { emoji:'⚡', name:'2× Multiplier',  desc:'All your points for one matchday are doubled.', color:'#FFD700' },
+  { emoji:'🏦', name:'Banker',          desc:'One match scores triple points. A +3 exact becomes +9.', color:'#4499FF' },
+  { emoji:'⏱', name:'Half Time Hero',  desc:'Change all your picks at half time for one matchday.', color:'#9966FF' },
+  { emoji:'🐱', name:'Copycat',         desc:"Copy another player's picks for a matchday silently.", color:'#00CCDD' },
+  { emoji:'🎟', name:'Coupon Buster',   desc:'Your worst result of a matchday is rescued — upgraded to the next points tier (0→1, 1→3).', color:'#4CAF50' },
+]
+
 export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, invLink }) {
   const [open, setOpen] = useState(false)
   const [section, setSection] = useState(null)
