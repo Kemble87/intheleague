@@ -12,6 +12,7 @@ export default function PoolView({ user, pool, poolId, onBack }) {
   const [allPicks, setAllPicks] = useState({})
   const [results, setResults] = useState({})
   const [fixtures, setFixtures] = useState([])
+  const [showPlayers, setShowPlayers] = useState(false)
   const timers = useRef({})
 
   useEffect(() => {
@@ -64,7 +65,8 @@ export default function PoolView({ user, pool, poolId, onBack }) {
   return (
     <>
       <button className="back" onClick={onBack}>← All pools</button>
-      <PoolHero pool={pool} fixtures={fixtures} picks={picks} results={results} members={members} userId={user.uid} />
+      <PoolHero pool={pool} fixtures={fixtures} picks={picks} results={results} members={members} userId={user.uid} onOpenPlayers={() => setShowPlayers(s => !s)} />
+      {showPlayers && <Members poolId={poolId} pool={pool} userId={user.uid} />}
       {isOrg && (
         <OrgNudge pool={pool} poolId={poolId} members={members} allPicks={allPicks} fixtures={fixtures} results={results} />
       )}
@@ -74,7 +76,6 @@ export default function PoolView({ user, pool, poolId, onBack }) {
         members={members}
         fixtures={fixtures}
       />
-      <Members poolId={poolId} pool={pool} userId={user.uid} />
       <Fixtures
         poolId={poolId}
         pool={pool}
