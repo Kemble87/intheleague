@@ -425,7 +425,7 @@ function CinemaModal({ chip, members, myId, onConfirm, onCancel }) {
           <div style={{ display:'flex', gap:8 }}>
             <button onClick={onCancel} style={{ flex:1, padding:13, background:'#1a1a1a', border:'none', borderRadius:500, color:'#555', font:'inherit', fontSize:13, fontWeight:600, cursor:'pointer' }}>Cancel</button>
             <button onClick={onConfirm} style={{ flex:2, padding:13, border:'none', borderRadius:500, color:'#000', font:'inherit', fontSize:13, fontWeight:800, cursor:'pointer', background:chip.color }}>
-              {chip.id === 'copycat' || chip.id === 'hth' ? 'Activate' : chip.id === 'coupon' ? 'Choose matchday →' : 'Choose →'}
+              {chip.id === 'coupon' ? 'Choose matchday →' : 'Choose →'}
             </button>
           </div>
         </div>
@@ -516,7 +516,8 @@ export default function Chips({ poolId, userId, members, fixtures }) {
     else if (chip.id === 'banker') { setConfirming(null); setChipStep('banker-pick-match') }
     else if (chip.id === 'copycat') { setConfirming(null); setChipStep('copycat-pick-player') }
     else if (chip.id === 'coupon') { setConfirming(null); setChipStep('coupon-pick-md') }
-    else { activate(chip) } // hth activates immediately
+    else if (chip.id === 'hth') { setConfirming(null); setChipStep('hth-pick-md') }
+    else { activate(chip) }
   }
 
   const now = new Date()
@@ -647,6 +648,31 @@ export default function Chips({ poolId, userId, members, fixtures }) {
                 ))}
               </div>
             )}
+            <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#555', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Half Time Hero — Pick matchday */}
+      {chipStep === 'hth-pick-md' && (
+        <div style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(0,0,0,.95)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-end' }}>
+          <div style={{ width:'100%', maxWidth:480, background:'#111', borderRadius:'20px 20px 0 0', padding:'24px 20px 40px' }}>
+            <div style={{ width:28, height:3, background:'#333', borderRadius:99, margin:'0 auto 20px' }}/>
+            <div style={{ fontSize:18, fontWeight:800, color:'#fff', marginBottom:6 }}>⏱ Choose your matchday</div>
+            <div style={{ fontSize:13, color:'#555', marginBottom:20 }}>You can change all your picks at half time for this matchday.</div>
+            <div style={{ display:'flex', flexDirection:'column', gap:8, maxHeight:'50vh', overflowY:'auto' }}>
+              {displayMatchdays.length === 0
+                ? <div style={{ color:'#444', fontSize:14, textAlign:'center', padding:'20px 0' }}>No matchdays found. Sync fixtures first.</div>
+                : displayMatchdays.map(md => (
+                  <button key={md}
+                    onClick={() => activate(CHIP_DEFS.find(c => c.id === 'hth'), { matchday: md })}
+                    style={{ padding:'14px 16px', background:'#1a1a1a', border:'1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:15, fontWeight:700, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                    <span>Matchday {md}</span>
+                    <span style={{ fontSize:12, color:'#555' }}>Half time edits unlocked</span>
+                  </button>
+                ))
+              }
+            </div>
             <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#555', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
           </div>
         </div>
