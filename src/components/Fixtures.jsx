@@ -4,8 +4,6 @@ import { rtdb } from '../lib/firebase'
 import { SAMPLE_FIXTURES } from '../lib/constants'
 import { fmtKO, fmtDay, groupDays, countdown, calcPts, abbr, fetchAndStoreFixtures, loadFixtures } from '../lib/helpers'
 import Kit from './Kit'
-import PoolHero from './PoolHero'
-import OrgNudge from './OrgNudge'
 
 const TEAM_NAMES = {
   'Nottingham': 'Nottm Forest',
@@ -283,17 +281,7 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
 
   return (
     <>
-      <PoolHero pool={pool} fixtures={fixtures} picks={picks} results={results} members={members} userId={user.uid} />
-      {isOrg && (
-        <OrgNudge
-          pool={pool}
-          poolId={poolId}
-          members={members}
-          allPicks={allPicks}
-          fixtures={fixtures}
-          results={results}
-        />
-      )}
+
 
       <NextToPick fixtures={fixtures} picks={picks} now={now} onGo={() => {
         setTab('picks')
@@ -311,10 +299,28 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
       {tab === 'picks' ? (
         <>
           <div className="fx-controls">
-            <select className="md-select" value={matchday} onChange={e => setMatchday(e.target.value)}>
-              <option value="ALL">All matchdays</option>
-              {mdays.map(md => <option key={md} value={md}>Matchday {md}</option>)}
-            </select>
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 4, background: '#0d0d0d', border: '1px solid #1a1a1a', borderRadius: 10, padding: 3 }}>
+              <button
+                onClick={() => {
+                  if (matchday === 'ALL') { setMatchday(String(mdays[0] || 1)); return }
+                  const i = mdays.indexOf(Number(matchday))
+                  if (i > 0) setMatchday(String(mdays[i - 1]))
+                  else setMatchday('ALL')
+                }}
+                style={{ width: 36, height: 36, background: 'none', border: 'none', borderRadius: 8, color: '#666', fontSize: 18, cursor: 'pointer', flexShrink: 0 }}
+              >‹</button>
+              <div style={{ flex: 1, textAlign: 'center', fontFamily: "'Space Grotesk','Inter',sans-serif", fontSize: 14, fontWeight: 700, color: '#fff', letterSpacing: '-.01em' }}>
+                {matchday === 'ALL' ? 'All matchdays' : `Matchday ${matchday}`}
+              </div>
+              <button
+                onClick={() => {
+                  if (matchday === 'ALL') { setMatchday(String(mdays[0] || 1)); return }
+                  const i = mdays.indexOf(Number(matchday))
+                  if (i < mdays.length - 1) setMatchday(String(mdays[i + 1]))
+                }}
+                style={{ width: 36, height: 36, background: 'none', border: 'none', borderRadius: 8, color: '#666', fontSize: 18, cursor: 'pointer', flexShrink: 0 }}
+              >›</button>
+            </div>
             {isOrg && (
               <button className="sync-btn" onClick={async () => {
                 try { const fx = await fetchAndStoreFixtures(pool.sport, poolId, rtdb); alert(fx.length > 0 ? `Synced ${fx.length} fixtures!` : 'No fixtures found') }
@@ -339,19 +345,63 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
         </>
       ) : (
         <div className="board">
-          {board.map((row, i) => (
-            <div key={row.uid} className={`board-row${i === 0 && row.pts > 0 ? ' gold' : ''}${row.isMe ? ' me' : ''}`}>
-              <div className="board-rank">{i === 0 && row.pts > 0 ? '🏆' : i + 1}</div>
-              <div className="board-info">
-                <div className="board-name">{row.name}{row.isMe ? ' · you' : ''}</div>
-                <div className="board-detail">{row.exact} exact · {row.made} picked</div>
+          {board.map((row, i) => {
+            const leader = board[0]
+            const above = i > 0 ? board[i - 1] : null
+            const gap = above ? above.pts - row.pts : 0
+            const rankColors = ['#FFD60A', '#C0C0C0', '#CD7F32']
+            const rankColor = i < 3 && row.pts > 0 ? rankColors[i] : '#555'
+            const rowChips = allChips[row.uid] || {}
+            const chipIcons = [
+              rowChips['2x'] && '⚡', rowChips['banker'] && '🏦',
+              rowChips['hth'] && '⏱', rowChips['copycat'] && '🐱', rowChips['coupon'] && '🎟',
+            ].filter(Boolean)
+            // Form: last completed matchday points
+            const doneMds = [...new Set((fixtures || []).filter(f => results[f.id]?.h != null).map(f => f.matchday))].sort((a, b) => b - a)
+            const lastMd = doneMds[0]
+            let lastMdPts = null
+            if (lastMd != null) {
+              const mp = row.uid === user.uid ? picks : (allPicks[row.uid] || {})
+              lastMdPts = (fixtures || []).filter(f => String(f.matchday) === String(lastMd)).reduce((s, f) => {
+                const p = calcPtsWithChips(row.uid, f.id, mp[f.id], results[f.id], f.matchday)
+                return p != null ? s + p : s
+              }, 0)
+            }
+            return (
+              <div key={row.uid} className={`board-row${i === 0 && row.pts > 0 ? ' gold' : ''}${row.isMe ? ' me' : ''}`}>
+                <div style={{
+                  width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+                  background: i < 3 && row.pts > 0 ? rankColor + '1a' : '#161616',
+                  border: `1.5px solid ${i < 3 && row.pts > 0 ? rankColor + '55' : '#222'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: "'Space Grotesk','Inter',sans-serif", fontSize: 14, fontWeight: 700, color: rankColor,
+                }}>{i + 1}</div>
+                <div className="board-info">
+                  <div className="board-name" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {row.name}{row.isMe && <span style={{ fontSize: 9, fontWeight: 800, color: 'var(--green)', background: '#00E05A1a', borderRadius: 500, padding: '2px 7px', letterSpacing: '.08em' }}>YOU</span>}
+                  </div>
+                  <div className="board-detail" style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <span>{row.exact} exact</span>
+                    {i > 0 && gap > 0 && <span style={{ color: '#666' }}>· {gap} pt{gap !== 1 ? 's' : ''} behind</span>}
+                    {i === 0 && row.pts > 0 && board.length > 1 && <span style={{ color: '#FFD60A' }}>· leading</span>}
+                    {chipIcons.length > 0 && <span style={{ opacity: .7 }}>{chipIcons.join(' ')}</span>}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div className="board-pts">{row.pts}</div>
+                  {lastMdPts != null && lastMdPts > 0
+                    ? <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--green)', marginTop: 1 }}>+{lastMdPts} last MD</div>
+                    : <div className="board-pts-label">pts</div>
+                  }
+                </div>
               </div>
-              <div>
-                <div className="board-pts">{row.pts}</div>
-                <div className="board-pts-label">pts</div>
-              </div>
+            )
+          })}
+          {board.length === 1 && (
+            <div style={{ textAlign: 'center', padding: '28px 20px', color: '#444', fontSize: 13, lineHeight: 1.6 }}>
+              It's lonely at the top. Invite your mates from the menu — the leaderboard comes alive with rivals. 🏆
             </div>
-          ))}
+          )}
         </div>
       )}
     </>
