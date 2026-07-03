@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { ref, onValue, set, update } from 'firebase/database'
 import { rtdb } from '../lib/firebase'
 import { SAMPLE_FIXTURES } from '../lib/constants'
-import { fmtKO, fmtDay, groupDays, countdown, calcPts, abbr, fetchAndStoreFixtures, loadFixtures } from '../lib/helpers'
+import { fmtKO, fmtDay, groupDays, countdown, calcPts, abbr, fetchAndStoreFixtures, loadFixtures, matchdayScores } from '../lib/helpers'
 import Kit from './Kit'
 
 const TEAM_NAMES = {
@@ -279,6 +279,19 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
     return { uid, name: m.name, pts: p, exact: ex, made: md, isMe: uid === user.uid }
   }).sort((a, b) => b.pts - a.pts || b.exact - a.exact)
 
+
+  // Matchday wins — chip-aware, only completed matchdays count
+  const mdWins = {}
+  {
+    const mds = matchdayScores(fixtures, results, members.map(([uid]) => uid), { ...allPicks, [user.uid]: picks }, allChips)
+    Object.values(mds).forEach(({ scores, complete }) => {
+      if (!complete) return
+      const top = Math.max(...Object.values(scores))
+      if (top <= 0) return
+      Object.entries(scores).forEach(([uid, p]) => { if (p === top) mdWins[uid] = (mdWins[uid] || 0) + 1 })
+    })
+  }
+
   return (
     <>
 
@@ -374,10 +387,7 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
             const rankColors = ['#FFD60A', '#C0C0C0', '#CD7F32']
             const rankColor = i < 3 && row.pts > 0 ? rankColors[i] : '#555'
             const rowChips = allChips[row.uid] || {}
-            const chipIcons = [
-              rowChips['2x'] && '⚡', rowChips['banker'] && '🏦',
-              rowChips['hth'] && '⏱', rowChips['copycat'] && '🐱', rowChips['coupon'] && '🎟',
-            ].filter(Boolean)
+            const chipsPlayed = Object.keys(rowChips).length
             // Form: last completed matchday points
             const doneMds = [...new Set((fixtures || []).filter(f => results[f.id]?.h != null).map(f => f.matchday))].sort((a, b) => b - a)
             const lastMd = doneMds[0]
@@ -401,12 +411,18 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
                 <div className="board-info">
                   <div className="board-name" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     {row.name}{row.isMe && <span style={{ fontSize: 9, fontWeight: 800, color: 'var(--green)', background: '#00E05A1a', borderRadius: 500, padding: '2px 7px', letterSpacing: '.08em' }}>YOU</span>}
+                    {mdWins[row.uid] > 0 && (
+                      <span title={`${mdWins[row.uid]} matchday win${mdWins[row.uid] !== 1 ? 's' : ''}`} style={{ display:'inline-flex', alignItems:'center', gap:4, border:'1px solid #FFD60A44', borderRadius:500, padding:'2px 8px' }}>
+                        <svg width="10" height="8" viewBox="0 0 12 9" fill="none"><path d="M1 8h10M1 8L.5 2.5 3.5 5 6 1l2.5 4 3-2.5L11 8" stroke="#FFD60A" strokeWidth="1.1" strokeLinejoin="round" strokeLinecap="round"/></svg>
+                        <span style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:10, fontWeight:700, color:'#FFD60A' }}>{mdWins[row.uid]}</span>
+                      </span>
+                    )}
                   </div>
                   <div className="board-detail" style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                     <span>{row.exact} exact</span>
                     {i > 0 && gap > 0 && <span style={{ color: '#666' }}>· {gap} pt{gap !== 1 ? 's' : ''} behind</span>}
                     {i === 0 && row.pts > 0 && board.length > 1 && <span style={{ color: '#FFD60A' }}>· leading</span>}
-                    {chipIcons.length > 0 && <span style={{ opacity: .7 }}>{chipIcons.join(' ')}</span>}
+                    {chipsPlayed > 0 && <span style={{ color: '#555' }}>· {chipsPlayed} chip{chipsPlayed !== 1 ? 's' : ''} played</span>}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
@@ -421,7 +437,7 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
           })}
           {board.length === 1 && (
             <div style={{ textAlign: 'center', padding: '28px 20px', color: '#444', fontSize: 13, lineHeight: 1.6 }}>
-              It's lonely at the top. Invite your mates from the menu — the leaderboard comes alive with rivals. 🏆
+              It's lonely at the top. Invite your mates from the menu — the leaderboard comes alive with rivals.
             </div>
           )}
         </div>
