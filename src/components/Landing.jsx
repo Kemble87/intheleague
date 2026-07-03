@@ -202,7 +202,7 @@ function Faq({ q, a }) {
         padding: '18px 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', gap: 16,
       }}>
         <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>{q}</span>
-        <span style={{ color: '#1DB954', fontSize: 20, flexShrink: 0, transform: open ? 'rotate(45deg)' : 'none', transition: 'transform .2s' }}>+</span>
+        <span style={{ color: '#00E05A', fontSize: 20, flexShrink: 0, transform: open ? 'rotate(45deg)' : 'none', transition: 'transform .2s' }}>+</span>
       </button>
       {open && <div style={{ fontSize: 14, color: '#777', lineHeight: 1.6, paddingBottom: 18 }}>{a}</div>}
     </div>
@@ -241,9 +241,9 @@ export default function Landing({ onGetStarted }) {
     { id: 'coupon', Badge: BadgeCouponL,  color: '#4CAF50', sub: 'Your worst result — rescued.' },
   ]
 
-  const green = '#1DB954'
+  const green = '#00E05A'
   const sectionPad = 'clamp(64px,12vw,120px) 20px'
-  const h2Style = { fontFamily: "'Bebas Neue',sans-serif", fontSize: 'clamp(40px,9vw,72px)', letterSpacing: '.02em', lineHeight: .95, color: '#fff', margin: 0 }
+  const h2Style = { fontFamily: "'Space Grotesk','Inter',sans-serif", fontWeight: 700, fontSize: 'clamp(32px,7vw,56px)', letterSpacing: '-.03em', lineHeight: 1.02, color: '#fff', margin: 0 }
   const subStyle = { fontSize: 'clamp(14px,3vw,17px)', color: '#666', lineHeight: 1.6, marginTop: 16, maxWidth: 480 }
   const ctaStyle = {
     padding: '16px 36px', background: green, color: '#000', border: 'none', borderRadius: 500,
@@ -256,7 +256,7 @@ export default function Landing({ onGetStarted }) {
       <style>{`
         @keyframes floatPhone { 0%,100% { transform: rotate(-4deg) translateY(0); } 50% { transform: rotate(-4deg) translateY(-14px); } }
         @keyframes pulseGlow { 0%,100% { opacity:.5; } 50% { opacity:1; } }
-        .cta-btn:hover { transform: scale(1.04); box-shadow: 0 8px 40px #1DB95455; }
+        .cta-btn:hover { transform: scale(1.04); box-shadow: 0 8px 40px #00E05A55; }
         .cta-btn:active { transform: scale(.98); }
       `}</style>
 
@@ -283,9 +283,9 @@ export default function Landing({ onGetStarted }) {
         </div>
 
         {/* Glow */}
-        <div style={{ position: 'absolute', top: '30%', left: '50%', transform: 'translate(-50%,-50%)', width: 600, height: 600, background: 'radial-gradient(circle, #1DB95415 0%, transparent 65%)', animation: 'pulseGlow 4s ease-in-out infinite', pointerEvents: 'none' }}/>
+        <div style={{ position: 'absolute', top: '30%', left: '50%', transform: 'translate(-50%,-50%)', width: 600, height: 600, background: 'radial-gradient(circle, #00E05A15 0%, transparent 65%)', animation: 'pulseGlow 4s ease-in-out infinite', pointerEvents: 'none' }}/>
 
-        <h1 style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 'clamp(56px,14vw,120px)', letterSpacing: '.01em', lineHeight: .92, color: '#fff', textAlign: 'center', margin: 0, position: 'relative' }}>
+        <h1 style={{ fontFamily: "'Space Grotesk','Inter',sans-serif", fontWeight: 700, fontSize: 'clamp(42px,10vw,88px)', letterSpacing: '-.035em', lineHeight: 1, color: '#fff', textAlign: 'center', margin: 0, position: 'relative' }}>
           Beat your mates.<br/><span style={{ color: green }}>All season long.</span>
         </h1>
         <p style={{ fontSize: 'clamp(15px,3.5vw,19px)', color: '#888', textAlign: 'center', maxWidth: 440, lineHeight: 1.6, margin: '24px 0 32px', position: 'relative' }}>
@@ -295,7 +295,7 @@ export default function Landing({ onGetStarted }) {
 
         {/* Floating fixture card demo */}
         <div style={{ marginTop: 64, animation: 'floatPhone 5s ease-in-out infinite', maxWidth: 420, width: '100%', position: 'relative' }}>
-          <div style={{ background: '#111', borderRadius: 18, padding: '14px 16px 16px', boxShadow: '0 40px 100px rgba(0,0,0,.9), 0 0 60px #1DB95411', border: '1px solid #1a1a1a' }}>
+          <div style={{ background: '#111', borderRadius: 18, padding: '14px 16px 16px', boxShadow: '0 40px 100px rgba(0,0,0,.9), 0 0 60px #00E05A11', border: '1px solid #1a1a1a' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#444', fontFamily: "'Share Tech Mono',monospace", letterSpacing: '.08em', marginBottom: 12 }}>
               <span>SAT 22 AUG · 15:00</span>
               <span style={{ color: '#FFD60A', background: '#221f00', borderRadius: 500, padding: '2px 8px', fontSize: 9, fontWeight: 700 }}>🔒 2H 14M</span>
@@ -304,7 +304,7 @@ export default function Landing({ onGetStarted }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 <MiniKit primary="#EF0107" sleeves="#fff"/>
                 <div>
-                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: '#fff', letterSpacing: '.05em' }}>Arsenal</div>
+                  <div style={{ fontFamily: "'Space Grotesk','Inter',sans-serif", fontWeight: 700, fontSize: 20, color: '#fff', letterSpacing: '.05em' }}>Arsenal</div>
                   <div style={{ fontSize: 8, color: '#333', letterSpacing: '.12em', fontFamily: "'Share Tech Mono',monospace" }}>ARS</div>
                 </div>
               </div>
@@ -315,7 +315,7 @@ export default function Landing({ onGetStarted }) {
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 20, color: '#fff', letterSpacing: '.05em' }}>Chelsea</div>
+                  <div style={{ fontFamily: "'Space Grotesk','Inter',sans-serif", fontWeight: 700, fontSize: 20, color: '#fff', letterSpacing: '.05em' }}>Chelsea</div>
                   <div style={{ fontSize: 8, color: '#333', letterSpacing: '.12em', fontFamily: "'Share Tech Mono',monospace" }}>CHE</div>
                 </div>
                 <MiniKit primary="#034694" flip/>
@@ -328,9 +328,9 @@ export default function Landing({ onGetStarted }) {
       {/* ── 2. SOCIAL PROOF STRIP ── */}
       <div style={{ borderTop: '1px solid #0d0d0d', borderBottom: '1px solid #0d0d0d', padding: '18px 20px', display: 'flex', gap: 'clamp(24px,7vw,64px)', justifyContent: 'center', flexWrap: 'wrap' }}>
         {[
-          { icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#1DB954" strokeWidth="1.3"/><path d="M8 5v3l2 1.5" stroke="#1DB954" strokeWidth="1.3" strokeLinecap="round"/></svg>, t: '380 fixtures synced live' },
-          { icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 2h8v3a4 4 0 01-8 0V2z" stroke="#1DB954" strokeWidth="1.3"/><path d="M6 12h4M8 9v3M5 14h6" stroke="#1DB954" strokeWidth="1.3" strokeLinecap="round"/><path d="M12 3h2v1.5a2 2 0 01-2 2M4 3H2v1.5a2 2 0 002 2" stroke="#1DB954" strokeWidth="1.1"/></svg>, t: 'Built for the 2026/27 season' },
-          { icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="#1DB954" strokeWidth="1.3"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="#1DB954" strokeWidth="1.3"/></svg>, t: 'Free to start — no card' },
+          { icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#00E05A" strokeWidth="1.3"/><path d="M8 5v3l2 1.5" stroke="#00E05A" strokeWidth="1.3" strokeLinecap="round"/></svg>, t: '380 fixtures synced live' },
+          { icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 2h8v3a4 4 0 01-8 0V2z" stroke="#00E05A" strokeWidth="1.3"/><path d="M6 12h4M8 9v3M5 14h6" stroke="#00E05A" strokeWidth="1.3" strokeLinecap="round"/><path d="M12 3h2v1.5a2 2 0 01-2 2M4 3H2v1.5a2 2 0 002 2" stroke="#00E05A" strokeWidth="1.1"/></svg>, t: 'Built for the 2026/27 season' },
+          { icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="#00E05A" strokeWidth="1.3"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="#00E05A" strokeWidth="1.3"/></svg>, t: 'Free to start — no card' },
         ].map(({ icon, t }) => (
           <span key={t} style={{ fontSize: 12, fontWeight: 600, color: '#666', letterSpacing: '.06em', textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
             {icon}{t}
@@ -424,7 +424,7 @@ export default function Landing({ onGetStarted }) {
             </div>
           </Reveal>
           <Reveal delay={.1}>
-            <div style={{ background: 'linear-gradient(160deg,#07180d,#0d0d0d 60%)', border: `1.5px solid ${green}`, borderRadius: 20, padding: '32px 28px', position: 'relative', height: '100%', boxShadow: '0 20px 80px #1DB95418' }}>
+            <div style={{ background: 'linear-gradient(160deg,#07180d,#0d0d0d 60%)', border: `1.5px solid ${green}`, borderRadius: 20, padding: '32px 28px', position: 'relative', height: '100%', boxShadow: '0 20px 80px #00E05A18' }}>
               <div style={{ position: 'absolute', top: -11, right: 24, background: green, color: '#000', fontSize: 10, fontWeight: 900, letterSpacing: '.1em', padding: '4px 12px', borderRadius: 500 }}>SEASON PASS</div>
               <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: green, marginBottom: 8 }}>Pro Organiser</div>
               <div style={{ fontSize: 40, fontWeight: 900, color: '#fff', letterSpacing: '-.04em' }}>£14.99</div>
@@ -454,9 +454,9 @@ export default function Landing({ onGetStarted }) {
 
       {/* ── 8. FINAL CTA ── */}
       <section style={{ padding: 'clamp(80px,16vw,160px) 20px', textAlign: 'center', borderTop: '1px solid #0d0d0d', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', bottom: '-40%', left: '50%', transform: 'translateX(-50%)', width: 700, height: 500, background: 'radial-gradient(ellipse, #1DB95412 0%, transparent 65%)', pointerEvents: 'none' }}/>
+        <div style={{ position: 'absolute', bottom: '-40%', left: '50%', transform: 'translateX(-50%)', width: 700, height: 500, background: 'radial-gradient(ellipse, #00E05A12 0%, transparent 65%)', pointerEvents: 'none' }}/>
         <Reveal>
-          <h2 style={{ ...h2Style, fontSize: 'clamp(48px,12vw,96px)' }}>The group chat<br/><span style={{ color: green }}>needs this.</span></h2>
+          <h2 style={{ ...h2Style, fontSize: 'clamp(36px,9vw,72px)' }}>The group chat<br/><span style={{ color: green }}>needs this.</span></h2>
         </Reveal>
         <Reveal delay={.15}>
           <div style={{ margin: '48px 0' }}>
