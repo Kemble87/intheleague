@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import Backdrop from './Backdrop'
 
 // ── Scroll reveal hook ───────────────────────────────────────────────────────
 function useReveal() {
@@ -252,7 +253,8 @@ export default function Landing({ onGetStarted }) {
   }
 
   return (
-    <div style={{ background: '#000', minHeight: '100vh', overflowX: 'hidden' }}>
+    <div style={{ background: '#000', minHeight: '100vh', overflowX: 'hidden', position: 'relative' }}>
+      <Backdrop />
       <style>{`
         @keyframes floatPhone { 0%,100% { transform: rotate(-4deg) translateY(0); } 50% { transform: rotate(-4deg) translateY(-14px); } }
         @keyframes pulseGlow { 0%,100% { opacity:.5; } 50% { opacity:1; } }
