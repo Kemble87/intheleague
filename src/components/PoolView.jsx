@@ -4,6 +4,8 @@ import { rtdb } from '../lib/firebase'
 import Fixtures from './Fixtures'
 import Chips from './Chips'
 import Members from './Members'
+import PoolHero from './PoolHero'
+import OrgNudge from './OrgNudge'
 
 export default function PoolView({ user, pool, poolId, onBack }) {
   const [picks, setPicks] = useState({})
@@ -57,16 +59,22 @@ export default function PoolView({ user, pool, poolId, onBack }) {
 
   const members = Object.entries(pool.members || {})
 
+  const isOrg = pool.createdBy === user.uid || pool.members?.[user.uid]?.isOrganiser
+
   return (
     <>
       <button className="back" onClick={onBack}>← All pools</button>
-      <Members poolId={poolId} pool={pool} userId={user.uid} />
+      <PoolHero pool={pool} fixtures={fixtures} picks={picks} results={results} members={members} userId={user.uid} />
+      {isOrg && (
+        <OrgNudge pool={pool} poolId={poolId} members={members} allPicks={allPicks} fixtures={fixtures} results={results} />
+      )}
       <Chips
         poolId={poolId}
         userId={user.uid}
         members={members}
         fixtures={fixtures}
       />
+      <Members poolId={poolId} pool={pool} userId={user.uid} />
       <Fixtures
         poolId={poolId}
         pool={pool}
