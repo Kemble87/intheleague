@@ -284,7 +284,13 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
     <>
       <PoolHero pool={pool} fixtures={fixtures} picks={picks} results={results} members={members} userId={user.uid} />
 
-      <NextToPick fixtures={fixtures} picks={picks} now={now} onGo={() => setTab('picks')} />
+      <NextToPick fixtures={fixtures} picks={picks} now={now} onGo={() => {
+        setTab('picks')
+        setTimeout(() => {
+          const el = document.querySelector('.fx')
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 100)
+      }} />
 
       <div className="tabs">
         <button className={`tab${tab === 'picks' ? ' on' : ''}`} onClick={() => setTab('picks')}>{isOrg ? 'Picks & results' : 'My picks'}</button>
