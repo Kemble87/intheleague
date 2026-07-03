@@ -60,7 +60,7 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
       <div style={{ position:'absolute', top:22, right:20, display:'flex', alignItems:'center', gap:6, background:'rgba(0,0,0,.25)', borderRadius:500, padding:'5px 12px 5px 8px', zIndex:1 }}>
         <div style={{ display:'flex' }}>
           {playerList.map(([uid, m], i) => (
-            <div key={uid} style={{ width:20, height:20, borderRadius:'50%', background: uid===userId ? '#1DB954' : 'rgba(255,255,255,.25)', border:'1.5px solid rgba(0,0,0,.3)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:8, fontWeight:800, color: uid===userId?'#000':'#fff', marginLeft: i>0?-5:0 }}>
+            <div key={uid} style={{ width:20, height:20, borderRadius:'50%', background: uid===userId ? '#00E05A' : 'rgba(255,255,255,.25)', border:'1.5px solid rgba(0,0,0,.3)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:8, fontWeight:800, color: uid===userId?'#000':'#fff', marginLeft: i>0?-5:0 }}>
               {(m.name||'?').slice(0,2).toUpperCase()}
             </div>
           ))}
@@ -70,12 +70,12 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
 
       {/* Eyebrow */}
       <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:11, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.55)', marginBottom:10 }}>
-        <span style={{ width:5, height:5, borderRadius:'50%', background:'#1DB954', display:'inline-block' }}/>
+        <span style={{ width:5, height:5, borderRadius:'50%', background:'#00E05A', display:'inline-block' }}/>
         {sport.name}
       </div>
 
       {/* Pool name */}
-      <div style={{ fontSize:'clamp(36px,8vw,52px)', fontWeight:900, color:'#fff', letterSpacing:'-.04em', lineHeight:.95, marginBottom:14, position:'relative', zIndex:1 }}>
+      <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:'clamp(32px,7vw,46px)', fontWeight:700, color:'#fff', letterSpacing:'-.03em', lineHeight:1, marginBottom:14, position:'relative', zIndex:1 }}>
         {pool.name}
       </div>
 
@@ -93,7 +93,7 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
         <div style={{ display:'flex', alignItems:'flex-end', gap:0, marginBottom:20 }}>
           {/* Points — dominant */}
           <div style={{ flexShrink:0, marginRight:24 }}>
-            <div style={{ fontSize:72, fontWeight:900, color:'#1DB954', letterSpacing:'-.05em', lineHeight:1 }}>{totalPts}</div>
+            <div style={{ fontSize:72, fontWeight:900, color:'#00E05A', letterSpacing:'-.05em', lineHeight:1 }}>{totalPts}</div>
             <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.35)', marginTop:2 }}>Points</div>
           </div>
 
@@ -132,7 +132,7 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
             <span style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,.6)', letterSpacing:'.04em' }}>Matchday {currentMD} of {totalMD}</span>
           </div>
           <div style={{ height:4, background:'rgba(255,255,255,.12)', borderRadius:999, overflow:'hidden' }}>
-            <div style={{ height:'100%', borderRadius:999, background:'linear-gradient(to right,#1DB954,#17a349)', width: progress+'%', transition:'width .6s ease' }}/>
+            <div style={{ height:'100%', borderRadius:999, background:'linear-gradient(to right,#00E05A,#00b348)', width: progress+'%', transition:'width .6s ease' }}/>
           </div>
           <div style={{ display:'flex', justifyContent:'space-between', marginTop:5 }}>
             {['MD1','MD10','MD19','MD29','MD38'].map(md => (
