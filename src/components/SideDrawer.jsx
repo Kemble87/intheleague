@@ -170,53 +170,75 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
               </button>
             )}
 
-            {/* Scoring rules */}
+            {/* About the game */}
             <button onClick={() => setSection(section === 'rules' ? null : 'rules')} style={rowStyle}>
-              <div style={iconBox('#1a1400')}>📋</div>
+              <div style={{ ...iconBox('#1a1400'), display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 2h8v3a4 4 0 01-8 0V2z" stroke="#FFD60A" strokeWidth="1.2"/><path d="M6 12h4M8 9v3M5 14h6" stroke="#FFD60A" strokeWidth="1.2" strokeLinecap="round"/><path d="M12 3h2v1.5a2 2 0 01-2 2M4 3H2v1.5a2 2 0 002 2" stroke="#FFD60A" strokeWidth="1"/></svg>
+              </div>
               <div style={{ flex: 1 }}>
-                <div style={rowTitle}>Scoring rules</div>
-                <div style={rowSub}>How points are calculated</div>
+                <div style={rowTitle}>About the game</div>
+                <div style={rowSub}>Scoring, chips and everything else</div>
               </div>
               <span style={{ color: '#333', fontSize: 12 }}>{section === 'rules' ? '▲' : '▼'}</span>
             </button>
             {section === 'rules' && (
-              <div style={{ margin: '0 20px 8px', background: '#222', borderRadius: 12, padding: '14px 16px', border: '1px solid #333' }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: '#333', marginBottom: 12 }}>Points</div>
+              <div style={{ margin: '0 20px 8px', background: '#161616', borderRadius: 12, padding: '16px', border: '1px solid #262626' }}>
+
+                {/* The basics */}
+                <div style={secHd}>The game</div>
+                <div style={body}>
+                  Predict the score of every fixture before kickoff. Points land automatically as real results come in — the season-long table decides who's insufferable until next August.
+                </div>
+
+                {/* Points */}
+                <div style={secHd}>Points</div>
                 {SCORING_RULES.map(r => (
-                  <div key={r.pts} style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
+                  <div key={r.pts} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
                     <div style={{
-                      width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+                      width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
                       background: r.pts === 3 ? '#0d2b19' : r.pts === 1 ? '#221f00' : '#1a1a1a',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 13, fontWeight: 900, color: r.color,
+                      fontSize: 12, fontWeight: 900, color: r.color,
                     }}>
                       {r.pts === 0 ? '✕' : '+' + r.pts}
                     </div>
                     <div>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{r.label}</div>
-                      <div style={{ fontSize: 12, color: '#555', marginTop: 2, lineHeight: 1.4 }}>{r.eg}</div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{r.label}</div>
+                      <div style={{ fontSize: 11, color: '#666', marginTop: 1, lineHeight: 1.4 }}>{r.eg}</div>
                     </div>
                   </div>
                 ))}
-                <div style={{ height: 1, background: '#1a1a1a', margin: '4px 0 14px' }}/>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: '#333', marginBottom: 12 }}>Chips — one use per season</div>
+
+                {/* Chips */}
+                <div style={secHd}>Chips — one use each per season</div>
                 {CHIP_RULES.map(c => (
-                  <div key={c.name} style={{ display: 'flex', gap: 12, marginBottom: 14 }}>
-                    <div style={{
-                      width: 36, height: 36, borderRadius: 8, flexShrink: 0,
-                      background: c.color + '22', border: '1px solid ' + c.color + '44',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 18,
-                    }}>{c.emoji}</div>
+                  <div key={c.name} style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
+                    <div style={{ width: 6, borderRadius: 3, background: c.color, flexShrink: 0, opacity: .8 }}/>
                     <div>
                       <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>{c.name}</div>
-                      <div style={{ fontSize: 12, color: '#555', marginTop: 2, lineHeight: 1.5 }}>{c.desc}</div>
+                      <div style={{ fontSize: 11, color: '#666', marginTop: 1, lineHeight: 1.5 }}>{c.desc}</div>
                     </div>
                   </div>
                 ))}
+
+                {/* Everything else */}
+                <div style={secHd}>Beyond the table</div>
+                {[
+                  { t: 'Matchday crowns', d: 'Top scorer of each completed matchday earns a crown next to their name. Every weekend is winnable, wherever you sit in the table.' },
+                  { t: 'Live table', d: 'While a matchday is in play the leaderboard runs live — arrows show who\'s climbing and who\'s sliding as results land.' },
+                  { t: 'Head-to-head', d: 'Tap any rival on the leaderboard for your record against them — matchday wins, streaks, and your biggest blowout.' },
+                  { t: 'Hidden picks', d: 'Nobody sees anyone else\'s predictions until kickoff. At the whistle, all picks are revealed on the fixture.' },
+                  { t: 'Share cards', d: 'After each matchday the organiser can share a full-time results card straight into the group chat.' },
+                  { t: 'Wooden spoon', d: 'Lowest scorer of the matchday takes the spoon — announced on the ticker for all to see.' },
+                ].map(f => (
+                  <div key={f.t} style={{ marginBottom: 10 }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>{f.t}</div>
+                    <div style={{ fontSize: 11, color: '#666', marginTop: 1, lineHeight: 1.5 }}>{f.d}</div>
+                  </div>
+                ))}
+
               </div>
             )}
-
             {/* Profile */}
             <button onClick={() => setSection(section === 'profile' ? null : 'profile')} style={rowStyle}>
               <div style={iconBox('#111')}>👤</div>
@@ -281,6 +303,8 @@ const rowStyle = {
   cursor: 'pointer', textAlign: 'left',
 }
 const rowTitle = { fontSize: 15, fontWeight: 600, color: '#fff' }
+const secHd = { fontSize: 10, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#555', margin: '16px 0 10px' }
+const body = { fontSize: 12, color: '#888', lineHeight: 1.6, marginBottom: 4 }
 const rowSub = { fontSize: 12, color: '#555', marginTop: 2 }
 const iconBox = (bg) => ({
   width: 40, height: 40, borderRadius: 10, background: bg,
