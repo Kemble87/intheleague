@@ -162,7 +162,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
               <span style={{ color: '#333', fontSize: 12 }}>{section === 'rules' ? '▲' : '▼'}</span>
             </button>
             {section === 'rules' && (
-              <div style={{ margin: '0 20px 8px', background: '#0d0d0d', borderRadius: 12, padding: '14px 16px' }}>
+              <div style={{ margin: '0 20px 8px', background: '#161616', borderRadius: 12, padding: '14px 16px', border: '1px solid #222' }}>
                 <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: '#333', marginBottom: 12 }}>Points</div>
                 {SCORING_RULES.map(r => (
                   <div key={r.pts} style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
@@ -209,7 +209,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
               <span style={{ color: '#333', fontSize: 12 }}>{section === 'profile' ? '▲' : '▼'}</span>
             </button>
             {section === 'profile' && (
-              <div style={{ margin: '0 20px 8px', background: '#0d0d0d', borderRadius: 12, padding: '14px 16px' }}>
+              <div style={{ margin: '0 20px 8px', background: '#161616', borderRadius: 12, padding: '14px 16px', border: '1px solid #222' }}>
                 <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: '#333', marginBottom: 10 }}>Display name</div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <input
