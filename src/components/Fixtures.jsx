@@ -95,6 +95,7 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, use
   const matchMins = (now - ko) / 60000
   const isHalfTime = matchMins >= 45 && matchMins <= 62
   const locked = now >= ko && !isHalfTime
+  const revealed = now >= ko
   const hasRes = result?.h != null && result?.a != null
   const p = calcPts(pick, result)
   const ct = countdown(fx.kickoff, now)
@@ -171,7 +172,13 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, use
           {locked && isOrg && <span className="fx-org-save">{hasRes ? '✓ Saved' : 'Enter above'}</span>}
         </div>
       )}
-      {locked && allPicks && members && members.length > 1 && (
+      {!revealed && members && members.length > 1 && (
+        <div style={{ display:'flex', alignItems:'center', gap:7, padding:'8px 14px 10px', borderTop:'1px solid #0a0a0a' }}>
+          <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="#333" strokeWidth="1.3"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="#333" strokeWidth="1.3"/></svg>
+          <span style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:10, letterSpacing:'.12em', color:'#333' }}>PICKS HIDDEN UNTIL KICKOFF</span>
+        </div>
+      )}
+      {revealed && allPicks && members && members.length > 1 && (
         <div className="picks-row">
           {members.map(([uid, m]) => {
             const mp = (allPicks[uid] || {})[fx.id]
