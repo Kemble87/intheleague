@@ -5,6 +5,7 @@ import Landing from './components/Landing'
 import Login from './components/Login'
 import Dashboard from './components/Dashboard'
 import SideDrawer from './components/SideDrawer'
+import Backdrop from './components/Backdrop'
 
 export default function App() {
   const [user, setUser] = useState(undefined)
@@ -36,7 +37,9 @@ export default function App() {
   const invLink = activePool ? `https://intheleague.app#join-${activePool}` : null
 
   return (
-    <div style={{ background: '#000', minHeight: '100vh' }}>
+    <div style={{ background: '#000', minHeight: '100vh', position: 'relative' }}>
+      <Backdrop />
+      <div style={{ position: 'relative', zIndex: 1 }}>
       <div className="nav">
         <div className="nav-logo">In<em>The</em>League</div>
         <div className="nav-right">
@@ -54,6 +57,7 @@ export default function App() {
         onPoolChange={setActivePool}
         onPoolsChange={setPools}
       />
+      </div>
     </div>
   )
 }
