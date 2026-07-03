@@ -345,6 +345,28 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
         </>
       ) : (
         <div className="board">
+          {board.length >= 3 && board[0].pts > 0 && (
+            <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'center', gap:10, padding:'8px 0 20px' }}>
+              {[1, 0, 2].map(pos => {
+                const r = board[pos]
+                if (!r) return null
+                const heights = { 0: 88, 1: 64, 2: 52 }
+                const colors = { 0: '#FFD60A', 1: '#C0C0C0', 2: '#CD7F32' }
+                return (
+                  <div key={r.uid} style={{ display:'flex', flexDirection:'column', alignItems:'center', width:92 }}>
+                    <div style={{ width:40, height:40, borderRadius:'50%', background:colors[pos]+'1a', border:`1.5px solid ${colors[pos]}66`, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:14, fontWeight:700, color:colors[pos], marginBottom:8 }}>
+                      {(r.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
+                    </div>
+                    <div style={{ fontSize:11, fontWeight:700, color:'#ccc', marginBottom:2, maxWidth:88, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{r.name?.split(' ')[0]}</div>
+                    <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:15, fontWeight:700, color:colors[pos], marginBottom:8 }}>{r.pts}</div>
+                    <div style={{ width:'100%', height:heights[pos], background:`linear-gradient(180deg, ${colors[pos]}22, ${colors[pos]}08)`, border:`1px solid ${colors[pos]}33`, borderBottom:'none', borderRadius:'8px 8px 0 0', display:'flex', alignItems:'flex-start', justifyContent:'center', paddingTop:8, fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:18, fontWeight:700, color:colors[pos]+'aa' }}>
+                      {pos + 1}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
           {board.map((row, i) => {
             const leader = board[0]
             const above = i > 0 ? board[i - 1] : null
