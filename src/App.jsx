@@ -3,11 +3,12 @@ import { onAuthStateChanged, getRedirectResult } from 'firebase/auth'
 import { auth } from './lib/firebase'
 import Login from './components/Login'
 import Dashboard from './components/Dashboard'
-import NavMenu from './components/NavMenu'
+import SideDrawer from './components/SideDrawer'
 
 export default function App() {
   const [user, setUser] = useState(undefined)
   const [activePool, setActivePool] = useState(null)
+  const [pools, setPools] = useState([])
 
   useEffect(() => {
     getRedirectResult(auth).then(r => { if (r?.user) setUser(r.user) }).catch(() => {})
@@ -29,10 +30,20 @@ export default function App() {
       <div className="nav">
         <div className="nav-logo">In<em>The</em>League</div>
         <div className="nav-right">
-          <NavMenu user={user} poolId={activePool} invLink={invLink} />
+          <SideDrawer
+            user={user}
+            pools={pools}
+            activePoolId={activePool}
+            onSwitchPool={setActivePool}
+            invLink={invLink}
+          />
         </div>
       </div>
-      <Dashboard user={user} onPoolChange={setActivePool} />
+      <Dashboard
+        user={user}
+        onPoolChange={setActivePool}
+        onPoolsChange={setPools}
+      />
     </div>
   )
 }
