@@ -81,7 +81,8 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
         ref={drawerRef}
         style={{
           position: 'fixed', top: 0, right: 0, bottom: 0,
-          width: 'min(320px, 85vw)',
+          width: '300px',
+          maxWidth: '85vw',
           background: '#0d0d0d',
           borderLeft: '1px solid #1a1a1a',
           zIndex: 901,
@@ -89,6 +90,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
           transition: 'transform .3s cubic-bezier(.25,.46,.45,.94)',
           display: 'flex', flexDirection: 'column',
           overflowY: 'auto',
+          boxShadow: '-20px 0 60px rgba(0,0,0,.8)',
         }}
       >
         {/* Header */}
