@@ -1,9 +1,17 @@
 import { calcPts } from '../lib/helpers'
 import { SPORTS } from '../lib/constants'
 
-export default function PoolHero({ pool, fixtures, picks, results, members, userId }) {
+export default function PoolHero({ pool, fixtures, picks, results, members, userId, onOpenPlayers }) {
   const sport = SPORTS[pool.sport] || SPORTS.PL
-  const grad = sport.grad
+  // Premium dark gradients — league accent kept subtle
+  const DARK_GRADS = {
+    PL:    'linear-gradient(150deg,#12081f 0%,#0a0a0a 55%)',
+    CHAMP: 'linear-gradient(150deg,#081120 0%,#0a0a0a 55%)',
+    L1:    'linear-gradient(150deg,#081408 0%,#0a0a0a 55%)',
+    WC:    'linear-gradient(150deg,#1a0f05 0%,#0a0a0a 55%)',
+    SN:    'linear-gradient(150deg,#081408 0%,#0a0a0a 55%)',
+  }
+  const grad = DARK_GRADS[pool.sport] || DARK_GRADS.PL
 
   // Stats
   const totalPts = (fixtures || []).reduce((s, f) => {
@@ -47,17 +55,21 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
   return (
     <div style={{
       background: grad,
-      borderRadius: 12,
+      border: '1px solid #1a1a1a',
+      borderRadius: 18,
       padding: '28px 22px 22px',
       position: 'relative',
       overflow: 'hidden',
       marginBottom: 16,
+      boxShadow: '0 20px 60px rgba(0,0,0,.5)',
     }}>
+      {/* green corner glow */}
+      <div style={{ position:'absolute', top:-120, right:-120, width:280, height:280, background:'radial-gradient(circle, #00E05A14 0%, transparent 65%)', pointerEvents:'none' }}/>
       {/* dark fade at bottom */}
       <div style={{ position:'absolute', bottom:0, left:0, right:0, height:'50%', background:'linear-gradient(to top,rgba(0,0,0,.35),transparent)', pointerEvents:'none' }}/>
 
-      {/* Players pill top right */}
-      <div style={{ position:'absolute', top:22, right:20, display:'flex', alignItems:'center', gap:6, background:'rgba(0,0,0,.25)', borderRadius:500, padding:'5px 12px 5px 8px', zIndex:1 }}>
+      {/* Players pill top right — tap to manage */}
+      <button onClick={onOpenPlayers} style={{ position:'absolute', top:22, right:20, display:'flex', alignItems:'center', gap:6, background:'rgba(0,0,0,.35)', border:'1px solid rgba(255,255,255,.08)', borderRadius:500, padding:'5px 12px 5px 8px', zIndex:2, cursor:'pointer', font:'inherit' }}>
         <div style={{ display:'flex' }}>
           {playerList.map(([uid, m], i) => (
             <div key={uid} style={{ width:20, height:20, borderRadius:'50%', background: uid===userId ? '#00E05A' : 'rgba(255,255,255,.25)', border:'1.5px solid rgba(0,0,0,.3)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:8, fontWeight:800, color: uid===userId?'#000':'#fff', marginLeft: i>0?-5:0 }}>
@@ -66,7 +78,8 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
           ))}
         </div>
         <span style={{ fontSize:12, fontWeight:700, color:'rgba(255,255,255,.7)' }}>{members.length} player{members.length!==1?'s':''}</span>
-      </div>
+        <span style={{ fontSize:10, color:'rgba(255,255,255,.4)' }}>▾</span>
+      </button>
 
       {/* Eyebrow */}
       <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:11, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.55)', marginBottom:10 }}>
@@ -83,18 +96,33 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
       <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'rgba(255,255,255,.6)', fontWeight:500, marginBottom:22, position:'relative', zIndex:1, flexWrap:'wrap' }}>
         <strong style={{ color:'#fff', fontWeight:700 }}>{me?.name?.split(' ')[0] || 'You'}</strong>
         <span style={{ width:3, height:3, borderRadius:'50%', background:'rgba(255,255,255,.4)', display:'inline-block' }}/>
-        <span>Season 2025/26</span>
+        <span>Season 2026/27</span>
         <span style={{ width:3, height:3, borderRadius:'50%', background:'rgba(255,255,255,.4)', display:'inline-block' }}/>
         <span>{fixtures.length} fixtures</span>
       </div>
 
       {/* Stats */}
+      {(() => {
+        const hasResults = (fixtures || []).some(f => results[f.id]?.h != null)
+        const firstKO = (fixtures || []).length ? (fixtures.map(f => new Date(f.kickoff)).sort((a,b)=>a-b)[0]) : null
+        const daysToKO = firstKO ? Math.max(0, Math.ceil((firstKO - Date.now()) / 864e5)) : null
+        const showCountdown = !hasResults && daysToKO != null && daysToKO > 0
+        return (
       <div style={{ position:'relative', zIndex:1, borderTop:'1px solid rgba(255,255,255,.12)', paddingTop:20 }}>
         <div style={{ display:'flex', alignItems:'flex-end', gap:0, marginBottom:20 }}>
-          {/* Points — dominant */}
+          {/* Points — dominant (or kickoff countdown pre-season) */}
           <div style={{ flexShrink:0, marginRight:24 }}>
-            <div style={{ fontSize:72, fontWeight:900, color:'#00E05A', letterSpacing:'-.05em', lineHeight:1 }}>{totalPts}</div>
-            <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.35)', marginTop:2 }}>Points</div>
+            {showCountdown ? (
+              <>
+                <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:64, fontWeight:700, color:'#00E05A', letterSpacing:'-.04em', lineHeight:1 }}>{daysToKO}</div>
+                <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.35)', marginTop:2 }}>Days to kickoff</div>
+              </>
+            ) : (
+              <>
+                <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:72, fontWeight:700, color:'#00E05A', letterSpacing:'-.05em', lineHeight:1 }}>{totalPts}</div>
+                <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.35)', marginTop:2 }}>Points</div>
+              </>
+            )}
           </div>
 
           <div style={{ width:1, background:'rgba(255,255,255,.12)', height:56, marginRight:24, flexShrink:0 }}/>
@@ -141,6 +169,8 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
           </div>
         </div>
       </div>
+        )
+      })()}
     </div>
   )
 }
