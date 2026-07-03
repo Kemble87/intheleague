@@ -151,26 +151,14 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
             <div style={{ height: 1, background: '#111', margin: '8px 0' }}/>
 
             {/* Invite */}
-            {activePool && invLink && (
+            {activePoolId && (
               <button onClick={async () => {
+                const link = `https://intheleague.app#join-${activePoolId}`
                 try {
-                  if (navigator.clipboard) {
-                    await navigator.clipboard.writeText(invLink)
-                  } else {
-                    // Fallback for older browsers
-                    const ta = document.createElement('textarea')
-                    ta.value = invLink
-                    ta.style.position = 'fixed'
-                    ta.style.opacity = '0'
-                    document.body.appendChild(ta)
-                    ta.focus()
-                    ta.select()
-                    document.execCommand('copy')
-                    document.body.removeChild(ta)
-                  }
-                  alert('Invite link copied! Share it with your group.')
+                  await navigator.clipboard.writeText(link)
+                  alert('Invite link copied! 🏆')
                 } catch(e) {
-                  alert('Link: ' + invLink)
+                  window.prompt('Copy this link:', link)
                 }
               }} style={rowStyle}>
                 <div style={iconBox('#001a0d')}>👥</div>
