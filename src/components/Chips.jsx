@@ -552,9 +552,11 @@ export default function Chips({ poolId, userId, members, fixtures }) {
           // Show chip-specific used info
           const usedData = used[chip.id]
           const usedLabel = isUsed ? (
-            chip.id === '2x' ? `MD${usedData?.matchday||'?'}` :
-            chip.id === 'banker' ? 'LOCKED' :
-            chip.id === 'hth' ? 'USED' : 'USED'
+            chip.id === '2x' ? (usedData?.matchday ? `MD${usedData.matchday}` : 'USED') :
+            chip.id === 'banker' ? (usedData?.home ? `${usedData.home.slice(0,3).toUpperCase()}` : 'LOCKED') :
+            chip.id === 'hth' ? (usedData?.matchday ? `MD${usedData.matchday}` : 'USED') :
+            chip.id === 'coupon' ? (usedData?.matchday ? `MD${usedData.matchday}` : 'USED') :
+            'USED'
           ) : null
           return (
             <div key={chip.id} style={{ position:'relative' }}>
