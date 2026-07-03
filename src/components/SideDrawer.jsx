@@ -152,11 +152,31 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
 
             {/* Invite */}
             {activePool && invLink && (
-              <button onClick={() => { navigator.clipboard?.writeText(invLink); setOpen(false) }} style={rowStyle}>
+              <button onClick={async () => {
+                try {
+                  if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(invLink)
+                  } else {
+                    // Fallback for older browsers
+                    const ta = document.createElement('textarea')
+                    ta.value = invLink
+                    ta.style.position = 'fixed'
+                    ta.style.opacity = '0'
+                    document.body.appendChild(ta)
+                    ta.focus()
+                    ta.select()
+                    document.execCommand('copy')
+                    document.body.removeChild(ta)
+                  }
+                  alert('Invite link copied! Share it with your group.')
+                } catch(e) {
+                  alert('Link: ' + invLink)
+                }
+              }} style={rowStyle}>
                 <div style={iconBox('#001a0d')}>👥</div>
                 <div style={{ flex: 1 }}>
                   <div style={rowTitle}>Invite players</div>
-                  <div style={rowSub}>Copy invite link for {activePool.name}</div>
+                  <div style={rowSub}>{activePoolId}</div>
                 </div>
                 <span style={{ color: '#333', fontSize: 18 }}>›</span>
               </button>
