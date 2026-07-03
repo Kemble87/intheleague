@@ -40,7 +40,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
         <span style={{
           position: 'absolute', bottom: -2, right: -2,
           width: 14, height: 14, borderRadius: '50%',
-          background: '#000', border: '1.5px solid #111',
+          background: '#0d0d0d', border: '1.5px solid #111',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
           <svg width="8" height="6" viewBox="0 0 8 6">
@@ -114,7 +114,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
                     <button key={pool.id} onClick={() => { onSwitchPool(pool.id); setOpen(false) }} style={{
                       width: '100%', display: 'flex', alignItems: 'center', gap: 12,
                       padding: '12px 14px', borderRadius: 12, marginBottom: 6,
-                      background: isActive ? '#111' : 'none',
+                      background: isActive ? '#2a2a2a' : 'none',
                       border: isActive ? '1px solid #1DB954' : '1px solid #111',
                       cursor: 'pointer', textAlign: 'left',
                     }}>
@@ -162,7 +162,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
               <span style={{ color: '#333', fontSize: 12 }}>{section === 'rules' ? '▲' : '▼'}</span>
             </button>
             {section === 'rules' && (
-              <div style={{ margin: '0 20px 8px', background: '#161616', borderRadius: 12, padding: '14px 16px', border: '1px solid #222' }}>
+              <div style={{ margin: '0 20px 8px', background: '#222', borderRadius: 12, padding: '14px 16px', border: '1px solid #333' }}>
                 <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: '#333', marginBottom: 12 }}>Points</div>
                 {SCORING_RULES.map(r => (
                   <div key={r.pts} style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
@@ -209,7 +209,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
               <span style={{ color: '#333', fontSize: 12 }}>{section === 'profile' ? '▲' : '▼'}</span>
             </button>
             {section === 'profile' && (
-              <div style={{ margin: '0 20px 8px', background: '#161616', borderRadius: 12, padding: '14px 16px', border: '1px solid #222' }}>
+              <div style={{ margin: '0 20px 8px', background: '#222', borderRadius: 12, padding: '14px 16px', border: '1px solid #333' }}>
                 <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: '#333', marginBottom: 10 }}>Display name</div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <input
