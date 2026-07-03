@@ -95,8 +95,8 @@ input:focus-visible { outline: none; }
 .pro-strip-btn { background: var(--green); color: #000; border: none; border-radius: 500px; padding: 9px 18px; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; white-space: nowrap; }
 
 /* POOL CARD */
-.pool-card { position: relative; border-radius: 12px; overflow: hidden; margin-bottom: 12px; cursor: pointer; transition: transform .15s; }
-.pool-card:hover { transform: scale(1.01); }
+.pool-card { position: relative; border: 1px solid #1a1a1a; border-radius: 18px; overflow: hidden; margin-bottom: 12px; cursor: pointer; transition: border-color .2s, transform .2s, box-shadow .2s; }
+.pool-card:hover { border-color: #00E05A44; transform: translateY(-2px); box-shadow: 0 16px 48px rgba(0,0,0,.55); }
 .pool-card-grad { padding: 24px 20px 20px; }
 .pool-card-sport { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.6); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
 .pool-card-sport-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); display: inline-block; }
