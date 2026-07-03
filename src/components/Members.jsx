@@ -108,10 +108,7 @@ export default function Members({ poolId, pool, userId }) {
             />
           ))}
           {isOrg && (
-            <div style={{ padding:'12px 0' }}>
-              <button onClick={() => navigator.clipboard?.writeText(`${location.href.split('#')[0]}#join-${poolId}`)} style={{ width:'100%', padding:'10px', background:'none', border:'1px solid #222', borderRadius:8, color:'#aaa', font:'inherit', fontSize:13, fontWeight:600, cursor:'pointer' }}>
-                📋 Copy invite link
-              </button>
+            <div style={{ padding:'4px 0' }}>
             </div>
           )}
         </div>
