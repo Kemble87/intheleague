@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { onAuthStateChanged, getRedirectResult } from 'firebase/auth'
 import { auth } from './lib/firebase'
+import Landing from './components/Landing'
 import Login from './components/Login'
 import Dashboard from './components/Dashboard'
 import SideDrawer from './components/SideDrawer'
@@ -9,10 +10,16 @@ export default function App() {
   const [user, setUser] = useState(undefined)
   const [activePool, setActivePool] = useState(null)
   const [pools, setPools] = useState([])
+  const [showLogin, setShowLogin] = useState(false)
 
   useEffect(() => {
     getRedirectResult(auth).then(r => { if (r?.user) setUser(r.user) }).catch(() => {})
     return onAuthStateChanged(auth, u => setUser(u || null))
+  }, [])
+
+  // If arriving via an invite link, go straight to login
+  useEffect(() => {
+    if ((location.hash || '').startsWith('#join-')) setShowLogin(true)
   }, [])
 
   if (user === undefined) return (
@@ -21,9 +28,12 @@ export default function App() {
     </div>
   )
 
-  if (!user) return <Login />
+  if (!user) {
+    if (showLogin) return <Login />
+    return <Landing onGetStarted={() => setShowLogin(true)} />
+  }
 
-  const invLink = activePool ? `${location.href.split('#')[0]}#join-${activePool}` : null
+  const invLink = activePool ? `https://intheleague.app#join-${activePool}` : null
 
   return (
     <div style={{ background: '#000', minHeight: '100vh' }}>
