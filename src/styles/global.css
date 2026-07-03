@@ -9,11 +9,23 @@ html, body {
 }
 
 :root {
-  --green: #1DB954;
-  --green-d: #158a3e;
+  --green: #00E05A;
+  --green-d: #00b348;
   --red: #FF3B5C;
   --gold: #FFD60A;
   --blue: #4488FF;
+  --display: 'Space Grotesk', 'Inter', sans-serif;
+}
+
+/* Subtle noise grain over everything */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: .025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 button:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
@@ -45,7 +57,7 @@ input:focus-visible { outline: none; }
 
 /* AUTH */
 .auth { min-height: 100vh; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; }
-.auth-logo { font-size: 42px; font-weight: 900; letter-spacing: -.05em; color: #fff; margin-bottom: 6px; }
+.auth-logo { font-family: var(--display); font-size: 40px; font-weight: 700; letter-spacing: -.04em; color: #fff; margin-bottom: 6px; }
 .auth-logo em { color: var(--green); font-style: normal; }
 .auth-tag { font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: #555; margin-bottom: 52px; }
 .auth-box { width: 100%; max-width: 340px; }
@@ -67,7 +79,7 @@ input:focus-visible { outline: none; }
 
 /* DASHBOARD */
 .dash-hero { padding: 32px 0 24px; }
-.dash-greeting { font-size: 38px; font-weight: 900; letter-spacing: -.04em; line-height: 1.05; color: #fff; }
+.dash-greeting { font-family: var(--display); font-size: 36px; font-weight: 700; letter-spacing: -.03em; line-height: 1.05; color: #fff; }
 .dash-greeting em { color: var(--green); font-style: normal; }
 .dash-sub { font-size: 15px; color: #555; margin-top: 6px; }
 .sec-label { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #555; margin-bottom: 12px; }
@@ -88,7 +100,7 @@ input:focus-visible { outline: none; }
 .pool-card-grad { padding: 24px 20px 20px; }
 .pool-card-sport { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: rgba(255,255,255,.6); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
 .pool-card-sport-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); display: inline-block; }
-.pool-card-name { font-size: 26px; font-weight: 900; letter-spacing: -.04em; color: #fff; margin-bottom: 16px; }
+.pool-card-name { font-family: var(--display); font-size: 24px; font-weight: 700; letter-spacing: -.02em; color: #fff; margin-bottom: 16px; }
 .pool-card-players { display: flex; align-items: center; gap: 8px; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.1); }
 .player-av { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,.2); border: 1.5px solid rgba(0,0,0,.3); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; color: #fff; }
 .pool-card-arrow { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 24px; color: rgba(255,255,255,.4); }
