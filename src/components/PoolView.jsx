@@ -9,6 +9,7 @@ export default function PoolView({ user, pool, poolId, onBack }) {
   const [picks, setPicks] = useState({})
   const [allPicks, setAllPicks] = useState({})
   const [results, setResults] = useState({})
+  const [fixtures, setFixtures] = useState([])
   const timers = useRef({})
 
   useEffect(() => {
@@ -29,6 +30,17 @@ export default function PoolView({ user, pool, poolId, onBack }) {
     return () => u()
   }, [poolId])
 
+  // Load fixtures so Chips step pickers can use them
+  useEffect(() => {
+    const r = ref(rtdb, `pools/${poolId}/fixtures`)
+    const u = onValue(r, s => {
+      if (s.exists()) {
+        setFixtures(Object.values(s.val()).sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff)))
+      }
+    })
+    return () => u()
+  }, [poolId])
+
   function savePick(fid, side, val) {
     const upd = { ...(picks[fid] || {}), [side]: val }
     setPicks(p => ({ ...p, [fid]: upd }))
@@ -44,13 +56,17 @@ export default function PoolView({ user, pool, poolId, onBack }) {
   }
 
   const members = Object.entries(pool.members || {})
-  const invLink = `${location.href.split('#')[0]}#join-${poolId}`
 
   return (
     <>
       <button className="back" onClick={onBack}>← All pools</button>
       <Members poolId={poolId} pool={pool} userId={user.uid} />
-      <Chips poolId={poolId} userId={user.uid} members={members} />
+      <Chips
+        poolId={poolId}
+        userId={user.uid}
+        members={members}
+        fixtures={fixtures}
+      />
       <Fixtures
         poolId={poolId}
         pool={pool}
