@@ -288,6 +288,112 @@ function SceneCopycat({ members, myId }) {
   )
 }
 
+// ── SCENE: COUPON BUSTER ─────────────────────────────────────────────────────
+function SceneCouponBuster() {
+  const [phase, setPhase] = useState(0) // 0=slip in, 1=bust, 2=saved, 3=rescued
+
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => setPhase(1), 750),
+      setTimeout(() => setPhase(2), 1900),
+      setTimeout(() => setPhase(3), 2300),
+    ]
+    return () => timers.forEach(clearTimeout)
+  }, [])
+
+  const selections = [
+    { match:'Arsenal v Chelsea',   pick:'Arsenal 2–1', pts:0, rescued: true },
+    { match:'Man City v Liverpool', pick:'Draw 1–1',   pts:3, rescued: false },
+    { match:'Spurs v Newcastle',    pick:'Spurs 2–0',  pts:1, rescued: false },
+    { match:'West Ham v Wolves',    pick:'Draw 1–1',   pts:1, rescued: false },
+  ]
+
+  return (
+    <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'#0a0a0a', position:'relative', overflow:'hidden' }}>
+      {/* Slip */}
+      <div style={{
+        width:260, background:'#fff', borderRadius:3,
+        boxShadow:'0 12px 48px rgba(0,0,0,.8)',
+        position:'relative', overflow:'visible',
+        transform: phase === 0 ? 'translateY(-120%) rotate(-6deg)' : phase === 1 ? 'translateY(0) rotate(0deg)' : 'translateY(0)',
+        transition:'transform .65s cubic-bezier(.22,1,.36,1)',
+        animation: phase === 1 ? 'none' : undefined,
+      }}>
+        {/* Tear top */}
+        <div style={{ height:8, background:'#fff', borderRadius:'3px 3px 0 0', borderBottom:'2px dashed #ddd' }}/>
+        {/* Green header */}
+        <div style={{ background:'#1a6b1a', padding:'8px 12px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <div>
+            <div style={{ fontSize:13, fontWeight:900, color:'#fff', letterSpacing:'.04em' }}>InTheLeague</div>
+            <div style={{ fontSize:9, color:'rgba(255,255,255,.7)', letterSpacing:'.12em', textTransform:'uppercase' }}>Match Predictions · MD14</div>
+          </div>
+          <span style={{ fontSize:20 }}>⚽</span>
+        </div>
+        {/* Barcode stripe */}
+        <div style={{ height:3, background:'repeating-linear-gradient(90deg,#000 0,#000 2px,#fff 2px,#fff 4px,#000 4px,#000 5px,#fff 5px,#fff 8px)', opacity:.12 }}/>
+        {/* Selections */}
+        <div style={{ padding:'10px 12px' }}>
+          <div style={{ fontSize:8, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'#888', marginBottom:8, paddingBottom:6, borderBottom:'1px solid #eee' }}>Your selections</div>
+          {selections.map((s, i) => {
+            const isRescued = s.rescued && phase >= 3
+            const ptsDisplay = isRescued ? '+1 ↑' : s.pts === 0 ? '0 ✗' : `+${s.pts} ✓`
+            const ptsColor = isRescued ? '#1a6b1a' : s.pts === 0 ? '#CC0000' : '#1a6b1a'
+            return (
+              <div key={i} style={{ padding:'6px 0', borderBottom: i<3 ? '1px dotted #e8e8e8' : 'none' }}>
+                <div style={{ fontSize:9, color:'#888', fontWeight:600, letterSpacing:'.03em', marginBottom:2 }}>{s.match}</div>
+                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                  <span style={{ fontSize:11, fontWeight:800, color:'#111' }}>{s.pick}</span>
+                  <span style={{ fontFamily:'ui-monospace,monospace', fontSize:11, fontWeight:700, color: ptsColor, background: isRescued ? '#e8f5e8' : 'transparent', padding: isRescued ? '1px 5px' : 0, borderRadius:3, transition:'all .3s' }}>{ptsDisplay}</span>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+        {/* Footer */}
+        <div style={{ background:'#f5f5f5', padding:'10px 12px', borderTop:'1px solid #e0e0e0' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
+            <span style={{ fontSize:9, fontWeight:700, color:'#888', textTransform:'uppercase', letterSpacing:'.1em' }}>Chip</span>
+            <span style={{ fontSize:9, fontWeight:800, color: phase >= 2 ? '#1a6b1a' : '#CC0000', fontFamily:'ui-monospace,monospace' }}>{phase >= 2 ? '✓ Applied' : 'Coupon Buster'}</span>
+          </div>
+          <div style={{ display:'flex', justifyContent:'space-between', paddingTop:6, borderTop:'1px solid #ddd' }}>
+            <span style={{ fontSize:11, fontWeight:900, color:'#111', textTransform:'uppercase', letterSpacing:'.06em' }}>Total</span>
+            <span style={{ fontSize:14, fontWeight:900, color: phase >= 3 ? '#1a6b1a' : '#111', fontFamily:'ui-monospace,monospace', transition:'color .3s' }}>{phase >= 3 ? '5 pts' : '4 pts'}</span>
+          </div>
+        </div>
+        <div style={{ height:8, background:'#f5f5f5', borderRadius:'0 0 3px 3px', borderTop:'2px dashed #ddd' }}/>
+
+        {/* BUST stamp */}
+        <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', pointerEvents:'none' }}>
+          <div style={{
+            fontFamily:'Inter,system-ui', fontSize:42, fontWeight:900, letterSpacing:'.1em',
+            color:'#CC0000', border:'5px solid #CC0000', borderRadius:4, padding:'4px 14px',
+            transform:'rotate(-10deg)',
+            opacity: phase === 1 ? 1 : 0,
+            scale: phase === 1 ? '1' : '3',
+            transition: phase === 1 ? 'opacity .1s, scale .4s cubic-bezier(.22,1,.36,1)' : 'opacity .3s',
+          }}>BUST</div>
+        </div>
+
+        {/* SAVED stamp */}
+        <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', pointerEvents:'none' }}>
+          <div style={{
+            fontFamily:'Inter,system-ui', fontSize:36, fontWeight:900, letterSpacing:'.08em',
+            color:'#1a6b1a', border:'5px solid #1a6b1a', borderRadius:4, padding:'4px 14px',
+            transform:'rotate(6deg)',
+            opacity: phase >= 2 ? 1 : 0,
+            transition:'opacity .4s cubic-bezier(.22,1,.36,1)',
+          }}>SAVED</div>
+        </div>
+      </div>
+
+      {/* Status text */}
+      <div style={{ marginTop:24, fontSize:12, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'#4CAF50', opacity: phase >= 3 ? 1 : 0, transition:'opacity .4s', textAlign:'center' }}>
+        Worst result rescued · +1 pt added
+      </div>
+    </div>
+  )
+}
+
 // ── CINEMA MODAL ─────────────────────────────────────────────────────────────
 function CinemaModal({ chip, members, myId, onConfirm, onCancel }) {
   const [sheetUp, setSheetUp] = useState(false)
@@ -303,6 +409,7 @@ function CinemaModal({ chip, members, myId, onConfirm, onCancel }) {
     'banker': <SceneBanker />,
     'hth': <SceneHTH />,
     'copycat': <SceneCopycat members={members} myId={myId} />,
+    'coupon': <SceneCouponBuster />,
   }
 
   return (
@@ -317,7 +424,9 @@ function CinemaModal({ chip, members, myId, onConfirm, onCancel }) {
           <div style={{ fontSize:11, color:'#882222', marginBottom:18 }}>⚠ {chip.warning}</div>
           <div style={{ display:'flex', gap:8 }}>
             <button onClick={onCancel} style={{ flex:1, padding:13, background:'#1a1a1a', border:'none', borderRadius:500, color:'#555', font:'inherit', fontSize:13, fontWeight:600, cursor:'pointer' }}>Cancel</button>
-            <button onClick={onConfirm} style={{ flex:2, padding:13, border:'none', borderRadius:500, color:'#000', font:'inherit', fontSize:13, fontWeight:800, cursor:'pointer', background:chip.color }}>Activate</button>
+            <button onClick={onConfirm} style={{ flex:2, padding:13, border:'none', borderRadius:500, color:'#000', font:'inherit', fontSize:13, fontWeight:800, cursor:'pointer', background:chip.color }}>
+              {chip.id === 'copycat' || chip.id === 'hth' ? 'Activate' : chip.id === 'coupon' ? 'Choose matchday →' : 'Choose →'}
+            </button>
           </div>
         </div>
       </div>
@@ -325,18 +434,66 @@ function CinemaModal({ chip, members, myId, onConfirm, onCancel }) {
   )
 }
 
+function BadgeCouponBuster({ active }) {
+  return (
+    <svg viewBox="0 0 170 190" xmlns="http://www.w3.org/2000/svg" style={{ width:'100%', height:'100%' }}>
+      <polygon points="85,8 158,49 158,133 85,174 12,133 12,49" fill="#0a1a0a" stroke="#1a6b1a" strokeWidth="1.5"/>
+      <polygon points="85,16 150,53 150,129 85,166 20,129 20,53" fill="none" stroke="#2d8b2d" strokeWidth="0.5" opacity="0.5"/>
+      <polygon points="85,24 142,57 142,125 85,158 28,125 28,57" fill="none" stroke="#4CAF50" strokeWidth="0.5" opacity="0.25"/>
+      {/* Slip background */}
+      <rect x="32" y="54" width="106" height="88" rx="3" fill="#f5f0e8" opacity={active ? 1 : 0.9}/>
+      {/* Green header */}
+      <rect x="32" y="54" width="106" height="18" rx="3" fill="#1a6b1a"/>
+      <rect x="32" y="66" width="106" height="6" fill="#1a6b1a"/>
+      <text x="85" y="66" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="7" fontWeight="900" fill="#fff" letterSpacing=".04em">COUPON</text>
+      {/* Dotted rows */}
+      <line x1="36" y1="82" x2="134" y2="82" stroke="#ccc" strokeWidth="0.5" strokeDasharray="2 2"/>
+      <line x1="36" y1="96" x2="134" y2="96" stroke="#ccc" strokeWidth="0.5" strokeDasharray="2 2"/>
+      <line x1="36" y1="110" x2="134" y2="110" stroke="#ccc" strokeWidth="0.5" strokeDasharray="2 2"/>
+      {/* Selection rows */}
+      <rect x="36" y="85" width="60" height="7" rx="1" fill="#ddd" opacity="0.6"/>
+      <text x="128" y="91" textAnchor="end" fontFamily="Share Tech Mono,ui-monospace" fontSize="7" fontWeight="700" fill="#1a6b1a">✓</text>
+      <rect x="36" y="99" width="50" height="7" rx="1" fill="#ddd" opacity="0.6"/>
+      <text x="128" y="105" textAnchor="end" fontFamily="Share Tech Mono,ui-monospace" fontSize="7" fontWeight="700" fill="#CC0000">✗</text>
+      <rect x="36" y="113" width="55" height="7" rx="1" fill="#ddd" opacity="0.6"/>
+      <text x="128" y="119" textAnchor="end" fontFamily="Share Tech Mono,ui-monospace" fontSize="7" fontWeight="700" fill="#1a6b1a">✓</text>
+      {/* Footer */}
+      <rect x="32" y="124" width="106" height="18" fill="#f0f0f0" opacity="0.8"/>
+      <line x1="32" y1="124" x2="138" y2="124" stroke="#ddd" strokeWidth="0.5"/>
+      <text x="38" y="135" fontFamily="Inter,system-ui" fontSize="7" fontWeight="900" fill="#111" letterSpacing=".04em">TOTAL</text>
+      <text x="132" y="135" textAnchor="end" fontFamily="Share Tech Mono,ui-monospace" fontSize="8" fontWeight="700" fill={active ? "#1a6b1a" : "#111"}>5 pts</text>
+      {/* SAVED stamp */}
+      <g transform={`rotate(${active ? -8 : -8}, 85, 95)`} opacity={active ? 1 : 0.7}>
+        <rect x="48" y="82" width="74" height="22" rx="2" fill="none" stroke="#1a6b1a" strokeWidth="2.5"/>
+        <text x="85" y="97" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="14" fontWeight="900" fill="#1a6b1a" letterSpacing=".08em">SAVED</text>
+      </g>
+      {/* Dividers */}
+      <line x1="28" y1="148" x2="142" y2="148" stroke="#4CAF50" strokeWidth="0.8" opacity="0.4"/>
+      <text x="85" y="161" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="8" fontWeight="700" fill="#4CAF50" letterSpacing="2">COUPON</text>
+      <text x="85" y="171" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="8" fontWeight="700" fill="#4CAF50" letterSpacing="2">BUSTER</text>
+      <line x1="28" y1="56" x2="142" y2="56" stroke="#4CAF50" strokeWidth="0.8" opacity="0.4"/>
+      <text x="85" y="50" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="7" fontWeight="600" fill="#2d8b2d" letterSpacing="4" opacity="0.8">CHIP</text>
+      <circle cx="85" cy="18" r="3" fill="#4CAF50" opacity="0.6"/>
+      <circle cx="85" cy="164" r="3" fill="#4CAF50" opacity="0.6"/>
+    </svg>
+  )
+}
+
 // ── CHIP DEFS ────────────────────────────────────────────────────────────────
 const CHIP_DEFS = [
   { id:'2x',     name:'2× Multiplier',  color:'#FFD700', desc:'Double your points for every pick this matchday.',     warning:'One use per season.', Badge:Badge2x      },
-  { id:'banker', name:'Banker',          color:'#4499FF', desc:'Triple your points on one specific match.',            warning:'One use per month.',  Badge:BadgeBanker  },
+  { id:'banker', name:'Banker',          color:'#4499FF', desc:'Triple your points on one specific match.',            warning:'One use per season.', Badge:BadgeBanker  },
   { id:'hth',    name:'Half Time Hero',  color:'#9966FF', desc:'Change all your picks at half time for one matchday.', warning:'One use per season.', Badge:BadgeHalfTime},
   { id:'copycat',name:'Copycat',         color:'#00CCDD', desc:"Mirror a player's complete picks for one matchday.",   warning:'One use per season.', Badge:BadgeCopycat },
+  { id:'coupon', name:'Coupon Buster',   color:'#4CAF50', desc:'Your worst result this matchday is rescued — upgraded to the next points tier.', warning:'One use per season.', Badge:BadgeCouponBuster },
 ]
 
 // ── MAIN EXPORT ──────────────────────────────────────────────────────────────
-export default function Chips({ poolId, userId, members }) {
+export default function Chips({ poolId, userId, members, fixtures }) {
   const [used, setUsed] = useState({})
   const [confirming, setConfirming] = useState(null)
+  const [chipStep, setChipStep] = useState(null) // '2x-pick-md' | 'banker-pick-match' | 'copycat-pick-player'
+  const [stepData, setStepData] = useState({})
 
   useEffect(() => {
     const r = ref(rtdb, `pools/${poolId}/chips/${userId}`)
@@ -344,11 +501,34 @@ export default function Chips({ poolId, userId, members }) {
     return () => u()
   }, [poolId, userId])
 
-  function activate(chip) {
-    set(ref(rtdb, `pools/${poolId}/chips/${userId}/${chip.id}`), { usedAt: Date.now() })
-    setUsed(u => ({ ...u, [chip.id]: { usedAt: Date.now() } }))
+  function activate(chip, extraData = {}) {
+    const data = { usedAt: Date.now(), ...extraData }
+    set(ref(rtdb, `pools/${poolId}/chips/${userId}/${chip.id}`), data)
+    setUsed(u => ({ ...u, [chip.id]: data }))
     setConfirming(null)
+    setChipStep(null)
+    setStepData({})
   }
+
+  // Step picker screens shown after cinema
+  function handleCinemaConfirm(chip) {
+    if (chip.id === '2x') { setConfirming(null); setChipStep('2x-pick-md') }
+    else if (chip.id === 'banker') { setConfirming(null); setChipStep('banker-pick-match') }
+    else if (chip.id === 'copycat') { setConfirming(null); setChipStep('copycat-pick-player') }
+    else if (chip.id === 'coupon') { setConfirming(null); setChipStep('coupon-pick-md') }
+    else { activate(chip) } // hth activates immediately
+  }
+
+  const upcomingMatchdays = [...new Set((fixtures||[])
+    .filter(f => new Date(f.kickoff) > new Date())
+    .map(f => f.matchday).filter(Boolean)
+  )].sort((a,b) => a-b).slice(0, 10)
+
+  const upcomingMatches = (fixtures||[])
+    .filter(f => new Date(f.kickoff) > new Date())
+    .slice(0, 20)
+
+  const teammates = (members||[]).filter(([uid]) => uid !== userId)
 
   return (
     <div className="chips-section">
@@ -357,24 +537,108 @@ export default function Chips({ poolId, userId, members }) {
         {CHIP_DEFS.map(chip => {
           const isUsed = !!used[chip.id]
           const isActive = confirming?.id === chip.id
+          // Show chip-specific used info
+          const usedData = used[chip.id]
+          const usedLabel = isUsed ? (
+            chip.id === '2x' ? `MD${usedData?.matchday||'?'}` :
+            chip.id === 'banker' ? 'LOCKED' :
+            chip.id === 'hth' ? 'USED' : 'USED'
+          ) : null
           return (
             <div key={chip.id} style={{ position:'relative' }}>
               <button className={`chip-btn${isUsed ? ' used' : ''}`} disabled={isUsed} onClick={() => !isUsed && setConfirming(chip)} title={isUsed ? 'Already used' : chip.name}>
                 <chip.Badge active={isActive} />
               </button>
-              {isUsed && <div className="chip-used-badge">USED</div>}
+              {isUsed && <div className="chip-used-badge">{usedLabel}</div>}
             </div>
           )
         })}
       </div>
+
+      {/* Cinema activation modal */}
       {confirming && (
         <CinemaModal
           chip={confirming}
           members={members}
           myId={userId}
-          onConfirm={() => activate(confirming)}
+          onConfirm={() => handleCinemaConfirm(confirming)}
           onCancel={() => setConfirming(null)}
         />
+      )}
+
+      {/* 2x — Pick matchday */}
+      {chipStep === '2x-pick-md' && (
+        <div style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(0,0,0,.95)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-end' }}>
+          <div style={{ width:'100%', maxWidth:480, background:'#111', borderRadius:'20px 20px 0 0', padding:'24px 20px 40px' }}>
+            <div style={{ width:28, height:3, background:'#333', borderRadius:99, margin:'0 auto 20px' }}/>
+            <div style={{ fontSize:18, fontWeight:800, color:'#fff', marginBottom:6 }}>⚡ Choose your matchday</div>
+            <div style={{ fontSize:13, color:'#555', marginBottom:20 }}>Your points for this matchday will be doubled.</div>
+            <div style={{ display:'flex', flexDirection:'column', gap:8, maxHeight:'50vh', overflowY:'auto' }}>
+              {upcomingMatchdays.map(md => (
+                <button key={md} onClick={() => activate(CHIP_DEFS.find(c=>c.id==='2x'), { matchday: md })}
+                  style={{ padding:'14px 16px', background: stepData.matchday===md ? '#0d2b19' : '#1a1a1a', border: stepData.matchday===md ? '1px solid var(--green)' : '1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:15, fontWeight:700, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                  <span>Matchday {md}</span>
+                  <span style={{ fontSize:12, color:'#555' }}>2× points</span>
+                </button>
+              ))}
+              {upcomingMatchdays.length === 0 && <div style={{ color:'#444', fontSize:14, textAlign:'center', padding:'20px 0' }}>No upcoming matchdays found. Sync fixtures first.</div>}
+            </div>
+            <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#555', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Banker — Pick match */}
+      {chipStep === 'banker-pick-match' && (
+        <div style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(0,0,0,.95)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-end' }}>
+          <div style={{ width:'100%', maxWidth:480, background:'#111', borderRadius:'20px 20px 0 0', padding:'24px 20px 40px' }}>
+            <div style={{ width:28, height:3, background:'#333', borderRadius:99, margin:'0 auto 20px' }}/>
+            <div style={{ fontSize:18, fontWeight:800, color:'#fff', marginBottom:6 }}>🏦 Choose your banker match</div>
+            <div style={{ fontSize:13, color:'#555', marginBottom:20 }}>Your points on this match will be tripled. Pick wisely.</div>
+            <div style={{ display:'flex', flexDirection:'column', gap:8, maxHeight:'50vh', overflowY:'auto' }}>
+              {upcomingMatches.map(f => (
+                <button key={f.id} onClick={() => activate(CHIP_DEFS.find(c=>c.id==='banker'), { fixtureId: f.id, home: f.home, away: f.away })}
+                  style={{ padding:'12px 16px', background:'#1a1a1a', border:'1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
+                  <span>{f.home} v {f.away}</span>
+                  <span style={{ fontSize:11, color:'#555', whiteSpace:'nowrap' }}>MD{f.matchday}</span>
+                </button>
+              ))}
+              {upcomingMatches.length === 0 && <div style={{ color:'#444', fontSize:14, textAlign:'center', padding:'20px 0' }}>No upcoming matches found. Sync fixtures first.</div>}
+            </div>
+            <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#555', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {/* Copycat — Pick player */}
+      {chipStep === 'copycat-pick-player' && (
+        <div style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(0,0,0,.95)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-end' }}>
+          <div style={{ width:'100%', maxWidth:480, background:'#111', borderRadius:'20px 20px 0 0', padding:'24px 20px 40px' }}>
+            <div style={{ width:28, height:3, background:'#333', borderRadius:99, margin:'0 auto 20px' }}/>
+            <div style={{ fontSize:18, fontWeight:800, color:'#fff', marginBottom:6 }}>🐱 Choose who to copy</div>
+            <div style={{ fontSize:13, color:'#555', marginBottom:20 }}>Their picks for the next matchday will be copied to you. They won't know.</div>
+            {teammates.length === 0 ? (
+              <div style={{ color:'#444', fontSize:14, textAlign:'center', padding:'20px 0' }}>You need at least one other player in the pool to use Copycat.</div>
+            ) : (
+              <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                {teammates.map(([uid, m]) => (
+                  <button key={uid} onClick={() => {
+                    // Copy their picks for the next upcoming matchday
+                    const nextMD = upcomingMatchdays[0]
+                    activate(CHIP_DEFS.find(c=>c.id==='copycat'), { targetUid: uid, targetName: m.name, matchday: nextMD })
+                  }}
+                    style={{ padding:'14px 16px', background:'#1a1a1a', border:'1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:15, fontWeight:600, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', gap:12 }}>
+                    <div style={{ width:36, height:36, borderRadius:'50%', background:'#00CCDD22', border:'1px solid #00CCDD44', display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, fontWeight:800, color:'#00CCDD', flexShrink:0 }}>
+                      {(m.name||'?').slice(0,2).toUpperCase()}
+                    </div>
+                    <span>{m.name}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#555', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
+          </div>
+        </div>
       )}
     </div>
   )
