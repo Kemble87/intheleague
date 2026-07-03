@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { calcPts } from '../lib/helpers'
+import { calcPts, matchdayScores } from '../lib/helpers'
 
 export default function Ticker({ pool, members, allChips, fixtures, allPicks, results, userId }) {
   const items = useMemo(() => {
@@ -30,6 +30,24 @@ export default function Ticker({ pool, members, allChips, fixtures, allPicks, re
       })
     })
 
+    // Last completed matchday — winner and wooden spoon
+    if ((members || []).length > 1) {
+      const mds = matchdayScores(fixtures, results, members.map(([uid]) => uid), allPicks, allChips)
+      const completed = Object.entries(mds).filter(([, v]) => v.complete).map(([md, v]) => [Number(md), v]).sort((a, b) => b[0] - a[0])
+      if (completed.length) {
+        const [md, { scores }] = completed[0]
+        const ranked = Object.entries(scores).sort((a, b) => b[1] - a[1])
+        const nameOf = uid => (pool.members?.[uid]?.name || '?').split(' ')[0].toUpperCase()
+        if (ranked[0] && ranked[0][1] > 0) {
+          out.push({ text: `${nameOf(ranked[0][0])} TAKES MATCHDAY ${md} · ${ranked[0][1]} PTS`, color: '#FFD60A' })
+          const last = ranked[ranked.length - 1]
+          if (last && last[0] !== ranked[0][0]) {
+            out.push({ text: `WOODEN SPOON MD${md}: ${nameOf(last[0])} · ${last[1]} PTS`, color: '#8a4a4a' })
+          }
+        }
+      }
+    }
+
     // Leader
     if ((members || []).length > 1) {
       const scores = members.map(([uid, m]) => {
@@ -43,6 +61,32 @@ export default function Ticker({ pool, members, allChips, fixtures, allPicks, re
       if (scores[0]?.pts > 0) {
         const gap = scores[0].pts - (scores[1]?.pts ?? 0)
         out.push({ text: `${scores[0].name} LEADS ON ${scores[0].pts} PTS${gap > 0 ? ` · ${gap} CLEAR` : ''}`, color: '#FFD60A' })
+      }
+    }
+
+    // Last completed matchday — MVP and wooden spoon
+    {
+      const byMd = {}
+      ;(fixtures || []).forEach(f => { (byMd[f.matchday] = byMd[f.matchday] || []).push(f) })
+      const completed = Object.entries(byMd)
+        .filter(([, fxs]) => fxs.every(f => results[f.id]?.h != null))
+        .map(([md]) => Number(md)).sort((a, b) => b - a)
+      const lastMd = completed[0]
+      if (lastMd != null && (members || []).length > 1) {
+        const scores = members.map(([uid, m]) => {
+          const pts = byMd[lastMd].reduce((s, f) => {
+            const p = calcPts((allPicks[uid] || {})[f.id], results[f.id])
+            return p != null ? s + p : s
+          }, 0)
+          return { name: (m.name || '?').split(' ')[0].toUpperCase(), pts }
+        }).sort((a, b) => b.pts - a.pts)
+        if (scores[0].pts > 0) {
+          out.push({ text: `${scores[0].name} TAKES MATCHDAY ${lastMd} · ${scores[0].pts} PTS`, color: '#FFD60A' })
+          const last = scores[scores.length - 1]
+          if (last.pts < scores[0].pts) {
+            out.push({ text: `WOODEN SPOON MD${lastMd} · ${last.name} · ${last.pts} PTS`, color: '#884444' })
+          }
+        }
       }
     }
 
