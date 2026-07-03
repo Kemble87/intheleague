@@ -6,7 +6,7 @@ export default function Backdrop() {
     size: 1.5 + (i % 3),
     dur: 22 + (i % 7) * 6,
     delay: -(i * 3.7),
-    op: 0.05 + (i % 4) * 0.02,
+    op: 0.10 + (i % 4) * 0.04,
   }))
 
   return (
@@ -28,28 +28,28 @@ export default function Backdrop() {
       {/* Floodlight — top left */}
       <div className="bd-anim" style={{
         position: 'absolute', top: '-28vh', left: '-24vw', width: '75vw', height: '80vh',
-        background: 'radial-gradient(ellipse at 30% 20%, rgba(200,220,255,.05) 0%, rgba(200,220,255,.02) 40%, transparent 70%)',
+        background: 'radial-gradient(ellipse at 30% 20%, rgba(200,220,255,.09) 0%, rgba(200,220,255,.035) 40%, transparent 70%)',
         animation: 'bdFlood 14s ease-in-out infinite',
       }}/>
       {/* Floodlight — top right, offset rhythm */}
       <div className="bd-anim" style={{
         position: 'absolute', top: '-30vh', right: '-26vw', width: '75vw', height: '85vh',
-        background: 'radial-gradient(ellipse at 70% 20%, rgba(200,220,255,.045) 0%, rgba(200,220,255,.018) 40%, transparent 70%)',
+        background: 'radial-gradient(ellipse at 70% 20%, rgba(200,220,255,.08) 0%, rgba(200,220,255,.03) 40%, transparent 70%)',
         animation: 'bdFloodB 19s ease-in-out infinite',
       }}/>
       {/* Green under-glow near the fold */}
       <div className="bd-anim" style={{
         position: 'absolute', bottom: '-45vh', left: '50%', transform: 'translateX(-50%)', width: '120vw', height: '80vh',
-        background: 'radial-gradient(ellipse, rgba(0,224,90,.035) 0%, transparent 60%)',
+        background: 'radial-gradient(ellipse, rgba(0,224,90,.06) 0%, transparent 60%)',
         animation: 'bdFlood 23s ease-in-out infinite',
       }}/>
 
       {/* Pitch geometry — giant centre circle + halfway line, viewed from the gods */}
       <svg viewBox="0 0 1000 1400" preserveAspectRatio="xMidYMin slice" style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 'max(1100px, 130vw)', height: '100%', opacity: 1 }}>
-        <g stroke="#ffffff" strokeOpacity="0.028" fill="none" strokeWidth="2">
+        <g stroke="#ffffff" strokeOpacity="0.055" fill="none" strokeWidth="2">
           <line x1="-100" y1="430" x2="1100" y2="430"/>
           <circle cx="500" cy="430" r="230"/>
-          <circle cx="500" cy="430" r="6" fill="#ffffff" fillOpacity="0.03" stroke="none"/>
+          <circle cx="500" cy="430" r="6" fill="#ffffff" fillOpacity="0.06" stroke="none"/>
           {/* Penalty box hint at the very bottom */}
           <rect x="230" y="1220" width="540" height="220" rx="2"/>
           <path d="M 355 1220 A 145 145 0 0 1 645 1220"/>
