@@ -77,3 +77,44 @@ export async function loadFixtures(poolId, rtdb) {
   if (snap.exists()) return Object.values(snap.val()).sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff))
   return []
 }
+
+// ── Chip-aware per-matchday scoring ──────────────────────────────────────────
+// Returns { [md]: { scores: { [uid]: pts }, complete: bool } }
+export function matchdayScores(fixtures, results, memberIds, allPicks, allChips) {
+  const byMd = {}
+  ;(fixtures || []).forEach(f => {
+    if (f.matchday == null) return
+    ;(byMd[f.matchday] = byMd[f.matchday] || []).push(f)
+  })
+  const out = {}
+  Object.entries(byMd).forEach(([md, fxs]) => {
+    const complete = fxs.length > 0 && fxs.every(f => results[f.id]?.h != null && results[f.id]?.a != null)
+    const scores = {}
+    ;(memberIds || []).forEach(uid => {
+      const chips = (allChips || {})[uid] || {}
+      const copyTarget = chips.copycat?.targetUid
+      const copyMd = chips.copycat?.matchday
+      const ptsArr = []
+      fxs.forEach(f => {
+        let pk = (allPicks[uid] || {})[f.id]
+        if (copyTarget && String(md) === String(copyMd)) pk = (allPicks[copyTarget] || {})[f.id] || pk
+        let p = calcPts(pk, results[f.id])
+        if (p != null) {
+          let mult = 1
+          if (chips['2x']?.matchday && String(chips['2x'].matchday) === String(md)) mult *= 2
+          if (chips.banker?.fixtureId === f.id) mult *= 3
+          p = p * mult
+        }
+        ptsArr.push(p)
+      })
+      if (chips.coupon?.matchday && String(chips.coupon.matchday) === String(md)) {
+        let wi = -1, wp = Infinity
+        ptsArr.forEach((p, i) => { if (p != null && p < wp) { wp = p; wi = i } })
+        if (wi >= 0 && wp < 3) ptsArr[wi] = wp === 0 ? 1 : 3
+      }
+      scores[uid] = ptsArr.reduce((s, p) => (p != null ? s + p : s), 0)
+    })
+    out[md] = { scores, complete }
+  })
+  return out
+}
