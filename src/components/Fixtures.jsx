@@ -299,6 +299,39 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
     })
   }
 
+  // Live matchday — some results in, but not all: the table is in motion
+  const liveMd = (() => {
+    const byMd = {}
+    ;(fixtures || []).forEach(f => { (byMd[f.matchday] = byMd[f.matchday] || []).push(f) })
+    const hit = Object.entries(byMd).find(([, fxs]) => {
+      const done = fxs.filter(f => results[f.id]?.h != null).length
+      return done > 0 && done < fxs.length
+    })
+    return hit ? hit[0] : null
+  })()
+
+  // Rank movement: position now vs position before this matchday's results
+  const rankDelta = {}
+  if (liveMd != null) {
+    const prev = members.map(([uid]) => {
+      const chips = allChips[uid] || {}
+      const copyT = chips['copycat']?.targetUid, copyMd = chips['copycat']?.matchday
+      const mp = uid === user.uid ? picks : (allPicks[uid] || {})
+      let p = 0
+      ;(fixtures || []).forEach(f => {
+        if (String(f.matchday) === String(liveMd)) return
+        let pk = mp[f.id]
+        if (copyT && String(f.matchday) === String(copyMd)) pk = (allPicks[copyT] || {})[f.id] || pk
+        const s = calcPtsWithChips(uid, f.id, pk, results[f.id], f.matchday)
+        if (s != null) p += s
+      })
+      return { uid, pts: p }
+    }).sort((a, b) => b.pts - a.pts)
+    const prevRank = {}
+    prev.forEach((r, i) => { prevRank[r.uid] = i })
+    board.forEach((r, i) => { rankDelta[r.uid] = (prevRank[r.uid] ?? i) - i })
+  }
+
   return (
     <>
 
@@ -365,6 +398,13 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
         </>
       ) : (
         <div className="board">
+          {liveMd != null && board.length > 1 && (
+            <div style={{ display:'flex', alignItems:'center', gap:9, marginBottom:14 }}>
+              <style>{`@keyframes livePulse { 0%,100% { opacity:1; } 50% { opacity:.25; } }`}</style>
+              <span style={{ width:7, height:7, borderRadius:'50%', background:'#FF3B5C', animation:'livePulse 1.6s ease-in-out infinite' }}/>
+              <span style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:11, letterSpacing:'.14em', color:'#FF3B5C' }}>LIVE · MATCHDAY {liveMd} · AS IT STANDS</span>
+            </div>
+          )}
           {board.length >= 3 && board[0].pts > 0 && (
             <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'center', gap:10, padding:'8px 0 20px' }}>
               {[1, 0, 2].map(pos => {
@@ -432,6 +472,11 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
                     {chipsPlayed > 0 && <span style={{ color: '#555' }}>· {chipsPlayed} chip{chipsPlayed !== 1 ? 's' : ''} played</span>}
                   </div>
                 </div>
+                {liveMd != null && rankDelta[row.uid] != null && rankDelta[row.uid] !== 0 && (
+                  <span style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:12, fontWeight:700, color: rankDelta[row.uid] > 0 ? 'var(--green)' : '#FF3B5C', flexShrink:0 }}>
+                    {rankDelta[row.uid] > 0 ? '▲' : '▼'}{Math.abs(rankDelta[row.uid])}
+                  </span>
+                )}
                 <div style={{ textAlign: 'right' }}>
                   <div className="board-pts">{row.pts}</div>
                   {lastMdPts != null && lastMdPts > 0
