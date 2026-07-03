@@ -6,6 +6,7 @@ import Chips from './Chips'
 import Members from './Members'
 import PoolHero from './PoolHero'
 import OrgNudge from './OrgNudge'
+import Ticker from './Ticker'
 
 export default function PoolView({ user, pool, poolId, onBack }) {
   const [picks, setPicks] = useState({})
@@ -13,6 +14,7 @@ export default function PoolView({ user, pool, poolId, onBack }) {
   const [results, setResults] = useState({})
   const [fixtures, setFixtures] = useState([])
   const [showPlayers, setShowPlayers] = useState(false)
+  const [allChips, setAllChips] = useState({})
   const timers = useRef({})
 
   useEffect(() => {
@@ -44,6 +46,12 @@ export default function PoolView({ user, pool, poolId, onBack }) {
     return () => u()
   }, [poolId])
 
+  useEffect(() => {
+    const r = ref(rtdb, `pools/${poolId}/chips`)
+    const u = onValue(r, s => setAllChips(s.val() || {}))
+    return () => u()
+  }, [poolId])
+
   function savePick(fid, side, val) {
     const upd = { ...(picks[fid] || {}), [side]: val }
     setPicks(p => ({ ...p, [fid]: upd }))
@@ -67,6 +75,7 @@ export default function PoolView({ user, pool, poolId, onBack }) {
       <button className="back" onClick={onBack}>← All pools</button>
       <PoolHero pool={pool} fixtures={fixtures} picks={picks} results={results} members={members} userId={user.uid} onOpenPlayers={() => setShowPlayers(s => !s)} />
       {showPlayers && <Members poolId={poolId} pool={pool} userId={user.uid} />}
+      <Ticker pool={pool} members={members} allChips={allChips} fixtures={fixtures} allPicks={allPicks} results={results} userId={user.uid} />
       {isOrg && (
         <OrgNudge pool={pool} poolId={poolId} members={members} allPicks={allPicks} fixtures={fixtures} results={results} />
       )}
