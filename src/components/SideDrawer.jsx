@@ -163,6 +163,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
             </button>
             {section === 'rules' && (
               <div style={{ margin: '0 20px 8px', background: '#0d0d0d', borderRadius: 12, padding: '14px 16px' }}>
+                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: '#333', marginBottom: 12 }}>Points</div>
                 {SCORING_RULES.map(r => (
                   <div key={r.pts} style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
                     <div style={{
@@ -176,6 +177,22 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
                     <div>
                       <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>{r.label}</div>
                       <div style={{ fontSize: 12, color: '#555', marginTop: 2, lineHeight: 1.4 }}>{r.eg}</div>
+                    </div>
+                  </div>
+                ))}
+                <div style={{ height: 1, background: '#1a1a1a', margin: '4px 0 14px' }}/>
+                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: '#333', marginBottom: 12 }}>Chips — one use per season</div>
+                {CHIP_RULES.map(c => (
+                  <div key={c.name} style={{ display: 'flex', gap: 12, marginBottom: 14 }}>
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 8, flexShrink: 0,
+                      background: c.color + '22', border: '1px solid ' + c.color + '44',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 18,
+                    }}>{c.emoji}</div>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>{c.name}</div>
+                      <div style={{ fontSize: 12, color: '#555', marginTop: 2, lineHeight: 1.5 }}>{c.desc}</div>
                     </div>
                   </div>
                 ))}
