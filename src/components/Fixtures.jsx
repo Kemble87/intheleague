@@ -214,6 +214,12 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
     return () => u()
   }, [poolId])
 
+  useEffect(() => {
+    const r = ref(rtdb, 'pools/' + poolId + '/chips')
+    const u = onValue(r, s => setAllChips(s.val() || {}))
+    return () => u()
+  }, [poolId])
+
   const mdays = [...new Set((fixtures || []).map(f => f.matchday).filter(Boolean))].sort((a, b) => a - b)
   const filtered = matchday === 'ALL' ? fixtures : (fixtures || []).filter(f => String(f.matchday) === String(matchday))
   const days = groupDays(filtered)
