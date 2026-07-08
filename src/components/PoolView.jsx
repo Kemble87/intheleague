@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { ref, onValue, set } from 'firebase/database'
 import { rtdb } from '../lib/firebase'
+import { fetchAndStoreFixtures } from '../lib/helpers'
 import Fixtures from './Fixtures'
 import Chips from './Chips'
 import Members from './Members'
@@ -52,6 +53,26 @@ export default function PoolView({ user, pool, poolId, onBack }) {
     const u = onValue(r, s => setAllChips(s.val() || {}))
     return () => u()
   }, [poolId])
+
+  // Auto-sync results: if a match finished 2h+ ago with no result, quietly
+  // pull fresh scores from the API (throttled to once per 45 min per pool)
+  useEffect(() => {
+    if (!fixtures.length || !pool?.sport) return
+    const now = Date.now()
+    const stale = fixtures.some(f => now - new Date(f.kickoff).getTime() > 2 * 3600e3 && results[f.id]?.h == null)
+    if (!stale) return
+    ;(async () => {
+      try {
+        const { get } = await import('firebase/database')
+        const syncRef = ref(rtdb, `pools/${poolId}/lastAutoSync`)
+        const snap = await get(syncRef)
+        const last = snap.exists() ? snap.val() : 0
+        if (now - last < 45 * 60e3) return
+        await set(syncRef, now)
+        await fetchAndStoreFixtures(pool.sport, poolId, rtdb)
+      } catch (e) { /* silent — manual sync still available */ }
+    })()
+  }, [fixtures, results, poolId, pool?.sport])
 
   function savePick(fid, side, val) {
     const upd = { ...(picks[fid] || {}), [side]: val }
