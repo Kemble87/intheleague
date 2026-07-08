@@ -384,7 +384,7 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
               }}>⟳ Sync</button>
             )}
           </div>
-          {isOrg && <div className="org-note">You're the organiser — enter official results after each match kicks off.</div>}
+          {isOrg && <div className="org-note"> Results sync automatically — as organiser you can correct any score by typing over it.</div>}
           <MatchdaySummary fixtures={filtered} picks={picks} results={results} matchday={matchday} allPicks={allPicks} />
           {loading ? <div className="loading">Loading fixtures…</div> : days.map(day => (
             <div key={day.d}>
