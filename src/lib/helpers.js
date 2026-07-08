@@ -80,12 +80,24 @@ export async function loadFixtures(poolId, rtdb) {
 
 // ── Chip-aware per-matchday scoring ──────────────────────────────────────────
 // Returns { [md]: { scores: { [uid]: pts }, complete: bool } }
+
+// ── The Run-In: final 9 matchdays score double, whatever the competition ──
+export function runInStart(fixtures) {
+  const mds = (fixtures || []).map(f => Number(f.matchday)).filter(n => !isNaN(n) && n > 0)
+  if (!mds.length) return Infinity
+  return Math.max(...mds) - 8
+}
+export function runInMult(matchday, fixtures) {
+  return Number(matchday) >= runInStart(fixtures) ? 2 : 1
+}
+
 export function matchdayScores(fixtures, results, memberIds, allPicks, allChips) {
   const byMd = {}
   ;(fixtures || []).forEach(f => {
     if (f.matchday == null) return
     ;(byMd[f.matchday] = byMd[f.matchday] || []).push(f)
   })
+  const riStart = runInStart(fixtures)
   const out = {}
   Object.entries(byMd).forEach(([md, fxs]) => {
     const complete = fxs.length > 0 && fxs.every(f => results[f.id]?.h != null && results[f.id]?.a != null)
@@ -100,7 +112,7 @@ export function matchdayScores(fixtures, results, memberIds, allPicks, allChips)
         if (copyTarget && String(md) === String(copyMd)) pk = (allPicks[copyTarget] || {})[f.id] || pk
         let p = calcPts(pk, results[f.id])
         if (p != null) {
-          let mult = 1
+          let mult = Number(md) >= riStart ? 2 : 1
           if (chips['2x']?.matchday && String(chips['2x'].matchday) === String(md)) mult *= 2
           if (chips.banker?.fixtureId === f.id) mult *= 3
           p = p * mult
@@ -108,9 +120,10 @@ export function matchdayScores(fixtures, results, memberIds, allPicks, allChips)
         ptsArr.push(p)
       })
       if (chips.coupon?.matchday && String(chips.coupon.matchday) === String(md)) {
+        const ri = Number(md) >= riStart ? 2 : 1
         let wi = -1, wp = Infinity
         ptsArr.forEach((p, i) => { if (p != null && p < wp) { wp = p; wi = i } })
-        if (wi >= 0 && wp < 3) ptsArr[wi] = wp === 0 ? 1 : 3
+        if (wi >= 0 && wp < 3 * ri) ptsArr[wi] = wp === 0 ? 1 * ri : 3 * ri
       }
       scores[uid] = ptsArr.reduce((s, p) => (p != null ? s + p : s), 0)
     })
