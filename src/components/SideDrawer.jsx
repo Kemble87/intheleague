@@ -72,3 +72,243 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
           animation: 'drawerIn .25s cubic-bezier(.25,.46,.45,.94)',
         }}>
           <style>{`
+            @keyframes drawerIn {
+              from { opacity: 0; transform: translateY(24px); }
+              to   { opacity: 1; transform: translateY(0); }
+            }
+          `}</style>
+
+          {/* Header */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '16px 20px',
+            borderBottom: '1px solid #111',
+            flexShrink: 0,
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{
+                width: 48, height: 48, borderRadius: '50%',
+                background: 'var(--green)', color: '#000',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 18, fontWeight: 800, flexShrink: 0,
+              }}>
+                {initials(user?.displayName || user?.email)}
+              </div>
+              <div>
+                <div style={{ fontSize: 17, fontWeight: 800, color: '#fff', letterSpacing: '-.02em' }}>
+                  {user?.displayName || user?.email?.split('@')[0]}
+                </div>
+                <div style={{ fontSize: 12, color: '#555', marginTop: 2 }}>{user?.email}</div>
+              </div>
+            </div>
+            <button onClick={() => setOpen(false)} style={{
+              background: '#111', border: '1px solid #222', borderRadius: '50%',
+              width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#888', cursor: 'pointer', fontSize: 16, flexShrink: 0,
+            }}>✕</button>
+          </div>
+
+          {/* Scrollable content */}
+          <div style={{ flex: 1, padding: '8px 0' }}>
+
+            {/* Switch pool */}
+            {pools?.length > 0 && (
+              <div style={{ padding: '12px 20px 4px' }}>
+                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#333', marginBottom: 8 }}>
+                  Your pools
+                </div>
+                {pools.map(pool => {
+                  const s = SPORTS[pool.sport] || SPORTS.PL
+                  const isActive = pool.id === activePoolId
+                  return (
+                    <button key={pool.id} onClick={() => { onSwitchPool(pool.id); setOpen(false) }} style={{
+                      width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                      padding: '12px 14px', borderRadius: 12, marginBottom: 6,
+                      background: isActive ? '#2a2a2a' : 'none',
+                      border: isActive ? '1px solid #1DB954' : '1px solid #111',
+                      cursor: 'pointer', textAlign: 'left',
+                    }}>
+                      <div style={{
+                        width: 40, height: 40, borderRadius: 10,
+                        background: s.grad,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 18, flexShrink: 0,
+                      }}>{s.emoji}</div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 15, fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pool.name}</div>
+                        <div style={{ fontSize: 12, color: '#555', marginTop: 2 }}>{s.name}</div>
+                      </div>
+                      {isActive
+                        ? <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--green)', flexShrink: 0 }}/>
+                        : <span style={{ color: '#333', fontSize: 18 }}>›</span>
+                      }
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+
+            <div style={{ height: 1, background: '#111', margin: '8px 0' }}/>
+
+            {/* Invite */}
+            {activePoolId && (
+              <button onClick={async () => {
+                const link = `https://intheleague.app#join-${activePoolId}`
+                try {
+                  await navigator.clipboard.writeText(link)
+                  alert('Invite link copied! 🏆')
+                } catch(e) {
+                  window.prompt('Copy this link:', link)
+                }
+              }} style={rowStyle}>
+                <div style={iconBox('#001a0d')}>👥</div>
+                <div style={{ flex: 1 }}>
+                  <div style={rowTitle}>Invite players</div>
+                  <div style={rowSub}>{activePoolId}</div>
+                </div>
+                <span style={{ color: '#333', fontSize: 18 }}>›</span>
+              </button>
+            )}
+
+            {/* About the game */}
+            <button onClick={() => setSection(section === 'rules' ? null : 'rules')} style={rowStyle}>
+              <div style={{ ...iconBox('#1a1400'), display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 2h8v3a4 4 0 01-8 0V2z" stroke="#FFD60A" strokeWidth="1.2"/><path d="M6 12h4M8 9v3M5 14h6" stroke="#FFD60A" strokeWidth="1.2" strokeLinecap="round"/><path d="M12 3h2v1.5a2 2 0 01-2 2M4 3H2v1.5a2 2 0 002 2" stroke="#FFD60A" strokeWidth="1"/></svg>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={rowTitle}>About the game</div>
+                <div style={rowSub}>Scoring, chips and everything else</div>
+              </div>
+              <span style={{ color: '#333', fontSize: 12 }}>{section === 'rules' ? '▲' : '▼'}</span>
+            </button>
+            {section === 'rules' && (
+              <div style={{ margin: '0 20px 8px', background: '#161616', borderRadius: 12, padding: '16px', border: '1px solid #262626' }}>
+
+                {/* The basics */}
+                <div style={secHd}>The game</div>
+                <div style={body}>
+                  Predict the score of every fixture before kickoff. Points land automatically as real results come in — the season-long table decides who's insufferable until next August.
+                </div>
+
+                {/* Points */}
+                <div style={secHd}>Points</div>
+                {SCORING_RULES.map(r => (
+                  <div key={r.pts} style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+                    <div style={{
+                      width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                      background: r.pts === 3 ? '#0d2b19' : r.pts === 1 ? '#221f00' : '#1a1a1a',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 12, fontWeight: 900, color: r.color,
+                    }}>
+                      {r.pts === 0 ? '✕' : '+' + r.pts}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{r.label}</div>
+                      <div style={{ fontSize: 11, color: '#666', marginTop: 1, lineHeight: 1.4 }}>{r.eg}</div>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Chips */}
+                <div style={secHd}>Chips — one use each per season</div>
+                {CHIP_RULES.map(c => (
+                  <div key={c.name} style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
+                    <div style={{ width: 6, borderRadius: 3, background: c.color, flexShrink: 0, opacity: .8 }}/>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>{c.name}</div>
+                      <div style={{ fontSize: 11, color: '#666', marginTop: 1, lineHeight: 1.5 }}>{c.desc}</div>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Everything else */}
+                <div style={secHd}>Beyond the table</div>
+                {[
+                  { t: 'The Run-In', d: 'The final nine matchdays of the season score double for everyone. Chips stack on top — a Banker in the run-in is worth six times the points.' },
+                  { t: 'Matchday crowns', d: 'Top scorer of each completed matchday earns a crown next to their name. Every weekend is winnable, wherever you sit in the table.' },
+                  { t: 'Live table', d: 'While a matchday is in play the leaderboard runs live — arrows show who\'s climbing and who\'s sliding as results land.' },
+                  { t: 'Head-to-head', d: 'Tap any rival on the leaderboard for your record against them — matchday wins, streaks, and your biggest blowout.' },
+                  { t: 'Hidden picks', d: 'Nobody sees anyone else\'s predictions until kickoff. At the whistle, all picks are revealed on the fixture.' },
+                  { t: 'Share cards', d: 'After each matchday the organiser can share a full-time results card straight into the group chat.' },
+                  { t: 'Wooden spoon', d: 'Lowest scorer of the matchday takes the spoon — announced on the ticker for all to see.' },
+                ].map(f => (
+                  <div key={f.t} style={{ marginBottom: 10 }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>{f.t}</div>
+                    <div style={{ fontSize: 11, color: '#666', marginTop: 1, lineHeight: 1.5 }}>{f.d}</div>
+                  </div>
+                ))}
+
+              </div>
+            )}
+            {/* Profile */}
+            <button onClick={() => setSection(section === 'profile' ? null : 'profile')} style={rowStyle}>
+              <div style={iconBox('#111')}>👤</div>
+              <div style={{ flex: 1 }}>
+                <div style={rowTitle}>Profile</div>
+                <div style={rowSub}>Change your display name</div>
+              </div>
+              <span style={{ color: '#333', fontSize: 12 }}>{section === 'profile' ? '▲' : '▼'}</span>
+            </button>
+            {section === 'profile' && (
+              <div style={{ margin: '0 20px 8px', background: '#222', borderRadius: 12, padding: '14px 16px', border: '1px solid #333' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: '#333', marginBottom: 10 }}>Display name</div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <input
+                    value={displayName}
+                    onChange={e => setDisplayName(e.target.value)}
+                    placeholder="Your name"
+                    style={{ flex: 1, padding: '10px 14px', background: '#111', border: '1px solid #222', borderRadius: 8, color: '#fff', font: 'inherit', fontSize: 14, outline: 'none' }}
+                  />
+                  <button
+                    onClick={async () => {
+                      if (!displayName.trim()) return
+                      try { await user.updateProfile?.({ displayName: displayName.trim() }) } catch(e) {}
+                      setSection(null)
+                    }}
+                    style={{ padding: '10px 18px', background: 'var(--green)', border: 'none', borderRadius: 8, color: '#000', font: 'inherit', fontSize: 13, fontWeight: 800, cursor: 'pointer' }}
+                  >Save</button>
+                </div>
+              </div>
+            )}
+
+            {/* Settings — coming soon */}
+            <div style={{ ...rowStyle, opacity: .35, cursor: 'default' }}>
+              <div style={iconBox('#111')}>⚙️</div>
+              <div style={{ flex: 1 }}>
+                <div style={rowTitle}>Settings</div>
+                <div style={rowSub}>Coming soon</div>
+              </div>
+            </div>
+
+            <div style={{ height: 1, background: '#111', margin: '8px 0' }}/>
+
+            {/* Sign out */}
+            <button onClick={() => signOut(auth)} style={{ ...rowStyle, color: '#ff4444' }}>
+              <div style={{ ...iconBox('#1a0000'), fontSize: 16 }}>→</div>
+              <div style={rowTitle}>Sign out</div>
+            </button>
+
+          </div>
+
+          {/* Safe area bottom */}
+          <div style={{ height: 'env(safe-area-inset-bottom, 20px)', flexShrink: 0 }}/>
+        </div>
+      )}
+    </>
+  )
+}
+
+const rowStyle = {
+  width: '100%', display: 'flex', alignItems: 'center', gap: 14,
+  padding: '12px 20px', background: 'none', border: 'none',
+  cursor: 'pointer', textAlign: 'left',
+}
+const rowTitle = { fontSize: 15, fontWeight: 600, color: '#fff' }
+const secHd = { fontSize: 10, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#555', margin: '16px 0 10px' }
+const body = { fontSize: 12, color: '#888', lineHeight: 1.6, marginBottom: 4 }
+const rowSub = { fontSize: 12, color: '#555', marginTop: 2 }
+const iconBox = (bg) => ({
+  width: 40, height: 40, borderRadius: 10, background: bg,
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  fontSize: 18, flexShrink: 0,
+})
