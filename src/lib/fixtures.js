@@ -2,8 +2,24 @@ import { useState, useEffect, useRef, useMemo } from 'react'
 import { ref, onValue, set, update } from 'firebase/database'
 import { rtdb } from '../lib/firebase'
 import { SAMPLE_FIXTURES } from '../lib/constants'
-import { fmtKO, fmtDay, groupDays, countdown, calcPts, abbr, fetchAndStoreFixtures, loadFixtures } from '../lib/helpers'
+import { fmtKO, fmtDay, groupDays, countdown, calcPts, abbr, fetchAndStoreFixtures, loadFixtures, matchdayScores, runInStart } from '../lib/helpers'
 import Kit from './Kit'
+
+const TEAM_NAMES = {
+  'Nottingham': 'Nottm Forest',
+  'Nott\'m Forest': 'Nottm Forest',
+  'Manchester City': 'Man City',
+  'Manchester United': 'Man United',
+  'Tottenham Hotspur': 'Spurs',
+  'Newcastle United': 'Newcastle',
+  'West Ham United': 'West Ham',
+  'Crystal Palace': 'Crystal Palace',
+  'Wolverhampton': 'Wolves',
+  'Brighton & Hove Albion': 'Brighton',
+  'Leicester City': 'Leicester',
+  'Ipswich Town': 'Ipswich',
+}
+function teamName(n) { return TEAM_NAMES[n] || n }
 
 function NextToPick({ fixtures, picks, now, onGo }) {
   const next = useMemo(() => {
@@ -21,12 +37,12 @@ function NextToPick({ fixtures, picks, now, onGo }) {
     <div className="ntp">
       <div className="ntp-label">⏱ Next to pick</div>
       <div className="ntp-match">
-        <div className="ntp-team">{next.home}</div>
+        <div className="ntp-team">{teamName(next.home)}</div>
         <div className="ntp-center">
           <span className="ntp-time">{p.weekday} {p.day} {p.month} · {p.hour}:{p.minute}</span>
           <span className="ntp-cd">locks in {cdStr}</span>
         </div>
-        <div className="ntp-team away">{next.away}</div>
+        <div className="ntp-team away">{teamName(next.away)}</div>
       </div>
       <button className="ntp-go" onClick={onGo}>Pick this match →</button>
     </div>
@@ -73,9 +89,13 @@ function MatchdaySummary({ fixtures, picks, results, matchday, allPicks }) {
   )
 }
 
-function FxCard({ fx, pick, result, now, isOrg, members, allPicks, onPick, onResult }) {
+function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, userId, runIn, onPick, onResult }) {
   const ko = new Date(fx.kickoff).getTime()
-  const locked = now >= ko
+  const chips = {} // loaded per-user at pool level, passed via prop if needed
+  const matchMins = (now - ko) / 60000
+  const isHalfTime = matchMins >= 45 && matchMins <= 62
+  const locked = now >= ko && !isHalfTime
+  const revealed = now >= ko
   const hasRes = result?.h != null && result?.a != null
   const p = calcPts(pick, result)
   const ct = countdown(fx.kickoff, now)
@@ -92,6 +112,18 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, onPick, onRes
       <div className="fx-time-row">
         <span className="fx-time">{fmtKO(fx.kickoff)}</span>
         <div className="fx-badges">
+          {/* Chip indicators */}
+          {allChips && userId && (() => { const mc = allChips[userId] || {}; return null })() }
+          {runIn &&
+            <span style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:9, letterSpacing:'.1em', fontWeight:700, padding:'2px 8px', borderRadius:500, background:'#1a0505', color:'#FF3B5C', border:'1px solid #FF3B5C44' }}>RUN-IN 2×</span>}
+          {allChips?.[userId]?.['2x']?.matchday && String(allChips[userId]['2x'].matchday) === String(fx.matchday) &&
+            <span style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#1a0800', color:'#FFD700', border:'1px solid #FFD70044' }}>⚡ 2×</span>}
+          {allChips?.[userId]?.['banker']?.fixtureId === fx.id &&
+            <span style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#000820', color:'#4499FF', border:'1px solid #4499FF44' }}>🏦 3×</span>}
+          {allChips?.[userId]?.['hth']?.matchday && String(allChips[userId]['hth'].matchday) === String(fx.matchday) && !result?.h &&
+            <span style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#0d001a', color:'#9966FF', border:'1px solid #9966FF44' }}>⏱</span>}
+          {allChips?.[userId]?.['coupon']?.matchday && String(allChips[userId]['coupon'].matchday) === String(fx.matchday) &&
+            <span style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:500, background:'#001a08', color:'#4CAF50', border:'1px solid #4CAF5044' }}>🎟</span>}
           {ct && <span className="pill pill-cd">🔒 {ct}</span>}
           {locked && !hasRes && !isOrg && <span className="pill pill-ko">Kicked off</span>}
           {hasRes && pick?.h != null && <span className={`pill ${p === 3 ? 'pill-p3' : p === 1 ? 'pill-p1' : 'pill-p0'}`}>{p === 3 ? '+3 exact' : p === 1 ? '+1 result' : '0 pts'}</span>}
@@ -99,26 +131,40 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, onPick, onRes
       </div>
       <div className="fx-match">
         <div className="fx-home">
-          <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-            <Kit team={fx.home} size={32} />
+          <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+            <Kit team={teamName(fx.home)} size={24} />
             <div>
-              <div className="fx-team-name">{fx.home}</div>
-              <div className="fx-team-abbr">{abbr(fx.home)}</div>
+              <div style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:"clamp(14px,4vw,20px)", color:'#fff', letterSpacing:'.06em', lineHeight:1 }}>{teamName(fx.home)}</div>
+              <div className="fx-team-abbr">{abbr(teamName(fx.home))}</div>
             </div>
           </div>
         </div>
-        <div className="sc-wrap">
-          <input className="sc" inputMode="numeric" value={display?.h ?? ''} placeholder="–" disabled={locked && !isOrg} aria-label={fx.home} onChange={e => onChange('h', e.target.value)} />
-          <span className="sc-sep">:</span>
-          <input className="sc" inputMode="numeric" value={display?.a ?? ''} placeholder="–" disabled={locked && !isOrg} aria-label={fx.away} onChange={e => onChange('a', e.target.value)} />
+        <div style={{ display:'flex', alignItems:'center', gap:3, padding:'0 6px' }}>
+          <div style={{ width:44, height:56, background:'#060606', border:'1.5px solid #1a1a1a', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
+            <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(0deg,rgba(0,0,0,.1) 0px,rgba(0,0,0,.1) 1px,transparent 1px,transparent 3px)', pointerEvents:'none', zIndex:1 }}/>
+            {(!locked || isOrg) && <input inputMode="numeric" value={display?.h ?? ''} onChange={e => onChange('h', e.target.value)} disabled={locked && !isOrg} aria-label={fx.home} style={{ position:'absolute', inset:0, opacity:0, cursor: locked&&!isOrg?'not-allowed':'pointer', zIndex:3, fontSize:32, textAlign:'center', background:'none', border:'none', WebkitAppearance:'none' }}/>}
+            <div style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:'clamp(22px,7vw,32px)', lineHeight:1, position:'relative', zIndex:2,
+              color: locked && hasRes ? '#ff6600' : display?.h != null ? '#00ff66' : '#1a0800',
+              textShadow: locked && hasRes ? '0 0 8px #ff440066' : display?.h != null ? '0 0 8px #00ff4466' : 'none'
+            }}>{display?.h ?? '–'}</div>
+          </div>
+          <span style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:'clamp(16px,5vw,22px)', color:'#2a2a2a', lineHeight:1, padding:'0 1px', marginBottom:2 }}>:</span>
+          <div style={{ width:44, height:56, background:'#060606', border:'1.5px solid #1a1a1a', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
+            <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(0deg,rgba(0,0,0,.1) 0px,rgba(0,0,0,.1) 1px,transparent 1px,transparent 3px)', pointerEvents:'none', zIndex:1 }}/>
+            {(!locked || isOrg) && <input inputMode="numeric" value={display?.a ?? ''} onChange={e => onChange('a', e.target.value)} disabled={locked && !isOrg} aria-label={fx.away} style={{ position:'absolute', inset:0, opacity:0, cursor: locked&&!isOrg?'not-allowed':'pointer', zIndex:3, fontSize:32, textAlign:'center', background:'none', border:'none', WebkitAppearance:'none' }}/>}
+            <div style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:'clamp(22px,7vw,32px)', lineHeight:1, position:'relative', zIndex:2,
+              color: locked && hasRes ? '#ff6600' : display?.a != null ? '#00ff66' : '#1a0800',
+              textShadow: locked && hasRes ? '0 0 8px #ff440066' : display?.a != null ? '0 0 8px #00ff4466' : 'none'
+            }}>{display?.a ?? '–'}</div>
+          </div>
         </div>
         <div className="fx-away">
-          <div style={{ display:'flex', alignItems:'center', gap:8, justifyContent:'flex-end' }}>
+          <div style={{ display:'flex', alignItems:'center', gap:6, justifyContent:'flex-end' }}>
             <div style={{ textAlign:'right' }}>
-              <div className="fx-team-name">{fx.away}</div>
-              <div className="fx-team-abbr">{abbr(fx.away)}</div>
+              <div style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:"clamp(14px,4vw,20px)", color:'#fff', letterSpacing:'.06em', lineHeight:1 }}>{teamName(fx.away)}</div>
+              <div className="fx-team-abbr">{abbr(teamName(fx.away))}</div>
             </div>
-            <Kit team={fx.away} size={32} flip />
+            <Kit team={teamName(fx.away)} size={24} flip />
           </div>
         </div>
       </div>
@@ -128,7 +174,13 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, onPick, onRes
           {locked && isOrg && <span className="fx-org-save">{hasRes ? '✓ Saved' : 'Enter above'}</span>}
         </div>
       )}
-      {locked && allPicks && members && members.length > 1 && (
+      {!revealed && members && members.length > 1 && (
+        <div style={{ display:'flex', alignItems:'center', gap:7, padding:'8px 14px 10px', borderTop:'1px solid #0a0a0a' }}>
+          <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="#333" strokeWidth="1.3"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="#333" strokeWidth="1.3"/></svg>
+          <span style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:10, letterSpacing:'.12em', color:'#333' }}>PICKS HIDDEN UNTIL KICKOFF</span>
+        </div>
+      )}
+      {revealed && allPicks && members && members.length > 1 && (
         <div className="picks-row">
           {members.map(([uid, m]) => {
             const mp = (allPicks[uid] || {})[fx.id]
@@ -151,12 +203,22 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
   const [loading, setLoading] = useState(true)
   const [matchday, setMatchday] = useState('ALL')
   const [now, setNow] = useState(Date.now())
+  const [allChips, setAllChips] = useState({})
   const [tab, setTab] = useState('picks')
+  const [h2h, setH2h] = useState(null)
 
   const isOrg = pool.createdBy === user.uid || pool.members?.[user.uid]?.isOrganiser
   const members = Object.entries(pool.members || {})
 
   useEffect(() => { const iv = setInterval(() => setNow(Date.now()), 30000); return () => clearInterval(iv) }, [])
+
+  // Open on the current matchday rather than the full-season scroll
+  const didDefaultMd = useRef(false)
+  useEffect(() => {
+    if (didDefaultMd.current || !fixtures.length) return
+    const up = fixtures.find(f => new Date(f.kickoff).getTime() > Date.now())
+    if (up?.matchday) { setMatchday(String(up.matchday)); didDefaultMd.current = true }
+  }, [fixtures])
 
   useEffect(() => {
     setLoading(true)
@@ -169,6 +231,12 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
     return () => u()
   }, [poolId])
 
+  useEffect(() => {
+    const r = ref(rtdb, 'pools/' + poolId + '/chips')
+    const u = onValue(r, s => setAllChips(s.val() || {}))
+    return () => u()
+  }, [poolId])
+
   const mdays = [...new Set((fixtures || []).map(f => f.matchday).filter(Boolean))].sort((a, b) => a - b)
   const filtered = matchday === 'ALL' ? fixtures : (fixtures || []).filter(f => String(f.matchday) === String(matchday))
   const days = groupDays(filtered)
@@ -177,81 +245,55 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
   const exactPts = (fixtures || []).filter(f => calcPts(picks[f.id], results[f.id]) === 3).length
   const totalPicks = (fixtures || []).filter(f => picks[f.id]?.h != null).length
 
+  // Apply chip effects to scoring
+  function calcPtsWithChips(uid, fid, pick, result, matchdayNum) {
+    const base = calcPts(pick, result)
+    if (base == null) return null
+    const chips = allChips[uid] || {}
+    let multiplier = Number(matchdayNum) >= runInStart(fixtures) ? 2 : 1
+    // 2x chip — doubles all points for chosen matchday
+    if (chips['2x']?.matchday && String(chips['2x'].matchday) === String(matchdayNum)) multiplier *= 2
+    // Banker chip — triples points for chosen fixture
+    if (chips['banker']?.fixtureId === fid) multiplier *= 3
+    return base * multiplier
+  }
+
+  function applyMatchdayChips(uid, matchdayFixtures, ptsArr) {
+    const chips = allChips[uid] || {}
+    // Coupon Buster — rescue worst result for chosen matchday
+    if (chips['coupon']?.matchday) {
+      const mdNum = chips['coupon'].matchday
+      const mdFx = matchdayFixtures.filter(f => String(f.matchday) === String(mdNum))
+      if (mdFx.length > 0) {
+        // Find worst scoring fixture index and upgrade it
+        let worstIdx = -1, worstPts = Infinity
+        ptsArr.forEach((p, i) => { if (p != null && p < worstPts) { worstPts = p; worstIdx = i } })
+        if (worstIdx >= 0 && worstPts < 3) {
+          ptsArr[worstIdx] = Math.min(3, worstPts + (worstPts === 0 ? 1 : 2))
+        }
+      }
+    }
+    return ptsArr
+  }
+
   const board = members.map(([uid, m]) => {
     let p = 0, ex = 0, md = 0
+    // Copycat — use target's picks if chip active
+    const chips = allChips[uid] || {}
+    const copyTargetUid = chips['copycat']?.targetUid
+    const copyMatchday = chips['copycat']?.matchday
     const mp = uid === user.uid ? picks : (allPicks[uid] || {})
-    ;(fixtures || []).forEach(f => { const pk = mp[f.id], rs = results[f.id]; if (pk?.h != null) md++; const s = calcPts(pk, rs); if (s != null) { p += s; if (s === 3) ex++ } })
+    ;(fixtures || []).forEach(f => {
+      // Apply copycat for the chosen matchday
+      let pk = mp[f.id]
+      if (copyTargetUid && String(f.matchday) === String(copyMatchday)) {
+        pk = (allPicks[copyTargetUid] || {})[f.id] || pk
+      }
+      const rs = results[f.id]
+      if (pk?.h != null) md++
+      const s = calcPtsWithChips(uid, f.id, pk, rs, f.matchday)
+      if (s != null) { p += s; if (calcPts(pk, rs) === 3) ex++ }
+    })
     return { uid, name: m.name, pts: p, exact: ex, made: md, isMe: uid === user.uid }
   }).sort((a, b) => b.pts - a.pts || b.exact - a.exact)
 
-  return (
-    <>
-      {/* Pool hero */}
-      <div className="pool-hero">
-        <div className="pool-hero-inner" style={{ background: (pool.sport ? { PL: 'linear-gradient(135deg,#3d0066,#6600aa)', CHAMP: 'linear-gradient(135deg,#003366,#0055aa)', L1: 'linear-gradient(135deg,#002200,#005500)', WC: 'linear-gradient(135deg,#662200,#aa4400)', SN: 'linear-gradient(135deg,#003300,#006600)' }[pool.sport] : 'linear-gradient(135deg,#3d0066,#6600aa)') }}>
-          <div className="pool-hero-sport">{pool.sport} · {pool.name}</div>
-          <div className="pool-hero-name">{pool.name}</div>
-          <div className="pool-hero-stats">
-            <div><div className="phs-num">{totalPts}</div><div className="phs-label">Pts</div></div>
-            <div><div className="phs-num">{exactPts}</div><div className="phs-label">Exact</div></div>
-            <div><div className="phs-num">{totalPicks}/{fixtures.length}</div><div className="phs-label">Picked</div></div>
-            <div><div className="phs-num">{members.length}</div><div className="phs-label">Players</div></div>
-          </div>
-        </div>
-      </div>
-
-      <NextToPick fixtures={fixtures} picks={picks} now={now} onGo={() => setTab('picks')} />
-
-      <div className="tabs">
-        <button className={`tab${tab === 'picks' ? ' on' : ''}`} onClick={() => setTab('picks')}>{isOrg ? 'Picks & results' : 'My picks'}</button>
-        <button className={`tab${tab === 'board' ? ' on' : ''}`} onClick={() => setTab('board')}>Leaderboard</button>
-      </div>
-
-      {tab === 'picks' ? (
-        <>
-          <div className="fx-controls">
-            <select className="md-select" value={matchday} onChange={e => setMatchday(e.target.value)}>
-              <option value="ALL">All matchdays</option>
-              {mdays.map(md => <option key={md} value={md}>Matchday {md}</option>)}
-            </select>
-            {isOrg && (
-              <button className="sync-btn" onClick={async () => {
-                try { const fx = await fetchAndStoreFixtures(pool.sport, poolId, rtdb); alert(fx.length > 0 ? `Synced ${fx.length} fixtures!` : 'No fixtures found') }
-                catch (e) { alert('Error: ' + e.message) }
-              }}>⟳ Sync</button>
-            )}
-          </div>
-          {isOrg && <div className="org-note">You're the organiser — enter official results after each match kicks off.</div>}
-          <MatchdaySummary fixtures={filtered} picks={picks} results={results} matchday={matchday} allPicks={allPicks} />
-          {loading ? <div className="loading">Loading fixtures…</div> : days.map(day => (
-            <div key={day.d}>
-              <div className="day-hd">{day.label}</div>
-              {day.items.map(f => (
-                <FxCard key={f.id} fx={f} pick={picks[f.id]} result={results[f.id]} now={now} isOrg={isOrg} members={members} allPicks={allPicks}
-                  onPick={(s, v) => onSavePick(f.id, s, v)}
-                  onResult={(s, v) => onSaveResult(f.id, s, v)}
-                />
-              ))}
-            </div>
-          ))}
-        </>
-      ) : (
-        <div className="board">
-          {board.map((row, i) => (
-            <div key={row.uid} className={`board-row${i === 0 && row.pts > 0 ? ' gold' : ''}${row.isMe ? ' me' : ''}`}>
-              <div className="board-rank">{i === 0 && row.pts > 0 ? '🏆' : i + 1}</div>
-              <div className="board-info">
-                <div className="board-name">{row.name}{row.isMe ? ' · you' : ''}</div>
-                <div className="board-detail">{row.exact} exact · {row.made} picked</div>
-              </div>
-              <div>
-                <div className="board-pts">{row.pts}</div>
-                <div className="board-pts-label">pts</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </>
-  )
-}
