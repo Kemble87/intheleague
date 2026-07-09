@@ -502,7 +502,18 @@ export default function Chips({ poolId, userId, members, fixtures }) {
   }, [poolId, userId])
 
   function activate(chip, extraData = {}) {
-    const data = { usedAt: Date.now(), ...extraData }
+        // House rule: one chip per matchday
+    const mdOf = d => { if (!d) return null; if (d.matchday != null && d.matchday !== 'ALL') return String(d.matchday); if (d.fixtureId) { const f = (fixtures || []).find(x => x.id === d.fixtureId); return f?.matchday != null ? String(f.matchday) : null } return null }
+    if (chip.id === 'banker' && extraData.fixtureId && extraData.matchday == null) {
+      const bf = (fixtures || []).find(x => x.id === extraData.fixtureId)
+      if (bf?.matchday != null) extraData = { ...extraData, matchday: bf.matchday }
+    }
+    const targetMd = mdOf(extraData)
+    if (targetMd != null) {
+      const clash = CHIP_DEFS.find(c => c.id !== chip.id && mdOf(used[c.id]) === targetMd)
+      if (clash) { alert(`One chip per matchday — you've already played ${clash.name} on Matchday ${targetMd}. Pick a different matchday.`); return }
+    }
+const data = { usedAt: Date.now(), ...extraData }
     set(ref(rtdb, `pools/${poolId}/chips/${userId}/${chip.id}`), data)
     setUsed(u => ({ ...u, [chip.id]: data }))
     setConfirming(null)
