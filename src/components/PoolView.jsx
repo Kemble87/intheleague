@@ -9,6 +9,7 @@ import PoolHero from './PoolHero'
 import OrgNudge from './OrgNudge'
 import Ticker from './Ticker'
 import ShareCard from './ShareCard'
+import PoolIntro from './PoolIntro'
 
 export default function PoolView({ user, pool, poolId, onBack }) {
   const [picks, setPicks] = useState({})
@@ -94,6 +95,8 @@ export default function PoolView({ user, pool, poolId, onBack }) {
 
   return (
     <>
+          <PoolIntro pool={pool} poolId={poolId} />
+
       <button className="back" onClick={onBack}>← All pools</button>
       <PoolHero pool={pool} fixtures={fixtures} picks={picks} results={results} members={members} userId={user.uid} onOpenPlayers={() => setShowPlayers(s => !s)} />
       {showPlayers && <Members poolId={poolId} pool={pool} userId={user.uid} />}
