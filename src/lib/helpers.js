@@ -49,12 +49,13 @@ export async function fetchAndStoreFixtures(sport, poolId, rtdb) {
     const text = await res.text()
     if (!res.ok) throw new Error('HTTP ' + res.status)
     const data = JSON.parse(text)
+    const STAGE_MD = { LAST_32: 4, LAST_16: 5, QUARTER_FINALS: 6, SEMI_FINALS: 7, THIRD_PLACE: 8, FINAL: 8 }
     const matches = (data.matches || []).map(m => ({
       id: 'm' + m.id,
       home: m.homeTeam?.shortName || m.homeTeam?.name || 'TBD',
       away: m.awayTeam?.shortName || m.awayTeam?.name || 'TBD',
       kickoff: m.utcDate,
-      matchday: m.matchday || 1,
+      matchday: (m.stage && STAGE_MD[m.stage]) || m.matchday || 1,
       status: m.status,
       homeScore: m.score?.fullTime?.home ?? null,
       awayScore: m.score?.fullTime?.away ?? null,
