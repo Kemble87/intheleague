@@ -159,7 +159,7 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
   return (
     <div className="main">
       <div className="dash-hero">
-        <div className="dash-greeting">Hey, <em>{first}</em></div>
+       <div className="dash-greeting">{new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, <em>{first}</em>.</div>
         <div className="dash-sub">Pick your scores. Beat your mates.</div>
       </div>
       {pools.length > 0 && (
