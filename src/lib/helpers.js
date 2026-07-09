@@ -35,7 +35,7 @@ export function calcPts(pick, result) {
 }
 
 export function initials(s) { return (s || '?').split(/[\s@]/)[0].slice(0, 2).toUpperCase() }
-export function abbr(n) { const w = n.split(' '); return w.length > 1 ? w.map(x => x[0]).join('').slice(0, 3).toUpperCase() : n.slice(0, 3).toUpperCase() }
+export function abbr(n) { n = n || 'TBD'; const w = String(n).split(' '); return w.length > 1 ? w.map(x => x[0]).join('').slice(0, 3).toUpperCase() : String(n).slice(0, 3).toUpperCase() }
 export function slugify(s) { return (s || 'pool').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 18) + '-' + Math.random().toString(36).slice(2, 5) }
 
 export async function fetchAndStoreFixtures(sport, poolId, rtdb) {
@@ -51,8 +51,8 @@ export async function fetchAndStoreFixtures(sport, poolId, rtdb) {
     const data = JSON.parse(text)
     const matches = (data.matches || []).map(m => ({
       id: 'm' + m.id,
-      home: m.homeTeam.shortName || m.homeTeam.name,
-      away: m.awayTeam.shortName || m.awayTeam.name,
+      home: m.homeTeam?.shortName || m.homeTeam?.name || 'TBD',
+      away: m.awayTeam?.shortName || m.awayTeam?.name || 'TBD',
       kickoff: m.utcDate,
       matchday: m.matchday || 1,
       status: m.status,
