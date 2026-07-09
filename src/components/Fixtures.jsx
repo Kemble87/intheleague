@@ -110,6 +110,8 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, use
 
   return (
     <div className="fx">
+            <ExactBurst id={fx.id} active={p === 3} />
+
       <div className="fx-time-row">
         <span className="fx-time">{fmtKO(fx.kickoff)}</span>
         <div className="fx-badges">
