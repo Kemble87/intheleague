@@ -322,3 +322,39 @@ button:active { transform: scale(.96); }
   .fx, .pick-chip { animation: none; }
   button:active, .board-row:active, .pool-card:active { transform: none; }
 }
+/* ── CHAPTER 2: landing-grade art direction inside the app ── */
+
+/* Nav becomes frosted glass */
+.nav { position: sticky; top: 0; z-index: 100; background: rgba(0,0,0,.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(255,255,255,.05); }
+
+/* Dashboard greeting goes landing-hero sized */
+.dash-greeting { font-family: 'Space Grotesk','Inter',sans-serif; font-size: clamp(38px, 10vw, 58px); font-weight: 700; letter-spacing: -.04em; line-height: .95; }
+
+/* Founding-season strip: quiet luxury */
+.pro-strip { background: linear-gradient(150deg, #0c140d, #0a0a0a); border: 1px solid #1a1a1a; border-radius: 16px; }
+
+/* Pool cards: taller, huge names, pitch-arc motif */
+.pool-card-grad { padding: 32px 22px 26px; min-height: 150px; position: relative; overflow: hidden; }
+.pool-card-grad::after { content: ''; position: absolute; width: 240px; height: 240px; border: 1px solid rgba(255,255,255,.06); border-radius: 50%; top: -90px; right: -70px; pointer-events: none; }
+.pool-card-grad::before { content: ''; position: absolute; width: 150px; height: 150px; border: 1px solid rgba(255,255,255,.04); border-radius: 50%; top: -45px; right: -25px; pointer-events: none; }
+.pool-card .pool-card-name, .pool-card h3 { font-family: 'Space Grotesk','Inter',sans-serif; font-size: clamp(26px, 7vw, 36px); font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+
+/* Back link becomes a proper pill */
+.back { border: 1px solid #1e1e1e; border-radius: 500px; padding: 8px 16px; background: rgba(255,255,255,.02); }
+
+/* Tabs: segmented-control feel */
+.tabs { border: 1px solid #161616; border-radius: 500px; padding: 4px; background: #0a0a0a; }
+.tab { border-radius: 500px; }
+
+/* Next-to-pick: give the hero moment a green aura */
+.ntp { border: 1px solid #00E05A2e; box-shadow: 0 0 50px rgba(0,224,90,.06), inset 0 0 40px rgba(0,224,90,.02); }
+
+/* Day headers: eyebrow typography like the landing */
+.day-hd { font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: #4a4a4a; }
+
+/* Section rhythm: let it breathe */
+.md-summary { border-radius: 16px; }
+.org-note { border-radius: 0 12px 12px 0; }
+
+/* Board: winner's row gets a golden aura */
+.board-row.gold { box-shadow: 0 0 40px rgba(255,214,10,.05), inset 0 0 30px rgba(255,214,10,.02); }
