@@ -278,3 +278,47 @@ input:focus-visible { outline: none; }
 
 /* LOADING */
 .loading { color: #333; text-align: center; padding: 40px 0; font-size: 14px; }
+/* ── FEEL: micro-interactions & motion ─────────────────────── */
+* { -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+::selection { background: #00E05A44; }
+
+/* Everything tappable responds to touch */
+button { transition: transform .12s ease, opacity .12s ease, border-color .2s ease, background .2s ease; }
+button:active { transform: scale(.96); }
+
+/* Fixture cards breathe in as they appear */
+@keyframes cardIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.fx { animation: cardIn .35s ease both; transition: border-color .2s ease; }
+.fx:nth-child(2) { animation-delay: .04s; }
+.fx:nth-child(3) { animation-delay: .08s; }
+.fx:nth-child(4) { animation-delay: .12s; }
+.fx:nth-child(5) { animation-delay: .16s; }
+.fx:active { border-color: #2a2a2a; }
+
+/* Sticky day headers with glass blur */
+.day-hd { position: sticky; top: 0; z-index: 5; background: rgba(0,0,0,.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+
+/* Leaderboard rows lift on touch */
+.board-row { transition: transform .15s ease, border-color .2s ease, background .2s ease; }
+.board-row:active { transform: scale(.985); }
+
+/* Chips strip snaps satisfyingly */
+.chips-grid { scroll-snap-type: x proximity; }
+.chips-grid > div { scroll-snap-align: start; }
+
+/* Pool cards press in */
+.pool-card:active { transform: scale(.98); }
+
+/* Tabs slide their state change */
+.tab { transition: background .2s ease, color .2s ease; }
+
+/* Pick chips pop when revealed */
+@keyframes chipPop { from { opacity: 0; transform: scale(.8); } to { opacity: 1; transform: scale(1); } }
+.pick-chip { animation: chipPop .25s ease both; }
+
+/* Reduced motion: respect it */
+@media (prefers-reduced-motion: reduce) {
+  .fx, .pick-chip { animation: none; }
+  button:active, .board-row:active, .pool-card:active { transform: none; }
+}
