@@ -8,6 +8,8 @@ import Members from './Members'
 import PoolHero from './PoolHero'
 import OrgNudge from './OrgNudge'
 import Ticker from './Ticker'
+import DivisionTable from './DivisionTable'
+
 import ShareCard from './ShareCard'
 import PoolIntro from './PoolIntro'
 
@@ -114,6 +116,8 @@ export default function PoolView({ user, pool, poolId, onBack }) {
       {isOrg && (
         <OrgNudge pool={pool} poolId={poolId} members={members} allPicks={allPicks} fixtures={fixtures} results={results} />
       )}
+            <DivisionTable sport={pool.sport} leagueName={(pool.sport === 'CHAMP' ? 'Championship' : pool.sport === 'L1' ? 'League One' : 'Premier League')} />
+
       <Chips
         poolId={poolId}
         userId={user.uid}
