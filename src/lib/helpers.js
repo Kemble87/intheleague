@@ -42,7 +42,7 @@ export async function fetchAndStoreFixtures(sport, poolId, rtdb) {
   const COMP_IDS = { PL: 'PL', CHAMP: 'ELC', L1: 'EL1', WC: 'WC' }
   const compId = COMP_IDS[sport]
   if (!compId) return []
-  const season = sport === 'WC' ? '2026' : '2025'
+  const season = '2026' // 2026/27 season (and 2026 World Cup)
   const url = `/.netlify/functions/fixtures?comp=${compId}&season=${season}`
   try {
     const res = await fetch(url)
