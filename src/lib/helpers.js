@@ -54,6 +54,8 @@ export async function fetchAndStoreFixtures(sport, poolId, rtdb) {
       id: 'm' + m.id,
       home: m.homeTeam?.shortName || m.homeTeam?.name || 'TBD',
       away: m.awayTeam?.shortName || m.awayTeam?.name || 'TBD',
+      homeCrest: m.homeTeam?.crest || null,
+      awayCrest: m.awayTeam?.crest || null,
       kickoff: m.utcDate,
       matchday: (m.stage && STAGE_MD[m.stage]) || m.matchday || 1,
       status: m.status,
