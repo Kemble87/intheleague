@@ -57,10 +57,14 @@ function CreateModal({ user, onClose, onCreate }) {
         <label className="modal-label">Sport</label>
         <div className="sport-grid">
           {Object.entries(SPORTS).map(([k, s]) => (
-            <div key={k} className={`sport-tile${sport === k ? ' on' : ''}`} onClick={() => setSport(k)}>
+>            <div key={k} className={`sport-tile${sport === k ? ' on' : ''}`}
+              onClick={() => !s.soon && setSport(k)}
+              style={s.soon ? { opacity: .35, cursor: 'default', position: 'relative' } : undefined}>
               <div className="sport-tile-em">{s.emoji}</div>
               <div className="sport-tile-name">{s.name}</div>
+              {s.soon && <div style={{ fontSize: 8, fontWeight: 800, letterSpacing: '.12em', color: '#FFD60A', marginTop: 3 }}>COMING SOON</div>}
             </div>
+
           ))}
         </div>
         <div className="modal-btns">
