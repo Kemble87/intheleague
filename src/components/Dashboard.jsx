@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { collection, query, where, onSnapshot, doc, setDoc, arrayUnion, updateDoc, increment, getDoc } from 'firebase/firestore'
-import { db } from '../lib/firebase'
+import { db, rtdb } from '../lib/firebase'
+import { ref, get } from 'firebase/database'
 import { SPORTS } from '../lib/constants'
 import { slugify, initials } from '../lib/helpers'
 import PoolView from './PoolView'
@@ -33,7 +34,7 @@ function CreateModal({ user, onClose, onCreate }) {
       <div className="modal-bg" onClick={onClose}>
         <div className="modal" onClick={e => e.stopPropagation()}>
           <div className="modal-pip" />
-          <div className="modal-h">Pool created 🎉</div>
+          <div className="modal-h">Pool created</div>
           <div className="modal-s">Share this link — they join in one tap.</div>
           <div className="inv-box">
             <span className="inv-code">{code}</span>
@@ -119,6 +120,7 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
   const [showCreate, setShowCreate] = useState(false)
   const [showJoin, setShowJoin] = useState(false)
   const [active, setActive] = useState(null)
+  const [meta, setMeta] = useState({})
 
   const first = (user.displayName || user.email || '').split(/[\s@]/)[0]
 
@@ -144,6 +146,35 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
     return () => unsub?.()
   }, [user.uid])
 
+  useEffect(() => {
+    if (!pools.length) return
+    let dead = false
+    ;(async () => {
+      const out = {}
+      for (const p of pools) {
+        try {
+          const [fs, ps] = await Promise.all([
+            get(ref(rtdb, `pools/${p.id}/fixtures`)),
+            get(ref(rtdb, `pools/${p.id}/picks/${user.uid}`)),
+          ])
+          if (!fs.exists()) continue
+          const fx = Object.values(fs.val()).sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff))
+          const picks = ps.exists() ? ps.val() : {}
+          const now = Date.now()
+          const next = fx.find(f => new Date(f.kickoff).getTime() > now)
+          if (!next) { out[p.id] = { done: true }; continue }
+          const md = next.matchday
+          const due = fx.filter(f => String(f.matchday) === String(md) && new Date(f.kickoff).getTime() > now && picks[f.id]?.h == null).length
+          const ko = new Date(next.kickoff)
+          const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(ko).reduce((a, b) => (a[b.type] = b.value, a), {})
+          out[p.id] = { due, nextKO: `${parts.weekday} ${parts.day} ${parts.month} · ${parts.hour}:${parts.minute}` }
+        } catch (e) { /* meta is decoration — never block the dashboard */ }
+      }
+      if (!dead) setMeta(out)
+    })()
+    return () => { dead = true }
+  }, [pools, user.uid])
+
   function goPool(id) { setActive(id); onPoolChange?.(id) }
   function goBack() { setActive(null); onPoolChange?.(null) }
 
@@ -159,7 +190,7 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
   return (
     <div className="main">
       <div className="dash-hero">
-       <div className="dash-greeting">{new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, <em>{first}</em>.</div>
+        <div className="dash-greeting">{new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, <em>{first}</em>.</div>
         <div className="dash-sub">Pick your scores. Beat your mates.</div>
       </div>
       {pools.length > 0 && (
@@ -168,10 +199,9 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M9 1L3 9.5h4L7 15l6-8.5H9L9 1z" stroke="#00E05A" strokeWidth="1.3" strokeLinejoin="round"/></svg>
           </div>
           <div className="pro-strip-text">
-            <div className="pro-strip-title">Season Pass · £14.99</div>
-            <div className="pro-strip-sub">One payment covers your whole pool · all season</div>
+            <div className="pro-strip-title">Season one · free for everyone</div>
+            <div className="pro-strip-sub">Every feature unlocked for founding pools</div>
           </div>
-          <button className="pro-strip-btn">Upgrade</button>
         </div>
       )}
       <div className="sec-label">Your pools</div>
@@ -181,7 +211,7 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
         <>
           {pools.length === 0 && (
             <div className="empty">
-                            <div className="empty-title">No pools yet</div>
+              <div className="empty-title">No pools yet</div>
               <div className="empty-body">Create your first pool or join one a mate has set up.</div>
             </div>
           )}
@@ -197,12 +227,26 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
                   WC:    'linear-gradient(150deg,#1a0f05 0%,#0d0d0d 60%)',
                   SN:    'linear-gradient(150deg,#081408 0%,#0d0d0d 60%)',
                 })[pool.sport] || 'linear-gradient(150deg,#12081f 0%,#0d0d0d 60%)' }}>
-                  <div className="pool-card-sport">
-                    <span className="pool-card-sport-dot" />
-                    {s.name}
+                  <div className="pool-card-sport" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><span className="pool-card-sport-dot" />{s.name}</span>
+                    {meta[pool.id]?.due > 0 && (
+                      <span style={{ fontFamily: "'Space Grotesk','Inter',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: '.06em', color: '#FFD60A', background: 'rgba(255,214,10,.1)', border: '1px solid rgba(255,214,10,.35)', borderRadius: 500, padding: '3px 10px' }}>
+                        {meta[pool.id].due} pick{meta[pool.id].due !== 1 ? 's' : ''} due
+                      </span>
+                    )}
+                    {meta[pool.id]?.due === 0 && (
+                      <span style={{ fontFamily: "'Space Grotesk','Inter',sans-serif", fontSize: 10, fontWeight: 700, letterSpacing: '.06em', color: '#00E05A', background: 'rgba(0,224,90,.08)', border: '1px solid rgba(0,224,90,.3)', borderRadius: 500, padding: '3px 10px' }}>
+                        All picked
+                      </span>
+                    )}
                   </div>
                   <div className="pool-card-name">{pool.name}</div>
-                  <div className="pool-card-players">
+                  {meta[pool.id]?.nextKO && (
+                    <div style={{ fontFamily: "'Share Tech Mono',ui-monospace,monospace", fontSize: 10, letterSpacing: '.1em', color: 'rgba(255,255,255,.35)', marginTop: 6 }}>
+                      NEXT KICKOFF · {meta[pool.id].nextKO.toUpperCase()}
+                    </div>
+                  )}
+                  <div className="pool-card-players" style={{ marginTop: 14 }}>
                     {mlist.slice(0, 5).map(([uid, m]) => (
                       <div key={uid} className="player-av" title={m.name}>{initials(m.name)}</div>
                     ))}
