@@ -135,7 +135,8 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, use
       <div className="fx-match">
         <div className="fx-home">
           <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-            <Kit team={teamName(fx.home)} size={24} />
+            <Kit team={teamName(fx.home)} crest={fx.homeCrest} size={24} />
+
             <div>
               <div style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:"clamp(14px,4vw,20px)", color:'#fff', letterSpacing:'.06em', lineHeight:1 }}>{teamName(fx.home)}</div>
               <div className="fx-team-abbr">{abbr(teamName(fx.home))}</div>
@@ -167,7 +168,8 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, use
               <div style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:"clamp(14px,4vw,20px)", color:'#fff', letterSpacing:'.06em', lineHeight:1 }}>{teamName(fx.away)}</div>
               <div className="fx-team-abbr">{abbr(teamName(fx.away))}</div>
             </div>
-            <Kit team={teamName(fx.away)} size={24} flip />
+            <Kit team={teamName(fx.away)} crest={fx.awayCrest} size={24} flip />
+
           </div>
         </div>
       </div>
