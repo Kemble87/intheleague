@@ -64,7 +64,6 @@ function CreateModal({ user, onClose, onCreate }) {
               <div className="sport-tile-name">{s.name}</div>
               {s.soon && <div style={{ fontSize: 8, fontWeight: 800, letterSpacing: '.12em', color: '#FFD60A', marginTop: 3 }}>COMING SOON</div>}
             </div>
-
           ))}
         </div>
         <div className="modal-btns">
@@ -169,9 +168,31 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
           if (!next) { out[p.id] = { done: true }; continue }
           const md = next.matchday
           const due = fx.filter(f => String(f.matchday) === String(md) && new Date(f.kickoff).getTime() > now && picks[f.id]?.h == null).length
+          // My league position — quick chip-free approximation for the card
+          let rank = null
+          try {
+            const [rs, ap] = await Promise.all([
+              get(ref(rtdb, `pools/${p.id}/results`)),
+              get(ref(rtdb, `pools/${p.id}/picks`)),
+            ])
+            const results = rs.exists() ? rs.val() : {}
+            const allPicks = ap.exists() ? ap.val() : {}
+            const memberIds = Object.keys(p.members || {})
+            if (memberIds.length > 1 && Object.keys(results).length) {
+              const score = uid => fx.reduce((s2, f) => {
+                const pk = (allPicks[uid] || {})[f.id], r = results[f.id]
+                if (!pk || !r || pk.h == null || r.h == null) return s2
+                if (pk.h === r.h && pk.a === r.a) return s2 + 3
+                if (Math.sign(pk.h - pk.a) === Math.sign(r.h - r.a)) return s2 + 1
+                return s2
+              }, 0)
+              const table = memberIds.map(uid => ({ uid, pts: score(uid) })).sort((a, b) => b.pts - a.pts)
+              rank = table.findIndex(t => t.uid === user.uid) + 1
+            }
+          } catch (e) { /* rank optional */ }
           const ko = new Date(next.kickoff)
           const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/London', weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(ko).reduce((a, b) => (a[b.type] = b.value, a), {})
-          out[p.id] = { due, nextKO: `${parts.weekday} ${parts.day} ${parts.month} · ${parts.hour}:${parts.minute}` }
+          out[p.id] = { due, rank, players: Object.keys(p.members || {}).length, nextKO: `${parts.weekday} ${parts.day} ${parts.month} · ${parts.hour}:${parts.minute}` }
         } catch (e) { /* meta is decoration — never block the dashboard */ }
       }
       if (!dead) setMeta(out)
@@ -248,6 +269,14 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
                   {meta[pool.id]?.nextKO && (
                     <div style={{ fontFamily: "'Share Tech Mono',ui-monospace,monospace", fontSize: 10, letterSpacing: '.1em', color: 'rgba(255,255,255,.35)', marginTop: 6 }}>
                       NEXT KICKOFF · {meta[pool.id].nextKO.toUpperCase()}
+                    </div>
+                  )}
+                  {meta[pool.id]?.rank && (
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginTop: 10, background: 'rgba(255,214,10,.08)', border: '1px solid rgba(255,214,10,.3)', borderRadius: 500, padding: '4px 12px' }}>
+                      <svg width="10" height="8" viewBox="0 0 12 9" fill="none"><path d="M1 8h10M1 8L.5 2.5 3.5 5 6 1l2.5 4 3-2.5L11 8" stroke="#FFD60A" strokeWidth="1.1" strokeLinejoin="round" strokeLinecap="round"/></svg>
+                      <span style={{ fontFamily: "'Space Grotesk','Inter',sans-serif", fontSize: 11, fontWeight: 700, color: '#FFD60A' }}>
+                        You're {meta[pool.id].rank}{['','st','nd','rd'][meta[pool.id].rank % 100 > 10 && meta[pool.id].rank % 100 < 14 ? 0 : meta[pool.id].rank % 10] || 'th'} of {meta[pool.id].players}
+                      </span>
                     </div>
                   )}
                   <div className="pool-card-players" style={{ marginTop: 14 }}>
