@@ -95,13 +95,22 @@ export default function PoolView({ user, pool, poolId, onBack }) {
 
   return (
     <>
-          <PoolIntro pool={pool} poolId={poolId} />
-
+      <PoolIntro pool={pool} poolId={poolId} />
       <button className="back" onClick={onBack}>← All pools</button>
       <PoolHero pool={pool} fixtures={fixtures} picks={picks} results={results} members={members} userId={user.uid} onOpenPlayers={() => setShowPlayers(s => !s)} />
       {showPlayers && <Members poolId={poolId} pool={pool} userId={user.uid} />}
       <Ticker pool={pool} members={members} allChips={allChips} fixtures={fixtures} allPicks={allPicks} results={results} userId={user.uid} />
       <ShareCard pool={pool} members={members} fixtures={fixtures} results={results} allPicks={allPicks} allChips={allChips} userPicks={picks} userId={user.uid} />
+      {isOrg && (
+        <button onClick={async () => {
+          const link = `https://intheleague.app#watch-${poolId}`
+          try { await navigator.clipboard.writeText(link); alert('Spectator link copied — anyone can watch your league, no login needed.') }
+          catch (e) { window.prompt('Copy this link:', link) }
+        }} style={{ width: '100%', marginBottom: 20, padding: '12px 18px', background: 'none', border: '1px solid #1e1e1e', borderRadius: 14, color: '#888', font: 'inherit', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9 }}>
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z" stroke="#00E05A" strokeWidth="1.2"/><circle cx="8" cy="8" r="2" stroke="#00E05A" strokeWidth="1.2"/></svg>
+          Share spectator link — let anyone watch
+        </button>
+      )}
       {isOrg && (
         <OrgNudge pool={pool} poolId={poolId} members={members} allPicks={allPicks} fixtures={fixtures} results={results} />
       )}
