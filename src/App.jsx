@@ -6,6 +6,8 @@ import Login from './components/Login'
 import Dashboard from './components/Dashboard'
 import SideDrawer from './components/SideDrawer'
 import Backdrop from './components/Backdrop'
+import Spectate from './components/Spectate'
+
 import Toast from './components/Toast'
 
 export default function App() {
@@ -23,6 +25,10 @@ export default function App() {
   useEffect(() => {
     if ((location.hash || '').startsWith('#join-')) setShowLogin(true)
   }, [])
+  // Public spectator route — works signed in or out, no auth required
+  const watchMatch = window.location.hash.match(/^#watch-(.+)$/)
+  if (watchMatch) return <Spectate poolId={watchMatch[1]} />
+
 
   if (user === undefined) return (
     <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: '#000', color: '#333' }}>
