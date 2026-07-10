@@ -8,10 +8,9 @@ import Members from './Members'
 import PoolHero from './PoolHero'
 import OrgNudge from './OrgNudge'
 import Ticker from './Ticker'
-import DivisionTable from './DivisionTable'
-
 import ShareCard from './ShareCard'
 import PoolIntro from './PoolIntro'
+import DivisionTable from './DivisionTable'
 
 export default function PoolView({ user, pool, poolId, onBack }) {
   const [picks, setPicks] = useState({})
@@ -104,20 +103,27 @@ export default function PoolView({ user, pool, poolId, onBack }) {
       <Ticker pool={pool} members={members} allChips={allChips} fixtures={fixtures} allPicks={allPicks} results={results} userId={user.uid} />
       <ShareCard pool={pool} members={members} fixtures={fixtures} results={results} allPicks={allPicks} allChips={allChips} userPicks={picks} userId={user.uid} />
       {isOrg && (
-        <button onClick={async () => {
-          const link = `https://intheleague.app#watch-${poolId}`
-          try { await navigator.clipboard.writeText(link); alert('Spectator link copied — anyone can watch your league, no login needed.') }
-          catch (e) { window.prompt('Copy this link:', link) }
-        }} style={{ width: '100%', marginBottom: 20, padding: '12px 18px', background: 'none', border: '1px solid #1e1e1e', borderRadius: 14, color: '#888', font: 'inherit', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9 }}>
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z" stroke="#00E05A" strokeWidth="1.2"/><circle cx="8" cy="8" r="2" stroke="#00E05A" strokeWidth="1.2"/></svg>
-          Share spectator link — let anyone watch
-        </button>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
+          <a href={`https://wa.me/?text=${encodeURIComponent(`Join our ${pool.name} prediction league on InTheLeague — free all season: https://intheleague.app#join-${poolId}`)}`}
+            target="_blank" rel="noreferrer"
+            style={{ padding: '12px 10px', background: '#0d1a10', border: '1px solid #25D36644', borderRadius: 14, color: '#25D366', fontSize: 12.5, fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#25D366"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5.1-1.3A10 10 0 1012 2zm0 18.2a8.2 8.2 0 01-4.2-1.2l-.3-.2-3 .8.8-3-.2-.3A8.2 8.2 0 1112 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.4 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3a3 3 0 00-1 2.2 5.2 5.2 0 001.1 2.8 11.9 11.9 0 004.6 4 15 15 0 001.5.6 3.7 3.7 0 001.7.1 2.8 2.8 0 001.9-1.3 2.3 2.3 0 00.2-1.3c-.1-.2-.3-.2-.5-.4z"/></svg>
+            Invite on WhatsApp
+          </a>
+          <button onClick={async () => {
+            const link = `https://intheleague.app#watch-${poolId}`
+            try { await navigator.clipboard.writeText(link); alert('Spectator link copied — anyone can watch, no login needed.') }
+            catch (e) { window.prompt('Copy this link:', link) }
+          }} style={{ padding: '12px 10px', background: 'none', border: '1px solid #1e1e1e', borderRadius: 14, color: '#888', font: 'inherit', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z" stroke="#00E05A" strokeWidth="1.2"/><circle cx="8" cy="8" r="2" stroke="#00E05A" strokeWidth="1.2"/></svg>
+            Spectator link
+          </button>
+        </div>
       )}
+      <DivisionTable sport={pool.sport} leagueName={(pool.sport === 'CHAMP' ? 'Championship' : pool.sport === 'L1' ? 'League One' : 'Premier League')} />
       {isOrg && (
         <OrgNudge pool={pool} poolId={poolId} members={members} allPicks={allPicks} fixtures={fixtures} results={results} />
       )}
-            <DivisionTable sport={pool.sport} leagueName={(pool.sport === 'CHAMP' ? 'Championship' : pool.sport === 'L1' ? 'League One' : 'Premier League')} />
-
       <Chips
         poolId={poolId}
         userId={user.uid}
