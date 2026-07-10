@@ -1,9 +1,9 @@
 export const SPORTS = {
   PL:   { name: 'Premier League',  short: 'PL',  emoji: '⚽', grad: 'linear-gradient(135deg,#3d0066,#6600aa)' },
   CHAMP:{ name: 'Championship',    short: 'CH',  emoji: '⚽', grad: 'linear-gradient(135deg,#003366,#0055aa)' },
-  L1:   { name: 'League One',      short: 'L1',  emoji: '⚽', grad: 'linear-gradient(135deg,#002200,#005500)' },
+    L1:   { name: 'League One',      short: 'L1',  emoji: '⚽', grad: 'linear-gradient(135deg,#002200,#005500)', soon: true },
   WC:   { name: 'World Cup',       short: 'WC',  emoji: '🏆', grad: 'linear-gradient(135deg,#662200,#aa4400)' },
-  SN:   { name: 'Six Nations',     short: '6N',  emoji: '🏉', grad: 'linear-gradient(135deg,#003300,#006600)' },
+    SN:   { name: 'Six Nations',     short: '6N',  emoji: '🏉', grad: 'linear-gradient(135deg,#003300,#006600)', soon: true },
 }
 
 export const COMP_IDS = { PL: 'PL', CHAMP: 'ELC', L1: 'EL1', WC: 'WC', SN: null }
