@@ -157,7 +157,15 @@ export default function Bulletin({ pool, poolId, members, fixtures, results, all
               {i === 0 ? p.slice(1) : p}
             </p>
           ))}
-          <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '.16em', color: '#333', marginTop: 16, textAlign: 'center' }}>■ FILED AUTOMATICALLY AT FULL TIME ■</div>
+                    <button onClick={() => {
+            const text = story.headline + '\n\n' + story.standfirst + '\n\n' + story.paras.join('\n\n') + '\n\n— The ' + (pool?.name || 'InTheLeague').replace(/^the\s+/i, '') + ' Gazette, via intheleague.app'
+            if (navigator.share) navigator.share({ text }).catch(() => {})
+            else { navigator.clipboard?.writeText(text); alert('Back page copied — paste it in the group chat.') }
+          }} style={{ width: '100%', marginTop: 16, padding: '12px 16px', background: '#0d1a10', border: '1px solid #25D36644', borderRadius: 12, color: '#25D366', font: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
+            Send the back page to the group →
+          </button>
+          <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '.16em', color: '#333', marginTop: 14, textAlign: 'center' }}>■ FILED AUTOMATICALLY AT FULL TIME ■</div>
+
         </div>
       )}
     </div>
