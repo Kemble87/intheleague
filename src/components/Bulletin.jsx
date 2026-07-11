@@ -110,7 +110,8 @@ export default function Bulletin({ pool, poolId, members, fixtures, results, all
     }
 
     return { md, headline, standfirst, paras }
-  }, [pool, poolId, members, fixtures, results, allPicks, allChips, userId,
+    }, [pool, poolId, members, fixtures, results, allPicks, allChips, userId, userPicks])
+
   if (story && !autoDone) {
     setAutoDone(true)
     try {
