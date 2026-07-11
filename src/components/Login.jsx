@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth'
+
 import { auth } from '../lib/firebase'
 
 export default function Login() {
@@ -21,7 +22,15 @@ export default function Login() {
     setErr(''); setBusy(true)
     try {
       if (mode === 'up') {
+                const issues = []
+        if (pass.length < 8) issues.push('8+ characters')
+        if (!/[A-Z]/.test(pass)) issues.push('an uppercase letter')
+        if (!/[0-9]/.test(pass)) issues.push('a number')
+        if (!/[^A-Za-z0-9]/.test(pass)) issues.push('a special character (like !)')
+        if (issues.length) { setErr('Password needs ' + issues.join(', ') + '.'); setBusy(false); return }
         const c = await createUserWithEmailAndPassword(auth, email, pass)
+        sendEmailVerification(c.user).catch(() => {})
+
         await updateProfile(c.user, { displayName: name })
       } else {
         await signInWithEmailAndPassword(auth, email, pass)
