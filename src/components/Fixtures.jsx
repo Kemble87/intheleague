@@ -458,5 +458,135 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
             </div>
           ))}
         </>
+      ) : (
+        <div className="board">
+          {(() => {
+            const mds = matchdayScores(fixtures, results, members.map(([uid]) => uid), { ...allPicks, [user.uid]: picks }, allChips)
+            const doneMd = Object.entries(mds).filter(([, v]) => v.complete).map(([md]) => Number(md)).sort((a, b) => b - a)[0]
+            if (doneMd == null) return null
+            const sc = mds[doneMd].scores
+            const top = Math.max(...Object.values(sc))
+            if (top <= 0 || sc[user.uid] !== top) return null
+            return (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'linear-gradient(90deg,#171303,#0d0d0d)', border: '1px solid #FFD60A44', borderRadius: 14, padding: '13px 16px', marginBottom: 14 }}>
+                <svg width="20" height="15" viewBox="0 0 12 9" fill="none"><path d="M1 8h10M1 8L.5 2.5 3.5 5 6 1l2.5 4 3-2.5L11 8" stroke="#FFD60A" strokeWidth="1" strokeLinejoin="round" strokeLinecap="round"/></svg>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontFamily: "'Space Grotesk','Inter',sans-serif", fontSize: 14, fontWeight: 700, color: '#FFD60A' }}>You won Matchday {doneMd}</div>
+                  <div style={{ fontSize: 11, color: '#777' }}>{top} points. The crown is yours.</div>
+                </div>
+                <button onClick={() => document.querySelector('.sharecard-btn')?.click()} style={{ padding: '9px 14px', background: '#FFD60A', border: 'none', borderRadius: 500, color: '#000', font: 'inherit', fontSize: 12, fontWeight: 800, cursor: 'pointer', flexShrink: 0 }}>Rub it in →</button>
+              </div>
+            )
+          })()}
+          {liveMd != null && board.length > 1 && (
+            <div style={{ display:'flex', alignItems:'center', gap:9, marginBottom:14 }}>
+              <style>{`@keyframes livePulse { 0%,100% { opacity:1; } 50% { opacity:.25; } }`}</style>
+              <span style={{ width:7, height:7, borderRadius:'50%', background:'#FF3B5C', animation:'livePulse 1.6s ease-in-out infinite' }}/>
+              <span style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:11, letterSpacing:'.14em', color:'#FF3B5C' }}>LIVE · MATCHDAY {liveMd} · AS IT STANDS</span>
+            </div>
+          )}
+          {board.length >= 3 && board[0].pts > 0 && (
+            <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'center', gap:10, padding:'8px 0 20px' }}>
+              {[1, 0, 2].map(pos => {
+                const r = board[pos]
+                if (!r) return null
+                const heights = { 0: 88, 1: 64, 2: 52 }
+                const colors = { 0: '#FFD60A', 1: '#C0C0C0', 2: '#CD7F32' }
+                return (
+                  <div key={r.uid} style={{ display:'flex', flexDirection:'column', alignItems:'center', width:92 }}>
+                    <div style={{ width:40, height:40, borderRadius:'50%', background:colors[pos]+'1a', border:`1.5px solid ${colors[pos]}66`, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:14, fontWeight:700, color:colors[pos], marginBottom:8 }}>
+                      {(r.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
+                    </div>
+                    <div style={{ fontSize:11, fontWeight:700, color:'#ccc', marginBottom:2, maxWidth:88, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{r.name?.split(' ')[0]}</div>
+                    <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:15, fontWeight:700, color:colors[pos], marginBottom:8 }}>{r.pts}</div>
+                    <div style={{ width:'100%', height:heights[pos], background:`linear-gradient(180deg, ${colors[pos]}22, ${colors[pos]}08)`, border:`1px solid ${colors[pos]}33`, borderBottom:'none', borderRadius:'8px 8px 0 0', display:'flex', alignItems:'flex-start', justifyContent:'center', paddingTop:8, fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:18, fontWeight:700, color:colors[pos]+'aa' }}>
+                      {pos + 1}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+          {board.map((row, i) => {
+            const leader = board[0]
+            const above = i > 0 ? board[i - 1] : null
+            const gap = above ? above.pts - row.pts : 0
+            const rankColors = ['#FFD60A', '#C0C0C0', '#CD7F32']
+            const rankColor = i < 3 && row.pts > 0 ? rankColors[i] : '#555'
+            const rowChips = allChips[row.uid] || {}
+            const chipsPlayed = Object.keys(rowChips).length
+            // Form streak: consecutive scoring picks, latest first
+            let streak = 0
+            {
+              const played = (fixtures || []).filter(f => results[f.id]?.h != null)
+                .sort((a, b) => new Date(b.kickoff) - new Date(a.kickoff))
+              const mp2 = row.uid === user.uid ? picks : (allPicks[row.uid] || {})
+              for (const f of played) {
+                const p2 = calcPts(mp2[f.id], results[f.id])
+                if (p2 === null) continue
+                if (p2 > 0) streak++
+                else break
+              }
+            }
+            // Form: last completed matchday points
+            const doneMds = [...new Set((fixtures || []).filter(f => results[f.id]?.h != null).map(f => f.matchday))].sort((a, b) => b - a)
+            const lastMd = doneMds[0]
+            let lastMdPts = null
+            if (lastMd != null) {
+              const mp = row.uid === user.uid ? picks : (allPicks[row.uid] || {})
+              lastMdPts = (fixtures || []).filter(f => String(f.matchday) === String(lastMd)).reduce((s, f) => {
+                const p = calcPtsWithChips(row.uid, f.id, mp[f.id], results[f.id], f.matchday)
+                return p != null ? s + p : s
+              }, 0)
+            }
+            return (
+              <div key={row.uid} onClick={() => !row.isMe && setH2h(row.uid)} className={`board-row${i === 0 && row.pts > 0 ? ' gold' : ''}${row.isMe ? ' me' : ''}`} style={{ cursor: row.isMe ? 'default' : 'pointer' }}>
+                <div style={{
+                  width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+                  background: i < 3 && row.pts > 0 ? rankColor + '1a' : '#161616',
+                  border: `1.5px solid ${i < 3 && row.pts > 0 ? rankColor + '55' : '#222'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: "'Space Grotesk','Inter',sans-serif", fontSize: 14, fontWeight: 700, color: rankColor,
+                }}>{i + 1}</div>
+                <div className="board-info">
+                  <div className="board-name" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {row.name}{row.isMe && <span style={{ fontSize: 9, fontWeight: 800, color: 'var(--green)', background: '#00E05A1a', borderRadius: 500, padding: '2px 7px', letterSpacing: '.08em' }}>YOU</span>}
+                    {mdWins[row.uid] > 0 && (
+                      <span title={`${mdWins[row.uid]} matchday win${mdWins[row.uid] !== 1 ? 's' : ''}`} style={{ display:'inline-flex', alignItems:'center', gap:4, border:'1px solid #FFD60A44', borderRadius:500, padding:'2px 8px' }}>
+                        <svg width="10" height="8" viewBox="0 0 12 9" fill="none"><path d="M1 8h10M1 8L.5 2.5 3.5 5 6 1l2.5 4 3-2.5L11 8" stroke="#FFD60A" strokeWidth="1.1" strokeLinejoin="round" strokeLinecap="round"/></svg>
+                        <span style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:10, fontWeight:700, color:'#FFD60A' }}>{mdWins[row.uid]}</span>
+                      </span>
+                    )}
+                  </div>
+                  <div className="board-detail" style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <span>{row.exact} exact</span>
+                    {streak >= 3 && <span style={{ color: '#ff6600', fontWeight: 700 }}>· {streak} on the spin</span>}
+                    {i > 0 && gap > 0 && <span style={{ color: '#666' }}>· {gap} pt{gap !== 1 ? 's' : ''} behind</span>}
+                    {i === 0 && row.pts > 0 && board.length > 1 && <span style={{ color: '#FFD60A' }}>· leading</span>}
+                    {chipsPlayed > 0 && <span style={{ color: '#555' }}>· {chipsPlayed} chip{chipsPlayed !== 1 ? 's' : ''} played</span>}
+                  </div>
+                </div>
+                {liveMd != null && rankDelta[row.uid] != null && rankDelta[row.uid] !== 0 && (
+                  <span style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:12, fontWeight:700, color: rankDelta[row.uid] > 0 ? 'var(--green)' : '#FF3B5C', flexShrink:0 }}>
+                    {rankDelta[row.uid] > 0 ? '▲' : '▼'}{Math.abs(rankDelta[row.uid])}
+                  </span>
+                )}
+                <div style={{ textAlign: 'right' }}>
+                  <div className="board-pts">{row.pts}</div>
+                  {lastMdPts != null && lastMdPts > 0
+                    ? <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--green)', marginTop: 1 }}>+{lastMdPts} last MD</div>
+                    : <div className="board-pts-label">pts</div>
+                  }
+                </div>
+              </div>
+            )
+          })}
+          {board.length === 1 && (
+            <div style={{ textAlign: 'center', padding: '28px 20px', color: '#444', fontSize: 13, lineHeight: 1.6 }}>
+              It's lonely at the top. Invite your mates from the menu — the leaderboard comes alive with rivals.
+            </div>
+          )}
+        </div>
+      )}
 
 
