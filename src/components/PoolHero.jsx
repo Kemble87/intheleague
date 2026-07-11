@@ -1,7 +1,9 @@
-import { calcPts, runInMult, runInStart } from '../lib/helpers'
+import { calcPts, runInMult, runInStart, matchdayScores } from '../lib/helpers'
+
 import { SPORTS } from '../lib/constants'
 
-export default function PoolHero({ pool, fixtures, picks, results, members, userId, onOpenPlayers }) {
+export default function PoolHero({ pool, fixtures, picks, results, members, userId, allPicks, allChips, onOpenPlayers }) {
+
   const accent = pool?.accent || '#00E05A'
   const sport = SPORTS[pool.sport] || SPORTS.PL
   // Premium dark gradients — league accent kept subtle
@@ -22,18 +24,14 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
   const exactPts = (fixtures || []).filter(f => calcPts(picks[f.id], results[f.id]) === 3).length
   const picksMade = (fixtures || []).filter(f => picks[f.id]?.h != null).length
 
-  // Rank — calculate board position
-  const board = members.map(([uid, m]) => {
-    const mp = uid === userId ? picks : {}
-    let p = 0
-    ;(fixtures || []).forEach(f => {
-      const s = calcPts(mp[f.id], results[f.id])
-      if (s != null) p += s
-    })
-    return { uid, pts: p }
-  }).sort((a, b) => b.pts - a.pts)
+    // Rank — same chip-aware engine as the Leaderboard, so the two always agree
+  const mdTotals = matchdayScores(fixtures || [], results || {}, members.map(([uid]) => uid), { ...(allPicks || {}), [userId]: picks }, allChips || {})
+  const totals = {}
+  Object.values(mdTotals).forEach(({ scores }) => Object.entries(scores).forEach(([u, p]) => { totals[u] = (totals[u] || 0) + p }))
+  const board = members.map(([uid]) => ({ uid, pts: totals[uid] || 0 })).sort((a, b) => b.pts - a.pts)
   const rankIdx = board.findIndex(r => r.uid === userId)
   const rank = rankIdx + 1
+
 
   function ordinal(n) {
     const s = ['th','st','nd','rd'], v = n % 100
