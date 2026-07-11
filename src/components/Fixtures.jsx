@@ -332,5 +332,131 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
     })
     return { uid, name: m.name, pts: p, exact: ex, made: md, isMe: uid === user.uid }
   }).sort((a, b) => b.pts - a.pts || b.exact - a.exact)
+  // Matchday wins — chip-aware, only completed matchdays count
+  const mdWins = {}
+  {
+    const mds = matchdayScores(fixtures, results, members.map(([uid]) => uid), { ...allPicks, [user.uid]: picks }, allChips)
+    Object.values(mds).forEach(({ scores, complete }) => {
+      if (!complete) return
+      const top = Math.max(...Object.values(scores))
+      if (top <= 0) return
+      Object.entries(scores).forEach(([uid, p]) => { if (p === top) mdWins[uid] = (mdWins[uid] || 0) + 1 })
+    })
+  }
+
+  // Live matchday — some results in, but not all: the table is in motion
+  const liveMd = (() => {
+    const byMd = {}
+    ;(fixtures || []).forEach(f => { (byMd[f.matchday] = byMd[f.matchday] || []).push(f) })
+    const hit = Object.entries(byMd).find(([, fxs]) => {
+      const done = fxs.filter(f => results[f.id]?.h != null).length
+      return done > 0 && done < fxs.length
+    })
+    return hit ? hit[0] : null
+  })()
+
+  // Rank movement: position now vs position before this matchday's results
+  const rankDelta = {}
+  if (liveMd != null) {
+    const prev = members.map(([uid]) => {
+      const chips = allChips[uid] || {}
+      const copyT = chips['copycat']?.targetUid, copyMd = chips['copycat']?.matchday
+      const mp = uid === user.uid ? picks : (allPicks[uid] || {})
+      let p = 0
+      ;(fixtures || []).forEach(f => {
+        if (String(f.matchday) === String(liveMd)) return
+        let pk = mp[f.id]
+        if (copyT && String(f.matchday) === String(copyMd)) pk = (allPicks[copyT] || {})[f.id] || pk
+        const s = calcPtsWithChips(uid, f.id, pk, results[f.id], f.matchday)
+        if (s != null) p += s
+      })
+      return { uid, pts: p }
+    }).sort((a, b) => b.pts - a.pts)
+    const prevRank = {}
+    prev.forEach((r, i) => { prevRank[r.uid] = i })
+    board.forEach((r, i) => { rankDelta[r.uid] = (prevRank[r.uid] ?? i) - i })
+  }
+
+  return (
+    <>
+
+
+      <NextToPick fixtures={fixtures} picks={picks} now={now} onGo={() => {
+        setTab('picks')
+        setTimeout(() => {
+          const el = document.querySelector('.fx')
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 100)
+      }} />
+
+      <div className="tabs">
+        <button className={`tab${tab === 'picks' ? ' on' : ''}`} onClick={() => setTab('picks')}>{isOrg ? 'Picks & results' : 'My picks'}</button>
+        <button className={`tab${tab === 'board' ? ' on' : ''}`} onClick={() => setTab('board')}>Leaderboard</button>
+      </div>
+
+      {tab === 'picks' ? (
+        <>
+          <div className="fx-controls">
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 4, background: '#0d0d0d', border: '1px solid #1a1a1a', borderRadius: 10, padding: 3 }}>
+              <button
+                onClick={() => {
+                  if (matchday === 'ALL') { setMatchday(String(currentMd)); return }
+                  const i = mdays.indexOf(Number(matchday))
+                  if (i > 0) setMatchday(String(mdays[i - 1]))
+                  else setMatchday('ALL')
+                }}
+                style={{ width: 36, height: 36, background: 'none', border: 'none', borderRadius: 8, color: '#666', fontSize: 18, cursor: 'pointer', flexShrink: 0 }}
+              >‹</button>
+              <div style={{ flex: 1, textAlign: 'center', fontFamily: "'Space Grotesk','Inter',sans-serif", fontSize: 14, fontWeight: 700, color: '#fff', letterSpacing: '-.01em' }}>
+                {matchday === 'ALL' ? 'All matchdays' : `Matchday ${matchday}`}
+              </div>
+              <button
+                onClick={() => {
+                  if (matchday === 'ALL') { setMatchday(String(currentMd)); return }
+                  const i = mdays.indexOf(Number(matchday))
+                  if (i < mdays.length - 1) setMatchday(String(mdays[i + 1]))
+                }}
+                style={{ width: 36, height: 36, background: 'none', border: 'none', borderRadius: 8, color: '#666', fontSize: 18, cursor: 'pointer', flexShrink: 0 }}
+              >›</button>
+            </div>
+            {isOrg && (
+              <button className="sync-btn" onClick={async () => {
+                try { const fx = await fetchAndStoreFixtures(pool.sport, poolId, rtdb); alert(fx.length > 0 ? `Synced ${fx.length} fixtures!` : 'No fixtures found') }
+                catch (e) { alert('Error: ' + e.message) }
+              }}>⟳ Sync</button>
+            )}
+          </div>
+          {isOrg && <div className="org-note">Results sync automatically — as organiser you can correct any score by typing over it.</div>}
+          <MatchdaySummary fixtures={filtered} picks={picks} results={results} matchday={matchday} allPicks={allPicks} />
+          {loading ? (
+            <div>
+              <style>{`@keyframes skel { 0% { opacity: .4; } 50% { opacity: .8; } 100% { opacity: .4; } }`}</style>
+              {[0, 1, 2].map(i => (
+                <div key={i} style={{ background: '#0d0d0d', border: '1px solid #141414', borderRadius: 14, padding: 16, marginBottom: 10, animation: `skel 1.4s ease-in-out ${i * .15}s infinite` }}>
+                  <div style={{ width: '38%', height: 9, background: '#1a1a1a', borderRadius: 99, marginBottom: 14 }}/>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+                    <div style={{ width: '26%', height: 14, background: '#1a1a1a', borderRadius: 99 }}/>
+                    <div style={{ display: 'flex', gap: 5 }}>
+                      <div style={{ width: 40, height: 50, background: '#101010', border: '1px solid #1a1a1a', borderRadius: 6 }}/>
+                      <div style={{ width: 40, height: 50, background: '#101010', border: '1px solid #1a1a1a', borderRadius: 6 }}/>
+                    </div>
+                    <div style={{ width: '26%', height: 14, background: '#1a1a1a', borderRadius: 99 }}/>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : days.map(day => (
+            <div key={day.d}>
+              <div className="day-hd">{day.label}</div>
+              {day.items.map(f => (
+                <FxCard key={f.id} fx={f} pick={picks[f.id]} result={results[f.id]} now={now} isOrg={isOrg} members={members} allPicks={allPicks}
+                  allChips={allChips} userId={user.uid} runIn={Number(f.matchday) >= runInStart(fixtures)}
+                  onPick={(s, v) => onSavePick(f.id, s, v)}
+                  onResult={(s, v) => onSaveResult(f.id, s, v)}
+                />
+              ))}
+            </div>
+          ))}
+        </>
 
 
