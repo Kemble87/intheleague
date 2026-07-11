@@ -11,6 +11,8 @@ import Ticker from './Ticker'
 import ShareCard from './ShareCard'
 import PoolIntro from './PoolIntro'
 import DivisionTable from './DivisionTable'
+import Bulletin from './Bulletin'
+
 
 export default function PoolView({ user, pool, poolId, onBack }) {
   const [picks, setPicks] = useState({})
@@ -102,7 +104,9 @@ export default function PoolView({ user, pool, poolId, onBack }) {
       {showPlayers && <Members poolId={poolId} pool={pool} userId={user.uid} />}
       <Ticker pool={pool} members={members} allChips={allChips} fixtures={fixtures} allPicks={allPicks} results={results} userId={user.uid} />
       <ShareCard pool={pool} members={members} fixtures={fixtures} results={results} allPicks={allPicks} allChips={allChips} userPicks={picks} userId={user.uid} />
-      {isOrg && (
+          <Bulletin pool={pool} poolId={poolId} members={members} fixtures={fixtures} results={results} allPicks={allPicks} allChips={allChips} userId={user.uid} userPicks={picks} />
+
+       {isOrg && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
           <a href={`https://wa.me/?text=${encodeURIComponent(`Join our ${pool.name} prediction league on InTheLeague — free all season: https://intheleague.app#join-${poolId}`)}`}
             target="_blank" rel="noreferrer"
