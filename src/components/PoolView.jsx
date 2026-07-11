@@ -100,7 +100,8 @@ export default function PoolView({ user, pool, poolId, onBack }) {
     <>
       <PoolIntro pool={pool} poolId={poolId} />
       <button className="back" onClick={onBack}>← All pools</button>
-      <PoolHero pool={pool} fixtures={fixtures} picks={picks} results={results} members={members} userId={user.uid} onOpenPlayers={() => setShowPlayers(s => !s)} />
+      <PoolHero pool={pool} fixtures={fixtures} picks={picks} results={results} members={members} userId={user.uid} allPicks={allPicks} allChips={allChips} onOpenPlayers=
+
       {showPlayers && <Members poolId={poolId} pool={pool} userId={user.uid} />}
       <Ticker pool={pool} members={members} allChips={allChips} fixtures={fixtures} allPicks={allPicks} results={results} userId={user.uid} />
       <ShareCard pool={pool} members={members} fixtures={fixtures} results={results} allPicks={allPicks} allChips={allChips} userPicks={picks} userId={user.uid} />
