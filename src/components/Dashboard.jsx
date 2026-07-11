@@ -2,14 +2,17 @@ import { useState, useEffect } from 'react'
 import { collection, query, where, onSnapshot, doc, setDoc, arrayUnion, updateDoc, increment, getDoc } from 'firebase/firestore'
 import { db, rtdb } from '../lib/firebase'
 import { ref, get } from 'firebase/database'
-import { SPORTS } from '../lib/constants'
+import { SPORTS, ACCENTS } from '../lib/constants'
+
 import { slugify, initials, fetchAndStoreFixtures } from '../lib/helpers'
 
 import PoolView from './PoolView'
 
 function CreateModal({ user, onClose, onCreate }) {
   const [name, setName] = useState('')
-  const [sport, setSport] = useState('PL')
+    const [sport, setSport] = useState('PL')
+  const [accent, setAccent] = useState(ACCENTS[0])
+
   const [busy, setBusy] = useState(false)
   const [code, setCode] = useState(null)
 
@@ -18,7 +21,8 @@ function CreateModal({ user, onClose, onCreate }) {
     setBusy(true)
     const id = slugify(name)
     await setDoc(doc(db, 'pools', id), {
-      name: name.trim(), sport, code: id,
+            name: name.trim(), sport, accent, code: id,
+
       createdBy: user.uid, createdAt: Date.now(),
       members: { [user.uid]: { name: user.displayName || user.email, joinedAt: Date.now(), isOrganiser: true } },
       memberCount: 1,
@@ -69,9 +73,21 @@ function CreateModal({ user, onClose, onCreate }) {
             </div>
           ))}
         </div>
+                <label className="modal-label" style={{ marginTop: 16 }}>Pool colour</label>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 4 }}>
+          {ACCENTS.map(c => (
+            <button key={c} onClick={() => setAccent(c)} aria-label={`Colour ${c}`} style={{
+              width: 34, height: 34, borderRadius: '50%', cursor: 'pointer', background: c,
+              border: accent === c ? '3px solid #fff' : '3px solid transparent',
+              outline: accent === c ? `2px solid ${c}` : 'none',
+              transition: 'transform .15s', transform: accent === c ? 'scale(1.1)' : 'scale(1)',
+            }}/>
+          ))}
+        </div>
         <div className="modal-btns">
           <button className="btn-ghost" onClick={onClose}>Cancel</button>
           <button className="btn-green" onClick={create} disabled={!name.trim() || busy}>{busy ? 'Creating…' : 'Create pool'}</button>
+
         </div>
       </div>
     </div>
@@ -256,7 +272,8 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
             const mlist = Object.entries(pool.members || {})
             return (
               <div key={pool.id} className="pool-card" onClick={() => goPool(pool.id)}>
-                <div className="pool-card-grad" style={{ background: ({
+                <div className="pool-card-grad" style={{ borderTop: pool.accent ? `2px solid ${pool.accent}` : undefined, background: ({
+
                   PL:    'linear-gradient(150deg,#12081f 0%,#0d0d0d 60%)',
                   CHAMP: 'linear-gradient(150deg,#081120 0%,#0d0d0d 60%)',
                   L1:    'linear-gradient(150deg,#081408 0%,#0d0d0d 60%)',
