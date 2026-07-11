@@ -589,4 +589,91 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
         </div>
       )}
 
+      {/* Head-to-head rivalry sheet */}
+      {h2h && (() => {
+        const rival = members.find(([uid]) => uid === h2h)
+        if (!rival) return null
+        const rivalName = (rival[1].name || '?').split(' ')[0]
+        const myName = ((members.find(([uid]) => uid === user.uid) || [null, {}])[1].name || 'You').split(' ')[0]
+        const myRow = board.find(r => r.uid === user.uid) || { pts: 0, exact: 0 }
+        const theirRow = board.find(r => r.uid === h2h) || { pts: 0, exact: 0 }
+        const mds = matchdayScores(fixtures, results, members.map(([uid]) => uid), { ...allPicks, [user.uid]: picks }, allChips)
+        const completed = Object.entries(mds).filter(([, v]) => v.complete).sort((a, b) => Number(a[0]) - Number(b[0]))
+        let myWins = 0, theirWins = 0, ties = 0, streakOwner = null, streak = 0
+        let blow = { margin: 0, md: null, mine: false }
+        completed.forEach(([md, { scores }]) => {
+          const a = scores[user.uid] || 0, b = scores[h2h] || 0
+          if (a > b) myWins++; else if (b > a) theirWins++; else ties++
+          const w = a > b ? 'me' : b > a ? 'them' : null
+          if (w) { if (w === streakOwner) streak++; else { streakOwner = w; streak = 1 } }
+          else { streakOwner = null; streak = 0 }
+          const m = Math.abs(a - b)
+          if (m > blow.margin) blow = { margin: m, md, mine: a > b }
+        })
+        const Stat = ({ label, a, b }) => {
+          const total = (a + b) || 1
+          return (
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ display:'flex', justifyContent:'space-between', marginBottom: 6 }}>
+                <span style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:16, fontWeight:700, color: a >= b ? 'var(--green)' : '#888' }}>{a}</span>
+                <span style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'#444', alignSelf:'center' }}>{label}</span>
+                <span style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:16, fontWeight:700, color: b > a ? '#FF3B5C' : '#888' }}>{b}</span>
+              </div>
+              <div style={{ display:'flex', height:4, borderRadius:99, overflow:'hidden', background:'#161616' }}>
+                <div style={{ flex: a || .001, background:'var(--green)', opacity:.85 }}/>
+                <div style={{ flex: b || .001, background:'#FF3B5C', opacity:.75 }}/>
+              </div>
+            </div>
+          )
+        }
+        return (
+          <div onClick={() => setH2h(null)} style={{ position:'fixed', inset:0, zIndex:9999, background:'rgba(0,0,0,.9)', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-end' }}>
+            <div onClick={e => e.stopPropagation()} style={{ width:'100%', maxWidth:480, background:'#111', border:'1px solid #1a1a1a', borderBottom:'none', borderRadius:'20px 20px 0 0', padding:'22px 22px 42px' }}>
+              <div style={{ width:28, height:3, background:'#333', borderRadius:99, margin:'0 auto 22px' }}/>
+              {/* VS header */}
+              <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:18, marginBottom:6 }}>
+                <div style={{ textAlign:'center' }}>
+                  <div style={{ width:52, height:52, borderRadius:'50%', background:'#00E05A1a', border:'1.5px solid #00E05A55', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:17, fontWeight:700, color:'var(--green)', margin:'0 auto 8px' }}>{myName.slice(0,2).toUpperCase()}</div>
+                  <div style={{ fontSize:13, fontWeight:700, color:'#fff' }}>{myName}</div>
+                </div>
+                <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:30, fontWeight:700, color:'#fff', letterSpacing:'-.02em' }}>
+                  {myWins}<span style={{ color:'#333', padding:'0 8px', fontSize:20 }}>—</span>{theirWins}
+                </div>
+                <div style={{ textAlign:'center' }}>
+                  <div style={{ width:52, height:52, borderRadius:'50%', background:'#FF3B5C1a', border:'1.5px solid #FF3B5C55', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:17, fontWeight:700, color:'#FF3B5C', margin:'0 auto 8px' }}>{rivalName.slice(0,2).toUpperCase()}</div>
+                  <div style={{ fontSize:13, fontWeight:700, color:'#fff' }}>{rivalName}</div>
+                </div>
+              </div>
+              <div style={{ textAlign:'center', fontSize:10, fontWeight:700, letterSpacing:'.16em', textTransform:'uppercase', color:'#444', marginBottom:24 }}>
+                Matchday record{ties > 0 ? ` · ${ties} shared` : ''}
+              </div>
+
+              <Stat label="Season points" a={myRow.pts} b={theirRow.pts} />
+              <Stat label="Exact scores" a={myRow.exact} b={theirRow.exact} />
+
+              {/* Streak + blowout */}
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginTop:20 }}>
+                <div style={{ background:'#0d0d0d', border:'1px solid #1a1a1a', borderRadius:12, padding:'14px 14px' }}>
+                  <div style={{ fontSize:9, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'#444', marginBottom:6 }}>Current streak</div>
+                  <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:15, fontWeight:700, color: streakOwner === 'me' ? 'var(--green)' : streakOwner === 'them' ? '#FF3B5C' : '#555' }}>
+                    {streakOwner ? `${streakOwner === 'me' ? myName : rivalName} · ${streak} straight` : 'All square'}
+                  </div>
+                </div>
+                <div style={{ background:'#0d0d0d', border:'1px solid #1a1a1a', borderRadius:12, padding:'14px 14px' }}>
+                  <div style={{ fontSize:9, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'#444', marginBottom:6 }}>Biggest blowout</div>
+                  <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:15, fontWeight:700, color: blow.md ? (blow.mine ? 'var(--green)' : '#FF3B5C') : '#555' }}>
+                    {blow.md ? `MD${blow.md} · by ${blow.margin}` : 'Nothing yet'}
+                  </div>
+                </div>
+              </div>
+
+              <button onClick={() => setH2h(null)} style={{ width:'100%', marginTop:22, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#555', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Close</button>
+            </div>
+          </div>
+        )
+      })()}
+    </>
+  )
+}
+
 
