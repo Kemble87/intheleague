@@ -52,7 +52,10 @@ function NextToPick({ fixtures, picks, now, onGo }) {
   )
 }
 
-function MatchdaySummary({ fixtures, picks, results, matchday, allPicks }) {
+function MatchdaySummary({ fixtures, picks, results, matchday, allPicks, members, userId }) {
+  const [showAll, setShowAll] = useState(false)
+  const revealed = (matchday !== 'ALL' ? (fixtures || []).filter(f => String(f.matchday) === String(matchday)) : []).filter(f => Date.now() >= new Date(f.kickoff).getTime())
+
   const mxs = matchday === 'ALL' ? fixtures : (fixtures || []).filter(f => String(f.matchday) === String(matchday))
   if (!mxs?.length) return null
   const played = mxs.filter(f => results[f.id]?.h != null)
@@ -86,7 +89,58 @@ function MatchdaySummary({ fixtures, picks, results, matchday, allPicks }) {
   })
   return (
     <>
+          {revealed.length > 0 && members && members.length > 1 && (
+        <div style={{ marginBottom: 10 }}>
+          <button onClick={() => setShowAll(o => !o)} style={{ width: '100%', padding: '10px 14px', background: 'none', border: '1px solid #1a1a1a', borderRadius: showAll ? '12px 12px 0 0' : 12, color: '#777', font: 'inherit', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z" stroke="#00E05A" strokeWidth="1.2"/><circle cx="8" cy="8" r="2" stroke="#00E05A" strokeWidth="1.2"/></svg>
+            {showAll ? 'Hide' : 'See'} everyone's picks
+            <span style={{ color: '#444', fontSize: 10 }}>{showAll ? '▲' : '▼'}</span>
+          </button>
+          {showAll && (
+            <div style={{ border: '1px solid #1a1a1a', borderTop: 'none', borderRadius: '0 0 12px 12px', padding: '12px 10px', background: '#0a0a0a', overflowX: 'auto' }}>
+              <table style={{ borderCollapse: 'separate', borderSpacing: '4px 5px', minWidth: '100%' }}>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: 'left', fontSize: 9, fontWeight: 700, letterSpacing: '.1em', color: '#444', padding: '0 4px' }}>MATCH</th>
+                    {members.map(([uid, m]) => (
+                      <th key={uid} style={{ fontSize: 9, fontWeight: 800, letterSpacing: '.06em', color: uid === userId ? '#00E05A' : '#666', padding: '0 2px', whiteSpace: 'nowrap' }}>
+                        {(m.name || '?').split(' ')[0].slice(0, 5).toUpperCase()}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {revealed.map(f => {
+                    const res = results[f.id]
+                    return (
+                      <tr key={f.id}>
+                        <td style={{ fontSize: 10, fontWeight: 700, color: '#888', whiteSpace: 'nowrap', padding: '0 4px' }}>
+                          {abbr(teamName(f.home))}–{abbr(teamName(f.away))}
+                          {res?.h != null && <span style={{ color: '#ff6600', marginLeft: 5, fontFamily: "'Share Tech Mono',ui-monospace,monospace" }}>{res.h}:{res.a}</span>}
+                        </td>
+                        {members.map(([uid]) => {
+                          const p = uid === userId ? picks[f.id] : (allPicks[uid] || {})[f.id]
+                          const s = calcPts(p, res)
+                          const col = s === 3 ? '#00ff66' : s === 1 ? '#8fd6a8' : s === 0 ? '#555' : '#777'
+                          return (
+                            <td key={uid} style={{ textAlign: 'center' }}>
+                              <span style={{ display: 'inline-block', minWidth: 34, fontFamily: "'Share Tech Mono',ui-monospace,monospace", fontSize: 12, color: p?.h != null ? col : '#2a2a2a', background: s === 3 ? '#00E05A14' : '#060606', border: `1px solid ${s === 3 ? '#00E05A44' : '#1a1a1a'}`, borderRadius: 6, padding: '3px 5px', textShadow: s === 3 ? '0 0 6px #00ff4444' : 'none' }}>
+                                {p?.h != null ? `${p.h}:${p.a}` : '–'}
+                              </span>
+                            </td>
+                          )
+                        })}
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
       {verdict && (
+
         <div style={{ display: 'flex', gap: 10, alignItems: 'flex-start', background: '#0d0d0d', border: '1px solid #1a1a1a', borderLeft: '2px solid #00E05A', borderRadius: '0 12px 12px 0', padding: '11px 14px', marginBottom: 10 }}>
           <span style={{ fontFamily: "'Share Tech Mono',ui-monospace,monospace", fontSize: 9, letterSpacing: '.14em', color: '#00E05A', paddingTop: 2, flexShrink: 0 }}>PUNDIT</span>
           <span style={{ fontSize: 12.5, color: '#999', lineHeight: 1.55, fontStyle: 'italic' }}>{verdict}</span>
@@ -427,7 +481,8 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
             )}
           </div>
           {isOrg && <div className="org-note">Results sync automatically — as organiser you can correct any score by typing over it.</div>}
-          <MatchdaySummary fixtures={filtered} picks={picks} results={results} matchday={matchday} allPicks={allPicks} />
+          <MatchdaySummary fixtures={filtered} picks={picks} results={results} matchday={matchday} allPicks={allPicks} members={members} userId={user.uid} />
+
           {loading ? (
             <div>
               <style>{`@keyframes skel { 0% { opacity: .4; } 50% { opacity: .8; } 100% { opacity: .4; } }`}</style>
