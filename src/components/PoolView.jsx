@@ -103,9 +103,9 @@ export default function PoolView({ user, pool, poolId, onBack }) {
       <PoolHero pool={pool} fixtures={fixtures} picks={picks} results={results} members={members} userId={user.uid} allPicks={allPicks} allChips={allChips} onOpenPlayers=
 
       {showPlayers && <Members poolId={poolId} pool={pool} userId={user.uid} />}
-      <Ticker pool={pool} members={members} allChips={allChips} fixtures={fixtures} allPicks={allPicks} results={results} userId={user.uid} />
+           <Ticker pool={pool} members={members} allChips={allChips} fixtures={fixtures} allPicks={allPicks} results={results} userId={user.uid} />
       <ShareCard pool={pool} members={members} fixtures={fixtures} results={results} allPicks={allPicks} allChips={allChips} userPicks={picks} userId={user.uid} />
-          <Bulletin pool={pool} poolId={poolId} members={members} fixtures={fixtures} results={results} allPicks={allPicks} allChips={allChips} userId={user.uid} userPicks={picks} />
+      <Bulletin pool={pool} poolId={poolId} members={members} fixtures={fixtures} results={results} allPicks={allPicks} allChips={allChips} userId={user.uid} userPicks={picks} />
 
        {isOrg && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
