@@ -3,7 +3,8 @@ import { collection, query, where, onSnapshot, doc, setDoc, arrayUnion, updateDo
 import { db, rtdb } from '../lib/firebase'
 import { ref, get } from 'firebase/database'
 import { SPORTS } from '../lib/constants'
-import { slugify, initials } from '../lib/helpers'
+import { slugify, initials, fetchAndStoreFixtures } from '../lib/helpers'
+
 import PoolView from './PoolView'
 
 function CreateModal({ user, onClose, onCreate }) {
@@ -23,9 +24,11 @@ function CreateModal({ user, onClose, onCreate }) {
       memberCount: 1,
     })
     await setDoc(doc(db, 'users', user.uid), { pools: arrayUnion(id) }, { merge: true })
+        fetchAndStoreFixtures(sport, id, rtdb).catch(() => {})
     setCode(id)
     onCreate(id)
     setBusy(false)
+
   }
 
   if (code) {
@@ -199,10 +202,18 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
     })()
     return () => { dead = true }
   }, [pools, user.uid])
+  const autoOpened = useState({ done: false })[0]
+  useEffect(() => {
+    if (autoOpened.done || loading || pools.length !== 1 || active) return
+    if ((location.hash || '').startsWith('#join-')) return
+    autoOpened.done = true
+    goPool(pools[0].id)
+  }, [loading, pools, active])
 
   function goPool(id) { setActive(id); onPoolChange?.(id) }
-  function goBack() { setActive(null); onPoolChange?.(null) }
+  function goBack() { autoOpened.done = true; setActive(null); onPoolChange?.(null) }
 
+  
   if (active) {
     const pool = pools.find(p => p.id === active)
     if (pool) return (
