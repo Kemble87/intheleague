@@ -20,3 +20,5 @@ export const CHIPS = [
   { id: 'hth',    name: 'Half Time Hero',  color: '#9966FF', warning: 'Once per season.'  },
   { id: 'copycat',name: 'Copycat',         color: '#00CCDD', warning: 'Once per season.'  },
 ]
+export const ACCENTS = ['#00E05A', '#FFD60A', '#FF3B5C', '#4499FF', '#9966FF', '#FF6600', '#00CCDD', '#FF4D9E']
+
