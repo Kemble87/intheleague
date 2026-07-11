@@ -111,7 +111,8 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
         const showCountdown = !hasResults && daysToKO != null && daysToKO > 0
         return (
       <div style={{ position:'relative', zIndex:1, borderTop:'1px solid rgba(255,255,255,.12)', paddingTop:20 }}>
-        <div style={{ display:'flex', alignItems:'flex-end', gap:0, marginBottom:20 }}>
+               <div style={{ display:'flex', alignItems:'flex-end', gap:0, marginBottom:20, flexWrap:'wrap', rowGap:16 }}>
+
           {/* Points — dominant (or kickoff countdown pre-season) */}
           <div style={{ flexShrink:0, marginRight:24 }}>
             {showCountdown ? (
@@ -121,7 +122,8 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
               </>
             ) : (
               <>
-                <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:72, fontWeight:700, color:'#00E05A', letterSpacing:'-.05em', lineHeight:1 }}>{totalPts}</div>
+                <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:'clamp(50px,15vw,72px)', fontWeight:700, color:'#00E05A', letterSpacing:'-.05em'
+, lineHeight:1 }}>{totalPts}</div>
                 <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.35)', marginTop:2 }}>Points</div>
               </>
             )}
@@ -144,9 +146,11 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
           {/* Rank */}
           {members.length > 1 && (
             <>
-              <div style={{ width:1, background:'rgba(255,255,255,.12)', height:56, margin:'0 24px', flexShrink:0 }}/>
+                          <div style={{ width:1, background:'rgba(255,255,255,.12)', height:56, margin:'0 14px 0 16px', flexShrink:0 }}/>
+
               <div style={{ textAlign:'center', paddingBottom:2 }}>
-                <div style={{ fontSize:40, fontWeight:900, color:'#FFD60A', letterSpacing:'-.04em', lineHeight:1 }}>
+                                <div style={{ fontSize:'clamp(30px,9vw,40px)', fontWeight:900, color:'#FFD60A', letterSpacing:'-.04em', lineHeight:1 }}>
+
                   {rank}<span style={{ fontSize:18, fontWeight:700, color:'rgba(255,212,10,.6)', verticalAlign:'super', marginLeft:1 }}>{ordinal(rank).replace(String(rank),'')}</span>
                 </div>
                 <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.35)', marginTop:2 }}>Your rank</div>
