@@ -1,6 +1,8 @@
 import { useState } from 'react'
-import { doc, updateDoc, deleteField, increment } from 'firebase/firestore'
-import { db } from '../lib/firebase'
+import { doc, updateDoc, deleteField, increment, deleteDoc } from 'firebase/firestore'
+import { db, rtdb } from '../lib/firebase'
+import { ref, remove } from 'firebase/database'
+
 import { initials } from '../lib/helpers'
 
 function MemberRow({ uid, member, isMe, canManage, poolId, onTransfer }) {
@@ -107,12 +109,68 @@ export default function Members({ poolId, pool, userId }) {
               onTransfer={transferOwnership}
             />
           ))}
-          {isOrg && (
-            <div style={{ padding:'4px 0' }}>
-            </div>
-          )}
+                    <DangerZone poolId={poolId} pool={pool} userId={userId} isOrg={isOrg} />
+
         </div>
       )}
     </div>
   )
 }
+
+function DangerZone({ poolId, pool, userId, isOrg }) {
+  const [confirm, setConfirm] = useState(null)
+  const [busy, setBusy] = useState(false)
+
+  async function deletePool() {
+    setBusy(true)
+    try {
+      await remove(ref(rtdb, `pools/${poolId}`))
+      await deleteDoc(doc(db, 'pools', poolId))
+      alert('Pool deleted.')
+      window.location.hash = ''
+      window.location.reload()
+    } catch (e) { alert('Could not delete pool: ' + e.message); setBusy(false) }
+  }
+
+  async function leavePool() {
+    setBusy(true)
+    try {
+      await remove(ref(rtdb, `pools/${poolId}/picks/${userId}`))
+      await updateDoc(doc(db, 'pools', poolId), {
+        [`members.${userId}`]: deleteField(),
+        memberCount: increment(-1),
+      })
+      alert('You have left the pool.')
+      window.location.hash = ''
+      window.location.reload()
+    } catch (e) { alert('Could not leave pool: ' + e.message); setBusy(false) }
+  }
+
+  const btn = { flex: 1, padding: '10px 12px', background: 'none', border: '1px solid #3a1418', borderRadius: 10, color: '#FF3B5C', font: 'inherit', fontSize: 12, fontWeight: 700, cursor: 'pointer' }
+
+  return (
+    <div style={{ borderTop: '1px solid #161616', padding: '14px 0 16px', marginTop: 4 }}>
+      {!confirm ? (
+        <div style={{ display: 'flex', gap: 10 }}>
+          {!isOrg && <button style={btn} onClick={() => setConfirm('leave')}>Leave this pool</button>}
+          {isOrg && <button style={btn} onClick={() => setConfirm('delete')}>Delete this pool</button>}
+        </div>
+      ) : (
+        <div>
+          <div style={{ fontSize: 12.5, color: '#bbb', lineHeight: 1.6, marginBottom: 12 }}>
+            {confirm === 'delete'
+              ? `Delete "${pool.name}" for everyone? All picks, results and history are permanently erased. This cannot be undone.`
+              : `Leave "${pool.name}"? Your picks are erased and you'll need a new invite to return.`}
+          </div>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button style={{ ...btn, color: '#888', border: '1px solid #222' }} onClick={() => setConfirm(null)} disabled={busy}>Cancel</button>
+            <button style={{ ...btn, background: '#1a0508' }} onClick={confirm === 'delete' ? deletePool : leavePool} disabled={busy}>
+              {busy ? 'Working…' : confirm === 'delete' ? 'Yes, delete forever' : 'Yes, leave'}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
