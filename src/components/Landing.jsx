@@ -215,7 +215,9 @@ export default function Landing({ onGetStarted }) {
   const [scrolled, setScrolled] = useState(false)
   const [demoH, setDemoH] = useState('2')
   const [demoA, setDemoA] = useState('1')
-  const [activeChip, setActiveChip] = useState(null)
+    const [activeChip, setActiveChip] = useState(null)
+  const joinIntent = (typeof location !== 'undefined' ? location.hash : '').startsWith('#join-')
+
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 400)
@@ -290,9 +292,9 @@ export default function Landing({ onGetStarted }) {
           Beat your mates.<br/><span style={{ color: green }}>All season long.</span>
         </h1>
         <p style={{ fontSize: 'clamp(15px,3.5vw,19px)', color: '#888', textAlign: 'center', maxWidth: 440, lineHeight: 1.6, margin: '24px 0 32px', position: 'relative' }}>
-          Private score prediction leagues for your group chat. Set up in 60 seconds — free.
+                  {joinIntent ? "You've been invited to a league. Sign in and you're in — takes ten seconds." : 'Private score prediction leagues for your group chat. Set up in 60 seconds — free.'}
         </p>
-        <button className="cta-btn" onClick={onGetStarted} style={{ ...ctaStyle, position: 'relative' }}>Start your pool →</button>
+        <button className="cta-btn" onClick={onGetStarted} style={{ ...ctaStyle, position: 'relative' }}>{joinIntent ? 'Join the league →' : 'Start your pool →'}</button>
 
         {/* Floating fixture card demo */}
         <div style={{ marginTop: 64, animation: 'floatPhone 5s ease-in-out infinite', maxWidth: 420, width: '100%', position: 'relative' }}>
