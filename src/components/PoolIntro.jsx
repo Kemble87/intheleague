@@ -54,7 +54,8 @@ export default function PoolIntro({ pool, poolId }) {
         {/* floodlight sweep across the name */}
         <div className="pi-anim" style={{
           position: 'absolute', top: 0, bottom: 0, width: '38%',
-          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,.14), transparent)',
+          background: `linear-gradient(90deg, transparent, ${pool?.accent || '#00E05A'}, transparent)`,
+
           animation: 'introSweep 1.25s ease both', pointerEvents: 'none',
         }}/>
       </div>
@@ -62,7 +63,8 @@ export default function PoolIntro({ pool, poolId }) {
       <div className="pi-anim" style={{
         width: 120, height: 2, marginTop: 22, borderRadius: 99,
         background: 'linear-gradient(90deg, transparent, #00E05A, transparent)',
-        boxShadow: '0 0 18px rgba(0,224,90,.5)',
+        boxShadow: `0 0 18px ${pool?.accent || '#00E05A'}80`,
+
         transformOrigin: 'center',
         animation: 'introLine 1.05s ease both',
       }}/>
