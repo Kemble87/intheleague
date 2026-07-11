@@ -123,6 +123,7 @@ export default function Bulletin({ pool, poolId, members, fixtures, results, all
 
   if (!story) return null
 
+  return (
 
     <div style={{ marginBottom: 20 }}>
       <button onClick={() => setOpen(o => !o)} style={{
