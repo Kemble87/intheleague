@@ -99,13 +99,16 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, use
   const hasRes = result?.h != null && result?.a != null
   const p = calcPts(pick, result)
   const ct = countdown(fx.kickoff, now)
-  const display = locked && hasRes ? result : pick
+    const display = locked && hasRes ? result : pick
+  const awayRef = useRef(null)
 
   function onChange(side, raw) {
     const v = raw.replace(/[^0-9]/g, '').slice(0, 2)
     const n = v === '' ? null : Math.min(99, +v)
-    isOrg && locked ? onResult(side, n) : onPick(side, n)
+     isOrg && locked ? onResult(side, n) : onPick(side, n)
+    if (side === 'h' && n != null) awayRef.current?.focus()
   }
+
 
   return (
     <div className="fx">
@@ -151,7 +154,8 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, use
           <span style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:'clamp(16px,5vw,22px)', color:'#2a2a2a', lineHeight:1, padding:'0 1px', marginBottom:2 }}>:</span>
           <div style={{ width:44, height:56, background:'#060606', border:'1.5px solid #1a1a1a', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
             <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(0deg,rgba(0,0,0,.1) 0px,rgba(0,0,0,.1) 1px,transparent 1px,transparent 3px)', pointerEvents:'none', zIndex:1 }}/>
-            {(!locked || isOrg) && <input inputMode="numeric" value={display?.a ?? ''} onChange={e => onChange('a', e.target.value)} disabled={locked && !isOrg} aria-label={fx.away} style={{ position:'absolute', inset:0, opacity:0, cursor: locked&&!isOrg?'not-allowed':'pointer', zIndex:3, fontSize:32, textAlign:'center', background:'none', border:'none', WebkitAppearance:'none' }}/>}
+             {(!locked || isOrg) && <input ref={awayRef} inputMode="numeric" value={display?.a ?? ''}
+onChange={e => onChange('a', e.target.value)} disabled={locked && !isOrg} aria-label={fx.away} style={{ position:'absolute', inset:0, opacity:0, cursor: locked&&!isOrg?'not-allowed':'pointer', zIndex:3, fontSize:32, textAlign:'center', background:'none', border:'none', WebkitAppearance:'none' }}/>}
             <div style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:'clamp(22px,7vw,32px)', lineHeight:1, position:'relative', zIndex:2,
               color: locked && hasRes ? '#ff6600' : display?.a != null ? '#00ff66' : '#1a0800',
               textShadow: locked && hasRes ? '0 0 8px #ff440066' : display?.a != null ? '0 0 8px #00ff4466' : 'none'
