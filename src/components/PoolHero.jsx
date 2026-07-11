@@ -2,6 +2,7 @@ import { calcPts, runInMult, runInStart } from '../lib/helpers'
 import { SPORTS } from '../lib/constants'
 
 export default function PoolHero({ pool, fixtures, picks, results, members, userId, onOpenPlayers }) {
+  const accent = pool?.accent || '#00E05A'
   const sport = SPORTS[pool.sport] || SPORTS.PL
   // Premium dark gradients — league accent kept subtle
   const DARK_GRADS = {
@@ -65,8 +66,8 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
       marginBottom: 16,
       boxShadow: '0 20px 60px rgba(0,0,0,.5)',
     }}>
-      {/* green corner glow */}
-      <div style={{ position:'absolute', top:-120, right:-120, width:280, height:280, background:'radial-gradient(circle, #00E05A14 0%, transparent 65%)', pointerEvents:'none' }}/>
+      {/* accent corner glow */}
+      <div style={{ position:'absolute', top:-120, right:-120, width:280, height:280, background:`radial-gradient(circle, ${accent}14 0%, transparent 65%)`, pointerEvents:'none' }}/>
       {/* dark fade at bottom */}
       <div style={{ position:'absolute', bottom:0, left:0, right:0, height:'50%', background:'linear-gradient(to top,rgba(0,0,0,.35),transparent)', pointerEvents:'none' }}/>
 
@@ -85,7 +86,7 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
 
       {/* Eyebrow */}
       <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:11, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.55)', marginBottom:10 }}>
-        <span style={{ width:5, height:5, borderRadius:'50%', background:'#00E05A', display:'inline-block' }}/>
+        <span style={{ width:5, height:5, borderRadius:'50%', background:accent, display:'inline-block' }}/>
         {sport.name}
       </div>
 
@@ -111,19 +112,17 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
         const showCountdown = !hasResults && daysToKO != null && daysToKO > 0
         return (
       <div style={{ position:'relative', zIndex:1, borderTop:'1px solid rgba(255,255,255,.12)', paddingTop:20 }}>
-               <div style={{ display:'flex', alignItems:'flex-end', gap:0, marginBottom:20, flexWrap:'wrap', rowGap:16 }}>
-
+        <div style={{ display:'flex', alignItems:'flex-end', gap:0, marginBottom:20, flexWrap:'wrap', rowGap:16 }}>
           {/* Points — dominant (or kickoff countdown pre-season) */}
           <div style={{ flexShrink:0, marginRight:24 }}>
             {showCountdown ? (
               <>
-                <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:64, fontWeight:700, color:'#00E05A', letterSpacing:'-.04em', lineHeight:1 }}>{daysToKO}</div>
+                <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:64, fontWeight:700, color:accent, letterSpacing:'-.04em', lineHeight:1 }}>{daysToKO}</div>
                 <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.35)', marginTop:2 }}>Days to kickoff</div>
               </>
             ) : (
               <>
-                <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:'clamp(50px,15vw,72px)', fontWeight:700, color:'#00E05A', letterSpacing:'-.05em'
-, lineHeight:1 }}>{totalPts}</div>
+                <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:'clamp(50px,15vw,72px)', fontWeight:700, color:accent, letterSpacing:'-.05em', lineHeight:1 }}>{totalPts}</div>
                 <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.35)', marginTop:2 }}>Points</div>
               </>
             )}
@@ -146,11 +145,9 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
           {/* Rank */}
           {members.length > 1 && (
             <>
-                          <div style={{ width:1, background:'rgba(255,255,255,.12)', height:56, margin:'0 14px 0 16px', flexShrink:0 }}/>
-
+              <div style={{ width:1, background:'rgba(255,255,255,.12)', height:56, margin:'0 14px 0 16px', flexShrink:0 }}/>
               <div style={{ textAlign:'center', paddingBottom:2 }}>
-                                <div style={{ fontSize:'clamp(30px,9vw,40px)', fontWeight:900, color:'#FFD60A', letterSpacing:'-.04em', lineHeight:1 }}>
-
+                <div style={{ fontSize:'clamp(30px,9vw,40px)', fontWeight:900, color:'#FFD60A', letterSpacing:'-.04em', lineHeight:1 }}>
                   {rank}<span style={{ fontSize:18, fontWeight:700, color:'rgba(255,212,10,.6)', verticalAlign:'super', marginLeft:1 }}>{ordinal(rank).replace(String(rank),'')}</span>
                 </div>
                 <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.35)', marginTop:2 }}>Your rank</div>
@@ -168,7 +165,7 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
           <div style={{ height:5, background:'rgba(255,255,255,.12)', borderRadius:999, overflow:'hidden', position:'relative' }}>
             {/* Run-in zone — final nine matchdays */}
             <div style={{ position:'absolute', left: riLeft+'%', right:0, top:0, bottom:0, background:'rgba(255,59,92,.22)', borderLeft:'1px solid rgba(255,59,92,.7)' }}/>
-            <div style={{ position:'relative', height:'100%', borderRadius:999, background: progress >= riLeft ? 'linear-gradient(to right,#00E05A,#FF3B5C)' : 'linear-gradient(to right,#00E05A,#00b348)', width: progress+'%', transition:'width .6s ease' }}/>
+            <div style={{ position:'relative', height:'100%', borderRadius:999, background: progress >= riLeft ? `linear-gradient(to right,${accent},#FF3B5C)` : `linear-gradient(to right,${accent},${accent}aa)`, width: progress+'%', transition:'width .6s ease' }}/>
           </div>
           <div style={{ display:'flex', justifyContent:'space-between', marginTop:5 }}>
             {['MD1','MD10','MD19','MD29','MD38'].map((md, i, arr) => (
