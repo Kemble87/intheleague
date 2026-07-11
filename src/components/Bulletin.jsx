@@ -9,7 +9,8 @@ const pick = (arr, seed) => arr[seed % arr.length]
 const hash = s => { let h = 0; for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h }
 
 export default function Bulletin({ pool, poolId, members, fixtures, results, allPicks, allChips, userId, userPicks }) {
-  const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(false)
+  const [autoDone, setAutoDone] = useState(false)
 
   const story = useMemo(() => {
     if ((members || []).length < 2) return null
@@ -109,11 +110,18 @@ export default function Bulletin({ pool, poolId, members, fixtures, results, all
     }
 
     return { md, headline, standfirst, paras }
-  }, [pool, poolId, members, fixtures, results, allPicks, allChips, userId, userPicks])
+  }, [pool, poolId, members, fixtures, results, allPicks, allChips, userId,
+  if (story && !autoDone) {
+    setAutoDone(true)
+    try {
+      const k = 'bulletin-' + poolId + '-' + story.md
+      if (!localStorage.getItem(k)) { localStorage.setItem(k, '1'); setOpen(true) }
+    } catch (e) {}
+  }
 
   if (!story) return null
 
-  return (
+
     <div style={{ marginBottom: 20 }}>
       <button onClick={() => setOpen(o => !o)} style={{
         width: '100%', padding: '12px 18px', background: 'none',
