@@ -141,7 +141,8 @@ export default function Bulletin({ pool, poolId, members, fixtures, results, all
         <div style={{ border: '1px solid #1e1e1e', borderTop: 'none', borderRadius: '0 0 14px 14px', padding: '20px 20px 22px', background: '#0a0a0a', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(0deg,rgba(255,255,255,.008) 0px,rgba(255,255,255,.008) 1px,transparent 1px,transparent 3px)', pointerEvents: 'none' }}/>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '2px solid #1e1e1e', paddingBottom: 8, marginBottom: 14 }}>
-            <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '.22em', color: '#555' }}>THE INTHELEAGUE GAZETTE</span>
+          <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '.22em', color: '#555', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginRight: 10 }}>THE {(pool?.name || 'INTHELEAGUE').replace(/^the\s+/i, '').toUpperCase()} GAZETTE</span>
+
             <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '.14em', color: '#3a3a3a' }}>MD{story.md} · FULL TIME EDITION</span>
           </div>
           <div style={{ fontFamily: BEBAS, fontSize: 'clamp(30px,8.5vw,44px)', color: '#fff', letterSpacing: '.02em', lineHeight: .96, marginBottom: 10 }}>
