@@ -118,7 +118,8 @@ export default function ShareCard({ pool, members, fixtures, results, allPicks, 
   }
 
   return (
-    <button onClick={generate} disabled={busy} style={{
+       <button className="sharecard-btn" onClick={generate} disabled={busy} style={{
+
       width: '100%', marginBottom: 20, padding: '13px 18px',
       background: 'linear-gradient(180deg,#121a12,#0d0d0d)',
       border: '1px solid #00E05A33', borderRadius: 14,
