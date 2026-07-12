@@ -13,10 +13,6 @@ function timeUntil(iso) {
 }
 
 export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, results }) {
-  const isOrg = pool.createdBy === members.find(([,m]) => m.isOrganiser)?.[0] ||
-    members.some(([uid, m]) => m.isOrganiser)
-
-  // Find current/next matchday
   const now = Date.now()
   const currentMD = useMemo(() => {
     const upcoming = (fixtures || []).filter(f => new Date(f.kickoff) > now)
@@ -24,13 +20,11 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
     return upcoming.reduce((min, f) => f.matchday < min ? f.matchday : min, upcoming[0].matchday)
   }, [fixtures, now])
 
-  // Fixtures in current matchday
   const mdFixtures = useMemo(() =>
     (fixtures || []).filter(f => String(f.matchday) === String(currentMD)),
     [fixtures, currentMD]
   )
 
-  // First kickoff of the matchday
   const firstKickoff = useMemo(() => {
     if (!mdFixtures.length) return null
     return mdFixtures.reduce((min, f) =>
@@ -40,10 +34,9 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
 
   const lockCountdown = firstKickoff ? timeUntil(firstKickoff) : null
 
-  // Who hasn't picked for this matchday
   const missing = useMemo(() => {
     if (!mdFixtures.length) return []
-    return members.filter(([uid, m]) => {
+    return members.filter(([uid]) => {
       const userPicks = allPicks[uid] || {}
       const picked = mdFixtures.filter(f => userPicks[f.id]?.h != null).length
       return picked === 0
@@ -52,7 +45,7 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
 
   const partial = useMemo(() => {
     if (!mdFixtures.length) return []
-    return members.filter(([uid, m]) => {
+    return members.filter(([uid]) => {
       const userPicks = allPicks[uid] || {}
       const picked = mdFixtures.filter(f => userPicks[f.id]?.h != null).length
       return picked > 0 && picked < mdFixtures.length
@@ -64,17 +57,32 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
     return `Hey ${name}! Don't forget to get your picks in for Matchday ${currentMD}${lock} ⚽ Get on it: intheleague.app`
   }
 
+  function nudgeWhatsApp(name) {
+    window.open('https://wa.me/?text=' + encodeURIComponent(nudgeMsg(name)), '_blank')
+  }
+
   function nudgeAll() {
     const names = missing.map(([, m]) => m.name?.split(' ')[0]).join(', ')
     const lock = lockCountdown ? ` — locks in ${lockCountdown}` : ''
     const msg = `${names} — get your Matchday ${currentMD} picks in${lock} ⚽ intheleague.app`
-        navigator.clipboard?.writeText(msg)
+    navigator.clipboard?.writeText(msg)
     alert('Nudge copied — paste it in the group chat.')
   }
 
-  }
+  if (!currentMD || (missing.length === 0 && partial.length === 0)) return null
 
-  if (!currentMD || missing.length === 0) return null
+  const nudgeBtn = {
+    padding: '6px 14px',
+    background: 'none',
+    border: '1px solid #222',
+    borderRadius: 500,
+    color: '#aaa',
+    font: 'inherit',
+    fontSize: 12,
+    fontWeight: 700,
+    cursor: 'pointer',
+    flexShrink: 0,
+  }
 
   return (
     <div style={{
@@ -84,12 +92,11 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
       padding: '16px',
       marginBottom: 20,
     }}>
-      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <div>
           <div style={{ fontSize: 13, fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: 8 }}>
             <span>⚡</span>
-            <span>Matchday {currentMD} · {missing.length} yet to pick</span>
+            <span>Matchday {currentMD} · {missing.length + partial.length} to chase</span>
           </div>
           {lockCountdown && (
             <div style={{ fontSize: 11, color: '#FF3B5C', marginTop: 3, fontWeight: 600 }}>
@@ -98,95 +105,41 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
           )}
         </div>
         {missing.length > 1 && (
-          <button
-            onClick={nudgeAll}
-            style={{
-              padding: '7px 14px',
-              background: 'none',
-              border: '1px solid #333',
-              borderRadius: 500,
-              color: '#aaa',
-              font: 'inherit',
-              fontSize: 12,
-              fontWeight: 700,
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <button onClick={nudgeAll} style={{ ...nudgeBtn, border: '1px solid #333' }}>
             Nudge all 👋
           </button>
         )}
       </div>
 
-      {/* Missing players */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {missing.map(([uid, m]) => (
           <div key={uid} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: '50%',
-              background: '#1a1a1a',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 11, fontWeight: 800, color: '#555', flexShrink: 0,
-            }}>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: '#555', flexShrink: 0 }}>
               {initials(m.name)}
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{m.name}</div>
               <div style={{ fontSize: 11, color: '#444', marginTop: 1 }}>No picks yet</div>
             </div>
-                      <button
-              onClick={() => window.open('https://wa.me/?text=' + encodeURIComponent(nudgeMsg(m.name?.split(' ')[0] || m.name)), '_blank')}
-              style={{
-                padding: '6px 14px',
-                background: 'none',
-                border: '1px solid #222',
-                borderRadius: 500,
-                color: '#aaa',
-                font: 'inherit',
-                fontSize: 12,
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
+            <button onClick={() => nudgeWhatsApp(m.name?.split(' ')[0] || m.name)} style={nudgeBtn}>
               Nudge 👋
             </button>
-
-                          
           </div>
         ))}
 
-        {/* Partial pickers */}
         {partial.map(([uid, m]) => {
           const userPicks = allPicks[uid] || {}
           const picked = mdFixtures.filter(f => userPicks[f.id]?.h != null).length
           return (
             <div key={uid} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{
-                width: 32, height: 32, borderRadius: '50%',
-                background: '#001a0d',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 11, fontWeight: 800, color: 'var(--green)', flexShrink: 0,
-              }}>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#001a0d', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: 'var(--green)', flexShrink: 0 }}>
                 {initials(m.name)}
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{m.name}</div>
                 <div style={{ fontSize: 11, color: '#555', marginTop: 1 }}>{picked} of {mdFixtures.length} picked</div>
               </div>
-              <button
-                             onClick={() => window.open('https://wa.me/?text=' + encodeURIComponent(nudgeMsg(m.name?.split(' ')[0] || m.name)), '_blank')}
-
-                  padding: '6px 14px',
-                  background: 'none',
-                  border: '1px solid #222',
-                  borderRadius: 500,
-                  color: '#aaa',
-                  font: 'inherit',
-                  fontSize: 12,
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                }}
-              >
+              <button onClick={() => nudgeWhatsApp(m.name?.split(' ')[0] || m.name)} style={nudgeBtn}>
                 Nudge 👋
               </button>
             </div>
@@ -194,9 +147,8 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
         })}
       </div>
 
-      {/* Tip */}
       <div style={{ fontSize: 11, color: '#333', marginTop: 14, borderTop: '1px solid #111', paddingTop: 12 }}>
-        Nudge copies a message to your clipboard — paste into WhatsApp, iMessage, whatever works.
+        Nudge opens WhatsApp with the message ready — Nudge all copies it for anywhere else.
       </div>
     </div>
   )
