@@ -134,8 +134,8 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
               <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{m.name}</div>
               <div style={{ fontSize: 11, color: '#444', marginTop: 1 }}>No picks yet</div>
             </div>
-                          onClick={() => window.open('https://wa.me/?text=' + encodeURIComponent(nudgeMsg(m.name?.split(' ')[0] || m.name)), '_blank')}
-
+                      <button
+              onClick={() => window.open('https://wa.me/?text=' + encodeURIComponent(nudgeMsg(m.name?.split(' ')[0] || m.name)), '_blank')}
               style={{
                 padding: '6px 14px',
                 background: 'none',
@@ -150,6 +150,8 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
             >
               Nudge 👋
             </button>
+
+                          
           </div>
         ))}
 
