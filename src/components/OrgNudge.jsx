@@ -54,7 +54,8 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
 
   function nudgeMsg(name) {
     const lock = lockCountdown ? ` — locks in ${lockCountdown}` : ''
-    return `Hey ${name}! Don't forget to get your picks in for Matchday ${currentMD}${lock} ⚽ Get on it: intheleague.app`
+       return `Hey ${name}! Don't forget to get your picks in for Matchday ${currentMD}${lock} ⚽ Get on it: https://intheleague.app`
+
   }
 
   function nudgeWhatsApp(name) {
@@ -64,7 +65,8 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
   function nudgeAll() {
     const names = missing.map(([, m]) => m.name?.split(' ')[0]).join(', ')
     const lock = lockCountdown ? ` — locks in ${lockCountdown}` : ''
-    const msg = `${names} — get your Matchday ${currentMD} picks in${lock} ⚽ intheleague.app`
+        const msg = `${names} — get your Matchday ${currentMD} picks in${lock} ⚽ https://intheleague.app`
+
     navigator.clipboard?.writeText(msg)
     alert('Nudge copied — paste it in the group chat.')
   }
