@@ -68,7 +68,10 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
     const names = missing.map(([, m]) => m.name?.split(' ')[0]).join(', ')
     const lock = lockCountdown ? ` — locks in ${lockCountdown}` : ''
     const msg = `${names} — get your Matchday ${currentMD} picks in${lock} ⚽ intheleague.app`
-    navigator.clipboard?.writeText(msg)
+        navigator.clipboard?.writeText(msg)
+    alert('Nudge copied — paste it in the group chat.')
+  }
+
   }
 
   if (!currentMD || missing.length === 0) return null
@@ -131,8 +134,8 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
               <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{m.name}</div>
               <div style={{ fontSize: 11, color: '#444', marginTop: 1 }}>No picks yet</div>
             </div>
-            <button
-              onClick={() => navigator.clipboard?.writeText(nudgeMsg(m.name?.split(' ')[0] || m.name))}
+                          onClick={() => window.open('https://wa.me/?text=' + encodeURIComponent(nudgeMsg(m.name?.split(' ')[0] || m.name)), '_blank')}
+
               style={{
                 padding: '6px 14px',
                 background: 'none',
@@ -169,8 +172,8 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
                 <div style={{ fontSize: 11, color: '#555', marginTop: 1 }}>{picked} of {mdFixtures.length} picked</div>
               </div>
               <button
-                onClick={() => navigator.clipboard?.writeText(nudgeMsg(m.name?.split(' ')[0] || m.name))}
-                style={{
+                             onClick={() => window.open('https://wa.me/?text=' + encodeURIComponent(nudgeMsg(m.name?.split(' ')[0] || m.name)), '_blank')}
+
                   padding: '6px 14px',
                   background: 'none',
                   border: '1px solid #222',
