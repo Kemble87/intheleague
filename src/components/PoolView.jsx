@@ -13,7 +13,6 @@ import PoolIntro from './PoolIntro'
 import DivisionTable from './DivisionTable'
 import Bulletin from './Bulletin'
 
-
 export default function PoolView({ user, pool, poolId, onBack }) {
   const [picks, setPicks] = useState({})
   const [allPicks, setAllPicks] = useState({})
@@ -41,7 +40,6 @@ export default function PoolView({ user, pool, poolId, onBack }) {
     return () => u()
   }, [poolId])
 
-  // Load fixtures so Chips step pickers can use them
   useEffect(() => {
     const r = ref(rtdb, `pools/${poolId}/fixtures`)
     const u = onValue(r, s => {
@@ -49,7 +47,52 @@ export default function PoolView({ user, pool, poolId, onBack }) {
         setFixtures(Object.values(s.val()).sort((a, b) => new Date(a.kickoff) - new Date(b.kickoff)))
       }
     })
-      return (
+    return () => u()
+  }, [poolId])
+
+  useEffect(() => {
+    const r = ref(rtdb, `pools/${poolId}/chips`)
+    const u = onValue(r, s => setAllChips(s.val() || {}))
+    return () => u()
+  }, [poolId])
+
+  // Auto-sync results when a match finished 2h+ ago with no result (throttled 45min)
+  useEffect(() => {
+    if (!fixtures.length || !pool?.sport) return
+    const now = Date.now()
+    const stale = fixtures.some(f => now - new Date(f.kickoff).getTime() > 2 * 3600e3 && results[f.id]?.h == null)
+    if (!stale) return
+    ;(async () => {
+      try {
+        const { get } = await import('firebase/database')
+        const syncRef = ref(rtdb, `pools/${poolId}/lastAutoSync`)
+        const snap = await get(syncRef)
+        const last = snap.exists() ? snap.val() : 0
+        if (now - last < 45 * 60e3) return
+        await set(syncRef, now)
+        await fetchAndStoreFixtures(pool.sport, poolId, rtdb)
+      } catch (e) { /* silent — manual sync still available */ }
+    })()
+  }, [fixtures, results, poolId, pool?.sport])
+
+  function savePick(fid, side, val) {
+    const upd = { ...(picks[fid] || {}), [side]: val }
+    setPicks(p => ({ ...p, [fid]: upd }))
+    clearTimeout(timers.current[fid])
+    timers.current[fid] = setTimeout(() => set(ref(rtdb, `pools/${poolId}/picks/${user.uid}/${fid}`), upd), 400)
+  }
+
+  function saveResult(fid, side, val) {
+    const upd = { ...(results[fid] || {}), [side]: val }
+    setResults(r => ({ ...r, [fid]: upd }))
+    clearTimeout(timers.current['r' + fid])
+    timers.current['r' + fid] = setTimeout(() => set(ref(rtdb, `pools/${poolId}/results/${fid}`), upd), 400)
+  }
+
+  const members = Object.entries(pool.members || {})
+  const isOrg = pool.createdBy === user.uid || pool.members?.[user.uid]?.isOrganiser
+
+  return (
     <>
       <PoolIntro pool={pool} poolId={poolId} />
       <button className="back" onClick={onBack}>← All pools</button>
@@ -68,7 +111,7 @@ export default function PoolView({ user, pool, poolId, onBack }) {
         onSaveResult={saveResult}
       />
 
-      {/* ── Chips: your strategic toys ── */}
+      {/* ── Chips ── */}
       <Chips
         poolId={poolId}
         userId={user.uid}
@@ -76,7 +119,7 @@ export default function PoolView({ user, pool, poolId, onBack }) {
         fixtures={fixtures}
       />
 
-      {/* ── The extras: table, wrap, sharing ── */}
+      {/* ── Extras: table, wrap, sharing ── */}
       <DivisionTable sport={pool.sport} leagueName={(pool.sport === 'CHAMP' ? 'Championship' : pool.sport === 'L1' ? 'League One' : 'Premier League')} />
       <Bulletin pool={pool} poolId={poolId} members={members} fixtures={fixtures} results={results} allPicks={allPicks} allChips={allChips} userId={user.uid} userPicks={picks} />
       <Ticker pool={pool} members={members} allChips={allChips} fixtures={fixtures} allPicks={allPicks} results={results} userId={user.uid} />
