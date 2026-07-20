@@ -45,21 +45,6 @@ export default function Feed({ pool, poolId, fixtures, results, allPicks, allChi
   }
 
   return (
-    
-      {events.map((e, i) => {
-        // ── Pinned deadline: a statement, not a card ──
-        if (e.type === 'deadline') {
-          return (
-            <div key={i} onClick={onGoPicks} style={{ cursor: 'pointer', padding: '4px 0 22px', borderBottom: '1px solid #141414', marginBottom: 22 }}>
-              <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '.18em', color: '#555', marginBottom: 8 }}>{e.kicker} IN</div>
-              <div style={{ fontFamily: MONO, fontSize: 'clamp(40px,12vw,60px)', fontWeight: 700, color: GREEN, lineHeight: 1, letterSpacing: '.02em' }}>
-                <Countdown target={e.lockTs} />
-              </div>
-              <div style={{ fontSize: 13, color: '#777', marginTop: 10 }}>{e.headline} · {e.sub}</div>
-            </div>
-          )
-        }
-return (
     <div style={{ paddingTop: 4 }}>
       {showReel && recapData && <RecapReel data={recapData} onClose={() => setShowReel(false)} />}
       {recapData && (
@@ -73,6 +58,20 @@ return (
           </span>
         </button>
       )}
+      {events.map((e, i) => {
+        // ── Pinned deadline: a statement, not a card ──
+        if (e.type === 'deadline') {
+          return (
+            <div key={i} onClick={onGoPicks} style={{ cursor: 'pointer', padding: '4px 0 22px', borderBottom: '1px solid #141414', marginBottom: 22 }}>
+              <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '.18em', color: '#555', marginBottom: 8 }}>{e.kicker} IN</div>
+              <div style={{ fontFamily: MONO, fontSize: 'clamp(40px,12vw,60px)', fontWeight: 700, color: GREEN, lineHeight: 1, letterSpacing: '.02em' }}>
+                <Countdown target={e.lockTs} />
+              </div>
+              <div style={{ fontSize: 13, color: '#777', marginTop: 10 }}>{e.headline} · {e.sub}</div>
+            </div>
+          )
+        }
+
         const accent = e.gold ? '#FFD60A' : GREEN
         return (
           <div key={i} style={{ display: 'flex', gap: 14, marginBottom: 26 }}>
