@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { exportRecap } from '../lib/recapExport'
 
 // ── The Matchday Recap Reel ──
 // A self-playing animated sequence built from real pool data.
@@ -35,6 +36,34 @@ export default function RecapReel({ data, onClose }) {
 
   function replay() { setT(0); setPlaying(true) }
 
+  const [exporting, setExporting] = useState(false)
+  const [pct, setPct] = useState(0)
+  const [exportMsg, setExportMsg] = useState('')
+
+  async function doExport() {
+    setExporting(true); setPct(0); setExportMsg('')
+    try {
+      const res = await exportRecap(data || DEMO, setPct)
+      if (!res.ok) { setExportMsg('✗ ' + res.reason); setExporting(false); return }
+      const ext = res.mime.includes('mp4') ? 'mp4' : 'webm'
+      const file = new File([res.blob], `matchday-recap.${ext}`, { type: res.mime })
+      // Prefer native share (WhatsApp/Stories); fall back to download
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'Matchday Recap' })
+        setExportMsg('✓ Shared')
+      } else {
+        const url = URL.createObjectURL(res.blob)
+        const a = document.createElement('a')
+        a.href = url; a.download = file.name; a.click()
+        setTimeout(() => URL.revokeObjectURL(url), 5000)
+        setExportMsg(`✓ Saved as .${ext} — check your downloads`)
+      }
+    } catch (e) {
+      setExportMsg('✗ ' + (e.message || 'Export failed'))
+    }
+    setExporting(false)
+  }
+
   const d = data || DEMO
 
   return (
@@ -42,13 +71,21 @@ export default function RecapReel({ data, onClose }) {
       <div style={{ position: 'relative', width: 'min(92vw, 46vh)', aspectRatio: '9/16', background: '#000', borderRadius: 20, overflow: 'hidden', boxShadow: '0 40px 120px rgba(0,0,0,.8)' }}>
         <Stage t={t} d={d} />
       </div>
-      <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
-        <button onClick={replay} style={ctrlBtn}>↻ Replay</button>
-        <button onClick={onClose} style={{ ...ctrlBtn, background: 'none', color: '#888', border: '1px solid #333' }}>Close</button>
+   <div style={{ display: 'flex', gap: 12, marginTop: 20 }}>
+        <button onClick={replay} disabled={exporting} style={{ ...ctrlBtn, background: 'none', color: '#888', border: '1px solid #333' }}>↻ Replay</button>
+        <button onClick={doExport} disabled={exporting} style={ctrlBtn}>{exporting ? `Rendering ${Math.round(pct * 100)}%` : '↓ Save / Share reel'}</button>
+        <button onClick={onClose} disabled={exporting} style={{ ...ctrlBtn, background: 'none', color: '#888', border: '1px solid #333' }}>Close</button>
       </div>
-      <div style={{ color: '#555', fontSize: 12, marginTop: 14, fontFamily: MONO, letterSpacing: '.1em' }}>
-        MP4 EXPORT COMING NEXT — THIS IS THE ANIMATION
-      </div>
+      {exporting && (
+        <div style={{ width: 'min(92vw,46vh)', height: 4, background: '#222', borderRadius: 99, marginTop: 14, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${pct * 100}%`, background: GREEN, transition: 'width .1s' }} />
+        </div>
+      )}
+      {exportMsg && (
+        <div style={{ color: exportMsg.startsWith('✓') ? GREEN : '#FF3B5C', fontSize: 13, marginTop: 14, fontFamily: MONO, letterSpacing: '.06em', textAlign: 'center', maxWidth: '90vw', lineHeight: 1.5 }}>
+          {exportMsg}
+        </div>
+      )}
     </div>
   )
 }
