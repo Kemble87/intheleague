@@ -4,6 +4,7 @@ import { rtdb } from '../lib/firebase'
 import { SAMPLE_FIXTURES } from '../lib/constants'
 import { fmtKO, fmtDay, groupDays, countdown, calcPts, abbr, fetchAndStoreFixtures, loadFixtures, matchdayScores, runInStart } from '../lib/helpers'
 import Kit from './Kit'
+import Feed from './Feed'
 
 const TEAM_NAMES = {
   'Nottingham': 'Nottm Forest',
@@ -443,12 +444,27 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
         }, 100)
       }} />
 
-      <div className="tabs">
+     <div className="tabs">
+        <button className={`tab${tab === 'feed' ? ' on' : ''}`} onClick={() => setTab('feed')}>Feed</button>
         <button className={`tab${tab === 'picks' ? ' on' : ''}`} onClick={() => setTab('picks')}>{isOrg ? 'Picks & results' : 'My picks'}</button>
         <button className={`tab${tab === 'board' ? ' on' : ''}`} onClick={() => setTab('board')}>Leaderboard</button>
       </div>
 
-      {tab === 'picks' ? (
+      {tab === 'feed' && (
+        <Feed
+          pool={pool}
+          poolId={poolId}
+          fixtures={fixtures}
+          results={results}
+          allPicks={allPicks}
+          allChips={allChips}
+          members={members}
+          userId={user.uid}
+          onGoPicks={() => setTab('picks')}
+        />
+      )}
+
+      {tab === 'feed' ? null : tab === 'picks' ? (
         <>
           <div className="fx-controls">
             <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 4, background: '#0d0d0d', border: '1px solid #1a1a1a', borderRadius: 10, padding: 3 }}>
