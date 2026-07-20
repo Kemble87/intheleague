@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { buildFeed } from '../lib/feedEvents'
+import { buildFeed, buildRecapData } from '../lib/feedEvents'
+import RecapReel from './RecapReel'
 
 const GREEN = '#00E05A'
 const DISP = "'Space Grotesk','Inter',sans-serif"
@@ -31,6 +32,8 @@ function Countdown({ target }) {
 
 export default function Feed({ pool, poolId, fixtures, results, allPicks, allChips, members, userId, onOpenGazette, onGoPicks }) {
   const events = buildFeed({ pool, poolId, fixtures, results, allPicks, allChips, members, userId })
+  const [showReel, setShowReel] = useState(false)
+  const recapData = buildRecapData({ pool, poolId, fixtures, results, allPicks, allChips, members, userId })
 
   if (!events.length) {
     return (
@@ -42,7 +45,7 @@ export default function Feed({ pool, poolId, fixtures, results, allPicks, allChi
   }
 
   return (
-    <div style={{ paddingTop: 4 }}>
+    
       {events.map((e, i) => {
         // ── Pinned deadline: a statement, not a card ──
         if (e.type === 'deadline') {
@@ -56,7 +59,20 @@ export default function Feed({ pool, poolId, fixtures, results, allPicks, allChi
             </div>
           )
         }
-
+return (
+    <div style={{ paddingTop: 4 }}>
+      {showReel && recapData && <RecapReel data={recapData} onClose={() => setShowReel(false)} />}
+      {recapData && (
+        <button onClick={() => setShowReel(true)} style={{ width: '100%', marginBottom: 24, padding: '16px 18px', background: 'linear-gradient(135deg,#0a1a0f,#0d0d0d)', border: '1px solid #00E05A55', borderRadius: 16, cursor: 'pointer', font: 'inherit', display: 'flex', alignItems: 'center', gap: 14, textAlign: 'left' }}>
+          <span style={{ width: 44, height: 44, borderRadius: '50%', background: '#00E05A', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <span style={{ color: '#000', fontSize: 18, marginLeft: 3 }}>▶</span>
+          </span>
+          <span style={{ flex: 1, minWidth: 0 }}>
+            <span style={{ display: 'block', fontFamily: "'Space Grotesk','Inter',sans-serif", fontSize: 16, fontWeight: 700, color: '#fff' }}>Your Matchday {recapData.md} recap</span>
+            <span style={{ display: 'block', fontSize: 12.5, color: '#00E05A', marginTop: 2 }}>10-second highlight reel · tap to play</span>
+          </span>
+        </button>
+      )}
         const accent = e.gold ? '#FFD60A' : GREEN
         return (
           <div key={i} style={{ display: 'flex', gap: 14, marginBottom: 26 }}>
