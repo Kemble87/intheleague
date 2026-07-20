@@ -46,8 +46,7 @@ export default function Feed({ pool, poolId, fixtures, results, allPicks, allChi
 
   return (
     <div style={{ paddingTop: 4 }}>
-      {showReel && !recapData && <RecapReel data={null} onClose={() => setShowReel(false)} />}
-      <button onClick={() => setShowReel(true)} style={{ width: '100%', marginBottom: 16, padding: '12px', background: '#0d0d0d', border: '1px dashed #00E05A55', borderRadius: 12, color: '#00E05A', font: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>▶ Test recap export (demo data)</button>
+      
       {showReel && recapData && <RecapReel data={recapData} onClose={() => setShowReel(false)} />}
       {recapData && (
         <button onClick={() => setShowReel(true)} style={{ width: '100%', marginBottom: 24, padding: '16px 18px', background: 'linear-gradient(135deg,#0a1a0f,#0d0d0d)', border: '1px solid #00E05A55', borderRadius: 16, cursor: 'pointer', font: 'inherit', display: 'flex', alignItems: 'center', gap: 14, textAlign: 'left' }}>
