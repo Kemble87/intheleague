@@ -39,25 +39,39 @@ export default function RecapReel({ data, onClose }) {
   const [exporting, setExporting] = useState(false)
   const [pct, setPct] = useState(0)
   const [exportMsg, setExportMsg] = useState('')
+  const [readyFile, setReadyFile] = useState(null)
+
+  async function shareReady() {
+    if (!readyFile) return
+    const file = new File([readyFile.blob], `matchday-recap.${readyFile.ext}`, { type: readyFile.mime })
+    try {
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: 'Matchday Recap' })
+      } else {
+        const url = URL.createObjectURL(readyFile.blob)
+        const a = document.createElement('a')
+        a.href = url; a.download = file.name; a.click()
+        setTimeout(() => URL.revokeObjectURL(url), 5000)
+        setExportMsg(`✓ Saved as .${readyFile.ext} — check your files`)
+      }
+    } catch (e) {
+      // final fallback: download
+      const url = URL.createObjectURL(readyFile.blob)
+      const a = document.createElement('a')
+      a.href = url; a.download = file.name; a.click()
+      setTimeout(() => URL.revokeObjectURL(url), 5000)
+      setExportMsg(`✓ Saved as .${readyFile.ext} — check your files`)
+    }
+  }
 
   async function doExport() {
     setExporting(true); setPct(0); setExportMsg('')
     try {
       const res = await exportRecap(data || DEMO, setPct)
       if (!res.ok) { setExportMsg('✗ ' + res.reason); setExporting(false); return }
-      const ext = res.mime.includes('mp4') ? 'mp4' : 'webm'
-      const file = new File([res.blob], `matchday-recap.${ext}`, { type: res.mime })
-      // Prefer native share (WhatsApp/Stories); fall back to download
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: 'Matchday Recap' })
-        setExportMsg('✓ Shared')
-      } else {
-        const url = URL.createObjectURL(res.blob)
-        const a = document.createElement('a')
-        a.href = url; a.download = file.name; a.click()
-        setTimeout(() => URL.revokeObjectURL(url), 5000)
-        setExportMsg(`✓ Saved as .${ext} — check your downloads`)
-      }
+     const ext = res.mime.includes('mp4') ? 'mp4' : 'webm'
+      setReadyFile({ blob: res.blob, mime: res.mime, ext })
+      setExportMsg(`✓ Ready as .${ext} — tap Share below`)
     } catch (e) {
       setExportMsg('✗ ' + (e.message || 'Export failed'))
     }
@@ -80,6 +94,9 @@ export default function RecapReel({ data, onClose }) {
         <div style={{ width: 'min(92vw,46vh)', height: 4, background: '#222', borderRadius: 99, marginTop: 14, overflow: 'hidden' }}>
           <div style={{ height: '100%', width: `${pct * 100}%`, background: GREEN, transition: 'width .1s' }} />
         </div>
+      )}
+      {readyFile && (
+        <button onClick={shareReady} style={{ ...ctrlBtn, marginTop: 14 }}>↗ Share / Save now</button>
       )}
       {exportMsg && (
         <div style={{ color: exportMsg.startsWith('✓') ? GREEN : '#FF3B5C', fontSize: 13, marginTop: 14, fontFamily: MONO, letterSpacing: '.06em', textAlign: 'center', maxWidth: '90vw', lineHeight: 1.5 }}>
