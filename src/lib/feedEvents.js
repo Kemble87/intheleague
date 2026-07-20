@@ -156,3 +156,67 @@ export function buildFeed({ pool, poolId, fixtures, results, allPicks, allChips,
     return b.ts - a.ts
   })
 }
+// ── Recap reel data: derives the latest completed matchday into reel scenes ──
+export function buildRecapData({ pool, poolId, fixtures, results, allPicks, allChips, members, userId }) {
+  if (!fixtures?.length || (members || []).length < 1) return null
+  const merged = { ...(allPicks || {}), [userId]: (allPicks || {})[userId] || {} }
+  const mds = matchdayScores(fixtures, results, members.map(([uid]) => uid), merged, allChips || {})
+  const done = Object.entries(mds).filter(([, v]) => v.complete).map(([md, v]) => ({ md: Number(md), scores: v.scores })).sort((a, b) => a.md - b.md)
+  if (!done.length) return null
+
+  const nameOf = uid => ((members.find(([id]) => id === uid) || [null, {}])[1].name || '?').split(' ')[0]
+  const latest = done[done.length - 1]
+  const md = latest.md
+  const scores = latest.scores
+
+  const ranked = Object.entries(scores).sort((a, b) => b[1] - a[1])
+  const [wUid, wPts] = ranked[0]
+  if (wPts <= 0) return null
+  const winner = nameOf(wUid)
+
+  const mdFx = fixtures.filter(f => String(f.matchday) === String(md))
+  let exact = null
+  for (const f of mdFx) {
+    const r = results[f.id], p = (merged[wUid] || {})[f.id]
+    if (r && p && r.h != null && p.h === r.h && p.a === r.a) {
+      exact = { home: f.home, away: f.away, h: r.h, a: r.a }
+      break
+    }
+  }
+  if (!exact) {
+    for (const f of mdFx) {
+      const r = results[f.id]
+      if (!r || r.h == null) continue
+      for (const uid of Object.keys(merged)) {
+        const p = (merged[uid] || {})[f.id]
+        if (p && p.h === r.h && p.a === r.a) { exact = { home: f.home, away: f.away, h: r.h, a: r.a }; break }
+      }
+      if (exact) break
+    }
+  }
+
+  const totalsAfter = {}, totalsBefore = {}
+  done.forEach(({ scores: s }) => Object.entries(s).forEach(([u, p]) => { totalsAfter[u] = (totalsAfter[u] || 0) + p }))
+  done.slice(0, -1).forEach(({ scores: s }) => Object.entries(s).forEach(([u, p]) => { totalsBefore[u] = (totalsBefore[u] || 0) + p }))
+  const rankAfter = Object.entries(totalsAfter).sort((a, b) => b[1] - a[1]).map(([u]) => u)
+  const rankBefore = Object.entries(totalsBefore).sort((a, b) => b[1] - a[1]).map(([u]) => u)
+  const table = rankAfter.slice(0, 4).map((uid, i) => {
+    const prev = rankBefore.indexOf(uid)
+    const move = prev === -1 ? 0 : prev - i
+    return { name: nameOf(uid), pts: totalsAfter[uid] || 0, move }
+  })
+
+  const CHIP_NAMES = { '2x': 'the 2× Multiplier', banker: 'the Banker', hth: 'Half Time Hero', copycat: 'Copycat', coupon: 'the Coupon Buster' }
+  let chip = null
+  for (const [uid, chips] of Object.entries(allChips || {})) {
+    for (const [cid, data] of Object.entries(chips || {})) {
+      if (CHIP_NAMES[cid] && String(data?.matchday) === String(md)) {
+        chip = { who: nameOf(uid), name: CHIP_NAMES[cid], pts: scores[uid] ?? 0 }
+        break
+      }
+    }
+    if (chip) break
+  }
+
+  return { poolName: pool?.name || 'Your League', md, winner, exact, table, chip }
+}
