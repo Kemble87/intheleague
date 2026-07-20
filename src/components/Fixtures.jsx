@@ -5,7 +5,7 @@ import { SAMPLE_FIXTURES } from '../lib/constants'
 import { fmtKO, fmtDay, groupDays, countdown, calcPts, abbr, fetchAndStoreFixtures, loadFixtures, matchdayScores, runInStart } from '../lib/helpers'
 import Kit from './Kit'
 import Feed from './Feed'
-import RecapReel from './RecapReel'
+
 
 const TEAM_NAMES = {
   'Nottingham': 'Nottm Forest',
@@ -291,7 +291,7 @@ export default function Fixtures({ poolId, pool, user, picks, allPicks, results,
   const [allChips, setAllChips] = useState({})
   const [tab, setTab] = useState('picks')
 const [h2h, setH2h] = useState(null)
-  const [showReel, setShowReel] = useState(false)
+  
   const isOrg = pool.createdBy === user.uid || pool.members?.[user.uid]?.isOrganiser
   const members = Object.entries(pool.members || {})
 
@@ -445,8 +445,6 @@ const [h2h, setH2h] = useState(null)
         }, 100)
       }} />
 
-     {showReel && <RecapReel data={null} onClose={() => setShowReel(false)} />}
-      <button onClick={() => setShowReel(true)} style={{ width: '100%', marginBottom: 14, padding: '12px', background: '#0d0d0d', border: '1px solid #00E05A44', borderRadius: 12, color: '#00E05A', font: 'inherit', fontSize: 14, fontWeight: 700, cursor: 'pointer' }}>▶ Preview recap reel (test)</button>
       <div className="tabs">
         <button className={`tab${tab === 'feed' ? ' on' : ''}`} onClick={() => setTab('feed')}>Feed</button>
         <button className={`tab${tab === 'picks' ? ' on' : ''}`} onClick={() => setTab('picks')}>{isOrg ? 'Picks & results' : 'My picks'}</button>
