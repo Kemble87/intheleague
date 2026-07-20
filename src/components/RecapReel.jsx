@@ -109,3 +109,127 @@ function Floodlights({ t, name }) {
     </div>
   )
 }
+function Headline({ t, winner, md }) {
+  if (t < SCENES.headline || t > SCENES.exact + 200) return null
+  const local = t - SCENES.headline
+  const out = prog(t, SCENES.exact, SCENES.exact + 200)
+  const name = (winner || 'ROB').toUpperCase()
+  return (
+    <div style={{ position: 'absolute', inset: 0, padding: '0 7%', display: 'flex', flexDirection: 'column', justifyContent: 'center', opacity: 1 - out, transform: `translateX(${out * -20}px)` }}>
+      <div style={{ fontFamily: MONO, fontSize: 'clamp(9px,2.6vw,13px)', letterSpacing: '.24em', color: '#666', marginBottom: '3%', opacity: prog(local, 100, 400) }}>MATCHDAY {md ?? 7}</div>
+      {[name, 'TAKES', 'THE CROWN'].map((w, i) => {
+        const wp = easeOut(prog(local, i * 130, i * 130 + 380))
+        const isCrown = i === 2
+        return (
+          <div key={i} style={{
+            fontFamily: DISP, fontWeight: 800,
+            fontSize: isCrown ? 'clamp(28px,10vw,52px)' : 'clamp(36px,13vw,68px)',
+            color: isCrown ? GOLD : '#fff', lineHeight: 0.98, letterSpacing: '-.02em',
+            opacity: wp, transform: `translateY(${(1 - wp) * 24}px)`,
+          }}>{w}</div>
+        )
+      })}
+      <div style={{ width: '26%', height: 4, borderRadius: 2, background: GREEN, marginTop: '4%', opacity: prog(local, 500, 800) }} />
+    </div>
+  )
+}
+
+function ExactScene({ t, exact, winner }) {
+  if (t < SCENES.exact || t > SCENES.table + 200) return null
+  const local = t - SCENES.exact
+  const inP = easeOut(prog(local, 0, 350))
+  const out = prog(t, SCENES.table, SCENES.table + 200)
+  const burst = prog(local, 300, 700)
+  if (!exact) return null
+  return (
+    <div style={{ position: 'absolute', inset: 0, padding: '0 7%', display: 'flex', flexDirection: 'column', justifyContent: 'center', opacity: (1 - out) * inP }}>
+      <div style={{ fontFamily: MONO, fontSize: 'clamp(9px,2.6vw,13px)', letterSpacing: '.2em', color: '#666', marginBottom: '4%' }}>EXACT SCORE · +3</div>
+      <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: '4%', background: '#050505', border: '2px solid #1a1a1a', borderRadius: 12, padding: '6% 4%', alignSelf: 'flex-start' }}>
+        <span style={{ fontFamily: MONO, fontSize: 'clamp(12px,3.4vw,18px)', color: '#777' }}>{abbr(exact.home)}</span>
+        <span style={{ fontFamily: MONO, fontSize: 'clamp(30px,9vw,46px)', color: GREEN, textShadow: `0 0 ${8 + burst * 10}px #00ff44` }}>{exact.h}:{exact.a}</span>
+        <span style={{ fontFamily: MONO, fontSize: 'clamp(12px,3.4vw,18px)', color: '#777' }}>{abbr(exact.away)}</span>
+        {burst > 0 && [...Array(10)].map((_, i) => {
+          const a = i * 36
+          const r = 30 + burst * 60
+          return <span key={i} style={{ position: 'absolute', left: '50%', top: '50%', width: 5, height: 5, borderRadius: '50%', background: i % 3 ? GREEN : GOLD, opacity: 1 - burst, transform: `translate(${Math.cos(a * Math.PI / 180) * r}px, ${Math.sin(a * Math.PI / 180) * r}px)` }} />
+        })}
+      </div>
+      <div style={{ fontSize: 'clamp(11px,3vw,15px)', color: '#888', marginTop: '5%' }}>{(winner || 'Rob')} called it. Nobody else did.</div>
+    </div>
+  )
+}
+
+function TableScene({ t, table }) {
+  if (t < SCENES.table || t > SCENES.chip + 200) return null
+  const local = t - SCENES.table
+  const out = prog(t, SCENES.chip, SCENES.chip + 200)
+  const rows = (table || []).slice(0, 4)
+  return (
+    <div style={{ position: 'absolute', inset: 0, padding: '0 7%', display: 'flex', flexDirection: 'column', justifyContent: 'center', opacity: 1 - out }}>
+      <div style={{ fontFamily: MONO, fontSize: 'clamp(9px,2.6vw,13px)', letterSpacing: '.2em', color: '#666', marginBottom: '5%' }}>AS IT STANDS</div>
+      {rows.map((r, i) => {
+        const rp = easeOut(prog(local, i * 140, i * 140 + 450))
+        const colors = [GOLD, '#C0C0C0', '#CD7F32', '#555']
+        const col = colors[i] || '#555'
+        return (
+          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '4%', padding: '3.5% 4%', marginBottom: '2.5%', background: i === 0 ? '#141003' : '#0d0d0d', border: `1px solid ${i === 0 ? GOLD + '55' : '#1a1a1a'}`, borderRadius: 10, opacity: rp, transform: `translateX(${(1 - rp) * 30}px)` }}>
+            <span style={{ fontFamily: DISP, fontSize: 'clamp(13px,3.6vw,18px)', fontWeight: 700, color: col, width: '8%' }}>{i + 1}</span>
+            <span style={{ fontFamily: DISP, fontSize: 'clamp(13px,3.6vw,18px)', fontWeight: 600, color: '#ddd', flex: 1 }}>{r.name}</span>
+            {r.move ? <span style={{ fontSize: 'clamp(10px,2.8vw,13px)', fontWeight: 700, color: r.move > 0 ? GREEN : RED }}>{r.move > 0 ? '▲' : '▼'}{Math.abs(r.move)}</span> : null}
+            <span style={{ fontFamily: DISP, fontSize: 'clamp(14px,4vw,20px)', fontWeight: 700, color: i === 0 ? col : '#999' }}>{r.pts}</span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function ChipScene({ t, chip }) {
+  if (t < SCENES.chip || t > SCENES.endcard + 200) return null
+  const local = t - SCENES.chip
+  const inP = easeOut(prog(local, 0, 350))
+  const out = prog(t, SCENES.endcard, SCENES.endcard + 200)
+  if (!chip) return null
+  const won = chip.pts > 0
+  return (
+    <div style={{ position: 'absolute', inset: 0, padding: '0 7%', display: 'flex', flexDirection: 'column', justifyContent: 'center', opacity: (1 - out) * inP, transform: `translateY(${(1 - inP) * 20}px)` }}>
+      <div style={{ fontFamily: MONO, fontSize: 'clamp(9px,2.6vw,13px)', letterSpacing: '.2em', color: '#666', marginBottom: '4%' }}>CHIP WATCH</div>
+      <div style={{ fontFamily: DISP, fontSize: 'clamp(24px,7vw,38px)', fontWeight: 800, color: '#fff', lineHeight: 1.05 }}>{chip.who} played</div>
+      <div style={{ fontFamily: DISP, fontSize: 'clamp(24px,7vw,38px)', fontWeight: 800, color: BLUE, lineHeight: 1.05 }}>{chip.name}</div>
+      <div style={{ fontFamily: DISP, fontSize: 'clamp(22px,6.5vw,34px)', fontWeight: 800, color: won ? GREEN : RED, marginTop: '4%' }}>{won ? `+${chip.pts} — nailed it.` : 'It backfired.'}</div>
+    </div>
+  )
+}
+
+function Endcard({ t }) {
+  if (t < SCENES.endcard) return null
+  const local = t - SCENES.endcard
+  const inP = easeOut(prog(local, 0, 500))
+  return (
+    <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', opacity: inP, background: '#000' }}>
+      <div style={{ fontFamily: DISP, fontSize: 'clamp(22px,7vw,34px)', fontWeight: 900, letterSpacing: '-.03em', transform: `scale(${0.9 + inP * 0.1})` }}>
+        <span style={{ color: '#fff' }}>In</span><span style={{ color: GREEN }}>The</span><span style={{ color: '#fff' }}>League</span>
+      </div>
+      <div style={{ width: '30%', height: 3, background: GREEN, borderRadius: 2, margin: '5% 0' }} />
+      <div style={{ fontFamily: DISP, fontSize: 'clamp(14px,4vw,20px)', fontWeight: 700, color: '#fff', textAlign: 'center', lineHeight: 1.3 }}>Beat your mates.<br />All season long.</div>
+      <div style={{ marginTop: '7%', padding: '3% 7%', background: GREEN, borderRadius: 500, fontFamily: DISP, fontSize: 'clamp(11px,3vw,15px)', fontWeight: 800, color: '#000' }}>intheleague.app</div>
+    </div>
+  )
+}
+
+function abbr(name) {
+  if (!name) return '?'
+  return name.replace(/^(AFC|FC)\s+/i, '').trim().slice(0, 3).toUpperCase()
+}
+
+const DEMO = {
+  poolName: 'The Lads', md: 7, winner: 'Rob',
+  exact: { home: 'Man City', away: 'Chelsea', h: 2, a: 1 },
+  table: [
+    { name: 'Rob', pts: 42, move: 1 },
+    { name: 'Dave', pts: 38, move: -1 },
+    { name: 'Lee', pts: 31, move: 0 },
+    { name: 'Sam', pts: 24, move: 0 },
+  ],
+  chip: { who: 'Lee', name: 'the Banker', pts: 0 },
+}
