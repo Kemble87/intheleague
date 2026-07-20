@@ -117,3 +117,115 @@ function drawFrame(ctx, t, d) {
     ctx.fillText(`${d.winner || 'Rob'} called it. Nobody else did.`, 80, 1140)
     ctx.globalAlpha = 1
   }
+// ── TABLE (5500–7500) ──
+  if (t >= 5500 && t < 7700 && d.table) {
+    const l = t - 5500, out = prog(t, 7500, 7700)
+    ctx.globalAlpha = 1 - out
+    ctx.textAlign = 'left'
+    ctx.fillStyle = '#666'; ctx.font = '600 30px monospace'
+    ctx.fillText('AS IT STANDS', 80, 660)
+    const cols = [GOLD, '#C0C0C0', '#CD7F32', '#555']
+    d.table.slice(0, 4).forEach((r, i) => {
+      const rp = easeOut(prog(l, i*140, i*140+450))
+      if (rp <= 0) return
+      ctx.globalAlpha = (1-out)*rp
+      const y = 720 + i*150, dx = (1-rp)*60
+      ctx.fillStyle = i === 0 ? '#141003' : '#0d0d0d'
+      ctx.strokeStyle = i === 0 ? GOLD : '#1a1a1a'; ctx.lineWidth = 2
+      roundRect(ctx, 80+dx, y, W-160, 120, 14); ctx.fill(); ctx.stroke()
+      ctx.fillStyle = cols[i]; ctx.font = "700 46px 'Space Grotesk', Inter, sans-serif"
+      ctx.fillText(String(i+1), 120+dx, y+78)
+      ctx.fillStyle = '#ddd'; ctx.font = "600 46px 'Space Grotesk', Inter, sans-serif"
+      ctx.fillText(r.name, 210+dx, y+78)
+      if (r.move) {
+        ctx.fillStyle = r.move > 0 ? GREEN : RED; ctx.font = '700 32px sans-serif'
+        ctx.fillText(`${r.move > 0 ? '▲' : '▼'}${Math.abs(r.move)}`, W-320+dx, y+76)
+      }
+      ctx.fillStyle = i === 0 ? cols[i] : '#999'; ctx.font = "700 54px 'Space Grotesk', Inter, sans-serif"
+      ctx.textAlign = 'right'; ctx.fillText(String(r.pts), W-120, y+80); ctx.textAlign = 'left'
+    })
+    ctx.globalAlpha = 1
+  }
+
+  // ── CHIP (7500–9000) ──
+  if (t >= 7500 && t < 9200 && d.chip) {
+    const l = t - 7500, inP = easeOut(prog(l, 0, 350)), out = prog(t, 9000, 9200)
+    const won = d.chip.pts > 0
+    ctx.globalAlpha = (1-out)*inP
+    ctx.textAlign = 'left'
+    ctx.fillStyle = '#666'; ctx.font = '600 30px monospace'
+    ctx.fillText('CHIP WATCH', 80, 820)
+    ctx.fillStyle = '#fff'; ctx.font = "800 76px 'Space Grotesk', Inter, sans-serif"
+    ctx.fillText(`${d.chip.who} played`, 80, 920)
+    ctx.fillStyle = BLUE; ctx.fillText(d.chip.name, 80, 1010)
+    ctx.fillStyle = won ? GREEN : RED; ctx.font = "800 64px 'Space Grotesk', Inter, sans-serif"
+    ctx.fillText(won ? `+${d.chip.pts} — nailed it.` : 'It backfired.', 80, 1120)
+    ctx.globalAlpha = 1
+  }
+
+  // ── ENDCARD (9000–10800) ──
+  if (t >= 9000) {
+    const inP = easeOut(prog(t, 9000, 9500))
+    ctx.globalAlpha = inP; ctx.fillStyle = '#000'; ctx.fillRect(0,0,W,H)
+    ctx.textAlign = 'center'
+    ctx.font = "900 72px 'Space Grotesk', Inter, sans-serif"
+    ctx.fillStyle = '#fff'; ctx.fillText('In', W/2 - 130, 900)
+    ctx.fillStyle = GREEN; ctx.fillText('The', W/2, 900)
+    ctx.fillStyle = '#fff'; ctx.fillText('League', W/2 + 150, 900)
+    ctx.fillStyle = GREEN; ctx.fillRect(W/2 - 160, 960, 320, 6)
+    ctx.fillStyle = '#fff'; ctx.font = "700 52px 'Space Grotesk', Inter, sans-serif"
+    ctx.fillText('Beat your mates.', W/2, 1080)
+    ctx.fillText('All season long.', W/2, 1150)
+    ctx.fillStyle = GREEN
+    roundRect(ctx, W/2 - 220, 1230, 440, 90, 45); ctx.fill()
+    ctx.fillStyle = '#000'; ctx.font = "800 40px 'Space Grotesk', Inter, sans-serif"
+    ctx.fillText('intheleague.app', W/2, 1288)
+    ctx.globalAlpha = 1
+  }
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath()
+  ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r)
+  ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r); ctx.closePath()
+}
+
+// Returns { ok, blob, mime, reason }
+export async function exportRecap(data, onProgress) {
+  const mime = pickMime()
+  if (!mime || typeof MediaRecorder === 'undefined') {
+    return { ok: false, reason: 'This browser can\'t record video. Try screen-recording the reel instead.' }
+  }
+  const canvas = document.createElement('canvas')
+  canvas.width = W; canvas.height = H
+  const ctx = canvas.getContext('2d')
+  const stream = canvas.captureStream(FPS)
+  const chunks = []
+  let recorder
+  try {
+    recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 8_000_000 })
+  } catch (e) {
+    return { ok: false, reason: 'Recorder failed to start: ' + e.message }
+  }
+  recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data) }
+
+  const done = new Promise(res => { recorder.onstop = res })
+  recorder.start()
+
+  const t0 = performance.now()
+  await new Promise(resolve => {
+    function tick(now) {
+      const t = now - t0
+      drawFrame(ctx, Math.min(t, DURATION), data)
+      onProgress?.(Math.min(1, t / DURATION))
+      if (t < DURATION) requestAnimationFrame(tick)
+      else resolve()
+    }
+    requestAnimationFrame(tick)
+  })
+
+  recorder.stop()
+  await done
+  const blob = new Blob(chunks, { type: mime })
+  return { ok: true, blob, mime }
+}
