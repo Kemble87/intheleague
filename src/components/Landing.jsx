@@ -66,6 +66,13 @@ const CSS = `@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@
     transition: transform .15s ease;
   }
   .itl-landing .nav-cta:hover { transform: translateY(-1px); }
+  .itl-landing .nav-right { display: flex; align-items: center; gap: 6px; }
+  .itl-landing .nav-login {
+    font-family: var(--display); font-weight: 700; font-size: 14px;
+    color: var(--chalk); background: transparent; text-decoration: none;
+    padding: 9px 12px; border-radius: 999px; transition: color .15s ease;
+  }
+  .itl-landing .nav-login:hover { color: var(--turf); }
 
   /* ---------- hero ---------- */
   .itl-landing .hero {
@@ -432,7 +439,7 @@ const CSS = `@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@
   }
 
   /* button resets (CTAs are <button> so they trigger onGetStarted) */
-  .itl-landing .nav-cta, .itl-landing .btn { border: 0; cursor: pointer; }
+  .itl-landing .nav-cta, .itl-landing .nav-login, .itl-landing .btn { border: 0; cursor: pointer; }
 `
 
 export default function Landing({ onGetStarted }) {
@@ -502,7 +509,10 @@ export default function Landing({ onGetStarted }) {
 
       <header className="topbar">
         <div className="wordmark">InThe<span>League</span></div>
-        <button type="button" className="nav-cta" onClick={onGetStarted}>Start a pool</button>
+        <div className="nav-right">
+          <button type="button" className="nav-login" onClick={onGetStarted}>Log in</button>
+          <button type="button" className="nav-cta" onClick={onGetStarted}>Start a pool</button>
+        </div>
       </header>
 
       <section className="hero">
@@ -581,19 +591,23 @@ export default function Landing({ onGetStarted }) {
           <div className="checklist" id="checklist">
             <div className="check">
               <span className="tick">✓</span>
-              <span className="txt"><b>Scoring</b><span>Every prediction scored the second the whistle goes.</span></span>
+              <span className="txt"><b>Predict every score</b><span>Call the exact scoreline for every fixture, every matchday. Nail it and you clean up — get close and you still bank points.</span></span>
             </div>
             <div className="check">
               <span className="tick">✓</span>
-              <span className="txt"><b>Live standings</b><span>Your table updates in real time, match by match.</span></span>
+              <span className="txt"><b>Scoring, done for you</b><span>Results sync automatically the moment full time hits. No spreadsheets, no manual tallying, no arguments about who actually won.</span></span>
             </div>
             <div className="check">
               <span className="tick">✓</span>
-              <span className="txt"><b>Chips &amp; streaks</b><span>Doubles, wildcards and form streaks, tracked automatically.</span></span>
+              <span className="txt"><b>Live standings</b><span>Your table reshuffles in real time, match by match — so the lead can change hands while the games are still on.</span></span>
             </div>
             <div className="check">
               <span className="tick">✓</span>
-              <span className="txt"><b>WhatsApp nudges</b><span>One tap reminds the mate who always forgets to pick.</span></span>
+              <span className="txt"><b>Chips &amp; streaks</b><span>Save a 2× Multiplier, Banker or Half-Time Hero for the weeks that count, and let form streaks build automatically.</span></span>
+            </div>
+            <div className="check">
+              <span className="tick">✓</span>
+              <span className="txt"><b>WhatsApp nudges</b><span>One tap fires a reminder straight into your group chat for the mate who always forgets to get their picks in.</span></span>
             </div>
           </div>
         </div>
