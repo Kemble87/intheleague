@@ -80,8 +80,8 @@ const CSS = `
 }
 `
 
-export default function Login() {
-  const [mode, setMode] = useState('in')
+export default function Login({ initialMode = 'in' }) {
+  const [mode, setMode] = useState(initialMode)
   const [email, setEmail] = useState('')
   const [pass, setPass] = useState('')
   const [name, setName] = useState('')
