@@ -1,473 +1,666 @@
-import { useState, useEffect, useRef } from 'react'
-import Backdrop from './Backdrop'
+import { useEffect, useRef } from 'react'
 
-// ── Scroll reveal hook ───────────────────────────────────────────────────────
-function useReveal() {
-  const ref = useRef(null)
-  const [shown, setShown] = useState(false)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { setShown(true); obs.disconnect() }
-    }, { threshold: 0.15 })
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [])
-  return [ref, shown]
-}
+// InTheLeague — landing / front door.
+// Self-contained: all styles are scoped under .itl-landing so they can't
+// collide with the app's global CSS. CTAs call onGetStarted (opens Login).
+const CSS = `@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Anton&family=Inter:wght@400;500;600&family=Poppins:wght@500;600;700;800&family=Space+Mono:wght@700&display=swap');
 
-function Reveal({ children, delay = 0 }) {
-  const [ref, shown] = useReveal()
-  return (
-    <div ref={ref} style={{
-      opacity: shown ? 1 : 0,
-      transform: shown ? 'translateY(0)' : 'translateY(32px)',
-      transition: `opacity .7s ${delay}s cubic-bezier(.22,1,.36,1), transform .7s ${delay}s cubic-bezier(.22,1,.36,1)`,
-    }}>{children}</div>
-  )
-}
+.itl-landing {
+    --ink: #0E120F;
+    --ink-soft: #171D18;
+    --ink-line: #23291F;
+    --chalk: #F6F5EF;
+    --coupon: #F3EFE4;
+    --coupon-card: #FBFAF5;
+    --coupon-line: #E4DECD;
+    --turf: #2CE86A;
+    --turf-deep: #1E7D37;
+    --amber: #F4B32C;
+    --muted-on-ink: #8B928A;
+    --muted-on-coupon: #6E7266;
 
-// ── LCD digit ────────────────────────────────────────────────────────────────
-function LcdDigit({ value, color = '#00ff66' }) {
-  return (
-    <div style={{
-      width: 'clamp(38px,9vw,52px)', height: 'clamp(48px,11vw,64px)',
-      background: '#060606', border: '1.5px solid #1a1a1a', borderRadius: 8,
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      position: 'relative', overflow: 'hidden',
-    }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0px,rgba(0,0,0,.12) 1px,transparent 1px,transparent 3px)', zIndex: 1 }}/>
-      <span style={{
-        fontFamily: "'Share Tech Mono',ui-monospace,monospace",
-        fontSize: 'clamp(26px,6vw,36px)', color, lineHeight: 1,
-        textShadow: `0 0 10px ${color}88`, position: 'relative', zIndex: 2,
-        transition: 'all .2s',
-      }}>{value}</span>
-    </div>
-  )
-}
+    --display: "Archivo", system-ui, sans-serif;
+    --body: "Inter", system-ui, sans-serif;
+    --mono: "Space Mono", ui-monospace, monospace;
+    --screamer: "Anton", "Archivo", sans-serif;
+    --news-serif: Georgia, "Times New Roman", serif;
 
-// ── Mini kit ─────────────────────────────────────────────────────────────────
-function MiniKit({ primary, secondary, stripes, sleeves, flip }) {
-  return (
-    <svg width="30" height="33" viewBox="0 0 40 44" style={{ flexShrink: 0, transform: flip ? 'scaleX(-1)' : 'none' }}>
-      <path d="M8,12 L2,18 L8,22 L8,40 L32,40 L32,22 L38,18 L32,12 L28,8 Q22,14 12,8 Z" fill={primary} stroke="rgba(0,0,0,.3)" strokeWidth=".5"/>
-      {stripes && <><rect x="14" y="8" width="5" height="32" fill={secondary}/><rect x="23" y="8" width="5" height="32" fill={secondary}/></>}
-      {sleeves && <><path d="M2,18 L8,12 L8,22 Z" fill={sleeves}/><path d="M38,18 L32,12 L32,22 Z" fill={sleeves}/></>}
-      <path d="M16,8 Q20,12 24,8" fill="none" stroke={sleeves || secondary || '#fff'} strokeWidth="2" strokeLinecap="round"/>
-    </svg>
-  )
-}
-
-// ── Real chip badges (matching in-app artwork) ───────────────────────────────
-function Badge2xL() {
-  return (
-    <svg viewBox="0 0 170 190" style={{ width:'100%', height:'auto', display:'block' }}>
-      <polygon points="85,8 158,49 158,133 85,174 12,133 12,49" fill="#1A0305" stroke="#8B0000" strokeWidth="1.5"/>
-      <polygon points="85,16 150,53 150,129 85,166 20,129 20,53" fill="none" stroke="#CC0000" strokeWidth="0.5" opacity="0.5"/>
-      <line x1="20" y1="60" x2="60" y2="100" stroke="#2a0000" strokeWidth="10" opacity="0.6"/>
-      <line x1="40" y1="50" x2="90" y2="100" stroke="#2a0000" strokeWidth="10" opacity="0.6"/>
-      <line x1="65" y1="45" x2="130" y2="110" stroke="#2a0000" strokeWidth="10" opacity="0.6"/>
-      <text x="85" y="115" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="48" fontWeight="900" fill="#FFD700" letterSpacing="-2">2×</text>
-      <line x1="32" y1="130" x2="138" y2="130" stroke="#FFD700" strokeWidth="0.8" opacity="0.5"/>
-      <text x="85" y="145" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="9" fontWeight="700" fill="#FFD700" letterSpacing="3">MULTIPLIER</text>
-      <text x="85" y="50" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="7" fontWeight="600" fill="#CC0000" letterSpacing="4" opacity="0.8">CHIP</text>
-      <circle cx="85" cy="18" r="3" fill="#FFD700" opacity="0.6"/><circle cx="85" cy="164" r="3" fill="#FFD700" opacity="0.6"/>
-    </svg>
-  )
-}
-function BadgeBankerL() {
-  return (
-    <svg viewBox="0 0 170 190" style={{ width:'100%', height:'auto', display:'block' }}>
-      <polygon points="85,8 158,49 158,133 85,174 12,133 12,49" fill="#020818" stroke="#002244" strokeWidth="1.5"/>
-      <rect x="38" y="62" width="94" height="80" rx="4" fill="#001133" stroke="#0044AA" strokeWidth="1.5"/>
-      {[44,57,70,83,96,109].map((x,i) => <line key={i} x1={x} y1="68" x2={x} y2="136" stroke="#FFD700" strokeWidth="2.5" opacity="0.7"/>)}
-      <line x1="38" y1="84" x2="132" y2="84" stroke="#FFD700" strokeWidth="1.5" opacity="0.4"/>
-      <line x1="38" y1="120" x2="132" y2="120" stroke="#FFD700" strokeWidth="1.5" opacity="0.4"/>
-      <circle cx="85" cy="96" r="14" fill="#002255" stroke="#0055CC" strokeWidth="1.5"/>
-      <circle cx="85" cy="96" r="3" fill="#FFD700"/>
-      <rect x="44" y="68" width="41" height="68" rx="2" fill="#002255" stroke="#0055CC" strokeWidth="1"/>
-      <text x="85" y="151" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="9" fontWeight="700" fill="#FFD700" letterSpacing="4">BANKER</text>
-      <text x="85" y="50" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="7" fontWeight="600" fill="#0055CC" letterSpacing="4" opacity="0.8">CHIP</text>
-      <circle cx="85" cy="18" r="3" fill="#FFD700" opacity="0.6"/><circle cx="85" cy="164" r="3" fill="#FFD700" opacity="0.6"/>
-    </svg>
-  )
-}
-function BadgeHthL() {
-  return (
-    <svg viewBox="0 0 170 190" style={{ width:'100%', height:'auto', display:'block' }}>
-      <polygon points="85,8 158,49 158,133 85,174 12,133 12,49" fill="#080418" stroke="#330066" strokeWidth="1.5"/>
-      <polygon points="92,54 71,100 83,100 70,136 99,90 85,90 98,54" fill="#9966FF"/>
-      <polygon points="92,54 71,100 83,100 70,136 99,90 85,90 98,54" fill="none" stroke="#C0C0C0" strokeWidth="0.8" opacity="0.6"/>
-      <text x="22" y="80" fontSize="11" fill="#C0C0C0" opacity="0.4">★</text>
-      <text x="138" y="80" fontSize="11" fill="#C0C0C0" opacity="0.4">★</text>
-      <text x="85" y="147" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="8" fontWeight="700" fill="#C0C0C0" letterSpacing="3">HALF TIME</text>
-      <text x="85" y="159" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="8" fontWeight="700" fill="#C0C0C0" letterSpacing="5">HERO</text>
-      <text x="85" y="52" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="7" fontWeight="600" fill="#9966FF" letterSpacing="4" opacity="0.8">CHIP</text>
-      <circle cx="85" cy="18" r="3" fill="#C0C0C0" opacity="0.5"/><circle cx="85" cy="164" r="3" fill="#C0C0C0" opacity="0.5"/>
-    </svg>
-  )
-}
-function BadgeCopycatL() {
-  return (
-    <svg viewBox="0 0 170 190" style={{ width:'100%', height:'auto', display:'block' }}>
-      <polygon points="85,8 158,49 158,133 85,174 12,133 12,49" fill="#020E14" stroke="#003344" strokeWidth="1.5"/>
-      <circle cx="82" cy="96" r="30" fill="none" stroke="#00AACC" strokeWidth="3"/>
-      <circle cx="82" cy="96" r="24" fill="#001A20" stroke="#004455" strokeWidth="1"/>
-      <polygon points="72,82 76,70 80,82" fill="#007799"/>
-      <polygon points="84,82 88,70 92,82" fill="#007799"/>
-      <ellipse cx="76" cy="95" rx="5" ry="6" fill="#00DDFF"/><ellipse cx="88" cy="95" rx="5" ry="6" fill="#00DDFF"/>
-      <ellipse cx="76" cy="95" rx="1.5" ry="5.5" fill="#001014"/><ellipse cx="88" cy="95" rx="1.5" ry="5.5" fill="#001014"/>
-      <path d="M78,105 Q82,110 86,105" fill="none" stroke="#00AACC" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="104" y1="118" x2="122" y2="136" stroke="#00AACC" strokeWidth="5" strokeLinecap="round"/>
-      <text x="85" y="149" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="9" fontWeight="700" fill="#00CCDD" letterSpacing="4">COPYCAT</text>
-      <text x="85" y="50" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="7" fontWeight="600" fill="#00AACC" letterSpacing="4" opacity="0.8">CHIP</text>
-      <circle cx="85" cy="18" r="3" fill="#00CCDD" opacity="0.6"/><circle cx="85" cy="164" r="3" fill="#00CCDD" opacity="0.6"/>
-    </svg>
-  )
-}
-function BadgeCouponL() {
-  return (
-    <svg viewBox="0 0 170 190" style={{ width:'100%', height:'auto', display:'block' }}>
-      <polygon points="85,8 158,49 158,133 85,174 12,133 12,49" fill="#0a1a0a" stroke="#1a6b1a" strokeWidth="1.5"/>
-      <rect x="32" y="54" width="106" height="88" rx="3" fill="#f5f0e8" opacity="0.92"/>
-      <rect x="32" y="54" width="106" height="18" rx="3" fill="#1a6b1a"/>
-      <rect x="32" y="66" width="106" height="6" fill="#1a6b1a"/>
-      <text x="85" y="66" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="7" fontWeight="900" fill="#fff">COUPON</text>
-      <line x1="36" y1="82" x2="134" y2="82" stroke="#ccc" strokeWidth="0.5" strokeDasharray="2 2"/>
-      <line x1="36" y1="96" x2="134" y2="96" stroke="#ccc" strokeWidth="0.5" strokeDasharray="2 2"/>
-      <line x1="36" y1="110" x2="134" y2="110" stroke="#ccc" strokeWidth="0.5" strokeDasharray="2 2"/>
-      <rect x="36" y="85" width="60" height="7" rx="1" fill="#ddd" opacity="0.6"/>
-      <rect x="36" y="99" width="50" height="7" rx="1" fill="#ddd" opacity="0.6"/>
-      <rect x="36" y="113" width="55" height="7" rx="1" fill="#ddd" opacity="0.6"/>
-      <g transform="rotate(-8, 85, 95)">
-        <rect x="48" y="82" width="74" height="22" rx="2" fill="none" stroke="#1a6b1a" strokeWidth="2.5"/>
-        <text x="85" y="97" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="14" fontWeight="900" fill="#1a6b1a" letterSpacing=".08em">SAVED</text>
-      </g>
-      <text x="85" y="158" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="8" fontWeight="700" fill="#4CAF50" letterSpacing="2">COUPON BUSTER</text>
-      <text x="85" y="50" textAnchor="middle" fontFamily="Inter,system-ui" fontSize="7" fontWeight="600" fill="#2d8b2d" letterSpacing="4" opacity="0.8">CHIP</text>
-      <circle cx="85" cy="18" r="3" fill="#4CAF50" opacity="0.6"/><circle cx="85" cy="164" r="3" fill="#4CAF50" opacity="0.6"/>
-    </svg>
-  )
-}
-
-function HexChip({ Badge, sub, color, active, onClick }) {
-  return (
-    <button onClick={onClick} style={{
-      background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-      width: 'clamp(100px,24vw,140px)',
-      transform: active ? 'scale(1.08) translateY(-6px)' : 'scale(1)',
-      transition: 'transform .25s cubic-bezier(.22,1,.36,1), filter .25s',
-      filter: active ? `drop-shadow(0 12px 32px ${color}55)` : 'drop-shadow(0 8px 24px rgba(0,0,0,.6))',
-    }}>
-      <Badge/>
-      <div style={{ fontSize: 11, color: active ? '#999' : '#555', marginTop: 10, lineHeight: 1.45, textAlign: 'center', transition: 'color .25s' }}>{sub}</div>
-    </button>
-  )
-}
-
-// ── Countdown ────────────────────────────────────────────────────────────────
-function Countdown() {
-  const kickoff = new Date('2026-08-21T19:00:00Z')
-  const [t, setT] = useState(kickoff - Date.now())
-  useEffect(() => {
-    const iv = setInterval(() => setT(kickoff - Date.now()), 1000)
-    return () => clearInterval(iv)
-  }, [])
-  if (t <= 0) return null
-  const d = Math.floor(t / 864e5)
-  const h = Math.floor((t % 864e5) / 36e5)
-  const m = Math.floor((t % 36e5) / 6e4)
-  const s = Math.floor((t % 6e4) / 1000)
-  const seg = (v, l) => (
-    <div style={{ textAlign: 'center' }}>
-      <div style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 'clamp(28px,7vw,44px)', color: '#ff6600', textShadow: '0 0 12px #ff440066', lineHeight: 1 }}>{String(v).padStart(2, '0')}</div>
-      <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '.16em', color: '#444', marginTop: 6, textTransform: 'uppercase' }}>{l}</div>
-    </div>
-  )
-  return (
-    <div style={{ display: 'flex', gap: 'clamp(16px,4vw,32px)', justifyContent: 'center' }}>
-      {seg(d, 'days')}{seg(h, 'hours')}{seg(m, 'mins')}{seg(s, 'secs')}
-    </div>
-  )
-}
-
-// ── FAQ item ─────────────────────────────────────────────────────────────────
-function Faq({ q, a }) {
-  const [open, setOpen] = useState(false)
-  return (
-    <div style={{ borderBottom: '1px solid #111' }}>
-      <button onClick={() => setOpen(o => !o)} style={{
-        width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '18px 0', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', gap: 16,
-      }}>
-        <span style={{ fontSize: 15, fontWeight: 700, color: '#fff' }}>{q}</span>
-        <span style={{ color: '#00E05A', fontSize: 20, flexShrink: 0, transform: open ? 'rotate(45deg)' : 'none', transition: 'transform .2s' }}>+</span>
-      </button>
-      {open && <div style={{ fontSize: 14, color: '#777', lineHeight: 1.6, paddingBottom: 18 }}>{a}</div>}
-    </div>
-  )
-}
-
-// ── MAIN ─────────────────────────────────────────────────────────────────────
-export default function Landing({ onGetStarted }) {
-  const [scrolled, setScrolled] = useState(false)
-  const [demoH, setDemoH] = useState('2')
-  const [demoA, setDemoA] = useState('1')
-    const [activeChip, setActiveChip] = useState(null)
-  const joinIntent = (typeof location !== 'undefined' ? location.hash : '').startsWith('#join-')
-
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 400)
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  // Cycle hero LCD digits
-  useEffect(() => {
-    const scores = [['2','1'],['3','0'],['1','1'],['2','2'],['4','1']]
-    let i = 0
-    const iv = setInterval(() => {
-      i = (i + 1) % scores.length
-      setDemoH(scores[i][0]); setDemoA(scores[i][1])
-    }, 2200)
-    return () => clearInterval(iv)
-  }, [])
-
-  const CHIPS = [
-    { id: '2x',     Badge: Badge2xL,      color: '#FFD700', sub: 'Double every point for one matchday.' },
-    { id: 'banker', Badge: BadgeBankerL,  color: '#4499FF', sub: 'Triple points on your surest pick.' },
-    { id: 'hth',    Badge: BadgeHthL,     color: '#9966FF', sub: 'Change your picks at half time.' },
-    { id: 'cat',    Badge: BadgeCopycatL, color: '#00CCDD', sub: "Steal a rival's picks. Silently." },
-    { id: 'coupon', Badge: BadgeCouponL,  color: '#4CAF50', sub: 'Your worst result — rescued.' },
-  ]
-
-  const green = '#00E05A'
-  const sectionPad = 'clamp(64px,12vw,120px) 20px'
-  const h2Style = { fontFamily: "'Space Grotesk','Inter',sans-serif", fontWeight: 700, fontSize: 'clamp(32px,7vw,56px)', letterSpacing: '-.03em', lineHeight: 1.02, color: '#fff', margin: 0 }
-  const subStyle = { fontSize: 'clamp(14px,3vw,17px)', color: '#666', lineHeight: 1.6, marginTop: 16, maxWidth: 480 }
-  const ctaStyle = {
-    padding: '16px 36px', background: green, color: '#000', border: 'none', borderRadius: 500,
-    font: 'inherit', fontSize: 16, fontWeight: 800, cursor: 'pointer', letterSpacing: '-.01em',
-    transition: 'transform .15s, box-shadow .15s',
+    --news: #ECE8DC;
+    --news-ink: #17140D;
+    --news-line: #C7C0AE;
+    --news-muted: #6A6455;
   }
 
+  .itl-landing, .itl-landing * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  
+  @media (prefers-reduced-motion: reduce) {  }
+
+  .itl-landing {
+    min-height: 100vh; width: 100%;
+    font-family: var(--body);
+    background: var(--ink);
+    color: var(--chalk);
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  .itl-landing .wrap { max-width: 1120px; margin: 0 auto; padding: 0 22px; }
+
+  /* ---------- top bar ---------- */
+  .itl-landing .topbar {
+    position: relative; z-index: 5;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 22px;
+    max-width: 1120px; margin: 0 auto;
+  }
+  .itl-landing .wordmark {
+    font-family: var(--display); font-weight: 900;
+    font-size: 22px; letter-spacing: -0.02em; color: var(--chalk);
+  }
+  .itl-landing .wordmark span { color: var(--turf); }
+  .itl-landing .nav-cta {
+    font-family: var(--display); font-weight: 700; font-size: 14px;
+    color: var(--ink); background: var(--chalk);
+    padding: 9px 16px; border-radius: 999px; text-decoration: none;
+    transition: transform .15s ease;
+  }
+  .itl-landing .nav-cta:hover { transform: translateY(-1px); }
+
+  /* ---------- hero ---------- */
+  .itl-landing .hero {
+    position: relative;
+    padding: 34px 0 72px;
+    background: radial-gradient(120% 90% at 50% -10%, #1c2a1e 0%, var(--ink) 55%);
+    overflow: hidden;
+  }
+  /* floodlit pitch markings, very subtle */
+  .itl-landing .pitch {
+    position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  }
+  .itl-landing .pitch::before { /* centre circle */
+    content: ""; position: absolute; left: 50%; top: 8%;
+    width: 340px; height: 340px; transform: translateX(-50%);
+    border: 1px solid rgba(246,245,239,.06); border-radius: 50%;
+  }
+  .itl-landing .pitch::after { /* halfway line */
+    content: ""; position: absolute; left: 0; right: 0; top: calc(8% + 170px);
+    height: 1px; background: rgba(246,245,239,.06);
+  }
+  .itl-landing .floodglow {
+    position: absolute; left: 50%; top: -6%; width: 620px; height: 380px;
+    transform: translateX(-50%);
+    background: radial-gradient(closest-side, rgba(244,179,44,.10), transparent 70%);
+    pointer-events: none;
+  }
+
+  .itl-landing .hero-inner { position: relative; z-index: 2; text-align: center; }
+
+  .itl-landing .eyebrow {
+    font-family: var(--display); font-weight: 700; font-size: 12px;
+    letter-spacing: .16em; text-transform: uppercase;
+    color: var(--turf);
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-bottom: 18px;
+  }
+  .itl-landing .eyebrow .dot {
+    width: 7px; height: 7px; border-radius: 50%; background: var(--turf);
+    box-shadow: 0 0 0 0 rgba(43,168,74,.6); animation: itlPulse 2.2s infinite;
+  }
+
+  .itl-landing h1 {
+    font-family: var(--display); font-weight: 900;
+    font-size: clamp(40px, 11vw, 74px);
+    line-height: .96; letter-spacing: -0.03em;
+    color: var(--chalk); margin: 0 auto 20px; max-width: 12ch;
+  }
+  .itl-landing h1 .keep { color: var(--turf); }
+
+  .itl-landing .sub {
+    font-size: clamp(15px, 4vw, 18px); color: var(--muted-on-ink);
+    max-width: 40ch; margin: 0 auto 28px; line-height: 1.55;
+  }
+  .itl-landing .sub b { color: var(--chalk); font-weight: 600; }
+
+  .itl-landing .cta-row {
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .itl-landing .btn {
+    font-family: var(--display); font-weight: 700; font-size: 16px;
+    padding: 14px 26px; border-radius: 999px; text-decoration: none;
+    display: inline-block; transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .itl-landing .btn-primary {
+    background: var(--turf); color: #06210F;
+    box-shadow: 0 8px 30px -8px rgba(43,168,74,.6);
+  }
+  .itl-landing .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 36px -10px rgba(43,168,74,.7); }
+  .itl-landing .btn-ghost {
+    background: transparent; color: var(--chalk);
+    border: 1px solid var(--ink-line);
+  }
+  .itl-landing .btn-ghost:hover { border-color: var(--muted-on-ink); }
+
+  .itl-landing .meta-line {
+    font-size: 13px; color: var(--muted-on-ink); margin-bottom: 44px;
+  }
+  .itl-landing .meta-line b { color: var(--amber); font-weight: 600; }
+
+  /* ---------- phone ---------- */
+  .itl-landing .phone-stage {
+    display: flex; justify-content: center;
+    perspective: 1400px;
+  }
+  .itl-landing .phone {
+    width: 300px; max-width: 82vw;
+    background: #05070599; border: 9px solid #050705;
+    border-radius: 42px;
+    box-shadow:
+      0 0 0 2px #262c26,
+      0 40px 80px -24px rgba(0,0,0,.8),
+      0 0 90px -20px rgba(44,232,106,.20);
+    overflow: hidden;
+    opacity: 0; transform: translateY(40px) scale(.98);
+    transition: opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1);
+  }
+  .itl-landing .phone.in { opacity: 1; transform: translateY(0) scale(1); }
+  .itl-landing .notch {
+    height: 26px; background: #050705; position: relative;
+  }
+  .itl-landing .notch::after {
+    content: ""; position: absolute; left: 50%; top: 8px; transform: translateX(-50%);
+    width: 96px; height: 6px; background: #1a1f1a; border-radius: 999px;
+  }
+  .itl-landing .screen {
+    background: #0A0B0A; color: #E7EAE5;
+    padding: 13px 12px 15px;
+    font-family: "Poppins", var(--display);
+    --pg: #2CE86A; --pgold: #F5B301; --pred: #FF4D6A;
+    --pmuted: #7E847B; --pline: #23271F; --pdim: #5A5F55;
+  }
+
+  .itl-landing .dash-card {
+    background: linear-gradient(158deg, #1c1b24 0%, #141613 42%);
+    border: 1px solid #23271F; border-radius: 16px;
+    padding: 13px 13px 14px; margin-bottom: 10px;
+  }
+  .itl-landing .dash-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px; }
+  .itl-landing .dash-eyebrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 9px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; color: var(--pg);
+  }
+  .itl-landing .dash-eyebrow .d { width: 5px; height: 5px; border-radius: 50%; background: var(--pg); }
+  .itl-landing .players-pill {
+    display: flex; align-items: center; gap: 6px;
+    background: #0e100d; border: 1px solid #262a22; border-radius: 999px;
+    padding: 3px 9px 3px 4px; font-size: 10px; font-weight: 600; color: #c7ccc3;
+  }
+  .itl-landing .players-pill .avs { display: flex; }
+  .itl-landing .players-pill .avs i {
+    width: 17px; height: 17px; border-radius: 50%; margin-left: -6px;
+    border: 1.5px solid #0e100d; font-size: 7px; font-weight: 800; color: #fff;
+    display: grid; place-items: center;
+  }
+  .itl-landing .dash-title { font-weight: 700; font-size: 27px; line-height: 1; letter-spacing: -0.01em; color: #fff; margin-bottom: 5px; }
+  .itl-landing .dash-sub { font-size: 10px; color: var(--pmuted); font-weight: 500; margin-bottom: 11px; }
+  .itl-landing .dash-sub b { color: #c7ccc3; font-weight: 600; }
+  .itl-landing .dash-hr { height: 1px; background: var(--pline); margin-bottom: 12px; }
+
+  .itl-landing .dash-stats { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: start; margin-bottom: 13px; }
+  .itl-landing .stat-lbl { font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--pmuted); margin-top: 4px; }
+  .itl-landing .stat-big .n { font-weight: 800; font-size: 36px; line-height: .85; color: var(--pg); }
+  .itl-landing .stat-mid { display: flex; flex-direction: column; gap: 7px; padding-top: 3px; }
+  .itl-landing .stat-mid .r { display: flex; align-items: baseline; gap: 8px; }
+  .itl-landing .stat-mid .r b { font-weight: 700; font-size: 15px; color: #fff; min-width: 11px; }
+  .itl-landing .stat-mid .r span { font-size: 8px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--pmuted); }
+  .itl-landing .stat-rank { text-align: right; }
+  .itl-landing .stat-rank .n { font-weight: 800; font-size: 22px; line-height: .85; color: var(--pgold); }
+  .itl-landing .stat-rank .n sup { font-size: 11px; }
+
+  .itl-landing .prog-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .itl-landing .prog-top .l { font-size: 8px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--pmuted); }
+  .itl-landing .prog-top .r { font-size: 9px; font-weight: 600; color: #c7ccc3; }
+  .itl-landing .prog-bar { height: 3px; border-radius: 2px; background: var(--pline); position: relative; overflow: hidden; margin-bottom: 5px; }
+  .itl-landing .prog-bar .fill { position: absolute; left: 0; top: 0; bottom: 0; width: 4%; background: var(--pg); }
+  .itl-landing .prog-bar .runin { position: absolute; right: 0; top: 0; bottom: 0; width: 15%; background: var(--pred); opacity: .85; }
+  .itl-landing .prog-ticks { display: flex; justify-content: space-between; font-size: 7px; color: var(--pdim); margin-bottom: 5px; }
+  .itl-landing .prog-runin { text-align: right; font-size: 8px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--pred); }
+
+  .itl-landing .nextpick { background: #0f130e; border: 1px solid #1f3320; border-radius: 14px; padding: 11px 12px; overflow: hidden; }
+  .itl-landing .np-label {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 8.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--pg); margin-bottom: 10px;
+  }
+  .itl-landing .np-fade { transition: opacity .35s ease; }
+  .itl-landing .np-fade.fade { opacity: 0; }
+  .itl-landing .np-teams { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 11px; }
+  .itl-landing .np-teams b { font-weight: 700; font-size: 14px; color: #fff; flex: 1; }
+  .itl-landing .np-teams b.away { text-align: right; }
+  .itl-landing .np-mid { flex: none; display: flex; flex-direction: column; align-items: center; }
+  .itl-landing .np-mid .dt { font-weight: 700; font-size: 11px; color: #fff; white-space: nowrap; }
+  .itl-landing .np-mid .lk { font-size: 9px; color: var(--pg); font-weight: 600; }
+  .itl-landing .np-btn {
+    display: block; background: var(--pg); color: #052610; text-align: center;
+    font-weight: 700; font-size: 13px; padding: 12px; margin: 0 -12px -11px;
+    border-radius: 0 0 13px 13px;
+  }
+
+  /* ---------- coupon / checklist section ---------- */
+  .itl-landing .coupon {
+    background: var(--coupon); color: var(--ink);
+    padding: 78px 0 84px; position: relative;
+  }
+  .itl-landing .coupon .wrap { display: grid; gap: 40px; }
+  @media (min-width: 860px) {
+    .itl-landing .coupon .wrap { grid-template-columns: 0.9fr 1.1fr; align-items: center; gap: 56px; }
+  }
+  .itl-landing .coupon-eyebrow {
+    font-family: var(--display); font-weight: 700; font-size: 12px;
+    letter-spacing: .16em; text-transform: uppercase; color: var(--turf-deep);
+    margin-bottom: 16px;
+  }
+  .itl-landing .coupon h2 {
+    font-family: var(--display); font-weight: 900;
+    font-size: clamp(30px, 7vw, 46px); line-height: 1.0; letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+  .itl-landing .coupon .lede { font-size: 16px; color: var(--muted-on-coupon); max-width: 34ch; }
+  .itl-landing .coupon .kicker {
+    margin-top: 22px; font-family: var(--display); font-weight: 800;
+    font-size: 15px; color: var(--ink);
+  }
+  .itl-landing .coupon .kicker span { color: var(--turf-deep); }
+
+  .itl-landing .checklist { display: grid; gap: 12px; }
+  .itl-landing .check {
+    background: var(--coupon-card); border: 1px solid var(--coupon-line);
+    border-radius: 16px; padding: 16px 18px;
+    display: flex; align-items: center; gap: 15px;
+    box-shadow: 0 1px 0 rgba(0,0,0,.02);
+    opacity: 0; transform: translateY(18px);
+    transition: opacity .55s ease, transform .55s cubic-bezier(.2,.7,.2,1);
+  }
+  .itl-landing .check.in { opacity: 1; transform: translateY(0); }
+  .itl-landing .tick {
+    flex: none; width: 34px; height: 34px; border-radius: 50%;
+    background: #E9F6EC; color: var(--turf-deep);
+    display: grid; place-items: center;
+    transform: scale(.4); transition: transform .4s cubic-bezier(.3,1.5,.5,1) .12s;
+  }
+  .itl-landing .check.in .tick { transform: scale(1); }
+  .itl-landing .tick svg { width: 17px; height: 17px; }
+  .itl-landing .check .txt b {
+    font-family: var(--display); font-weight: 800; font-size: 15px; display: block; margin-bottom: 2px;
+  }
+  .itl-landing .check .txt span { font-size: 13.5px; color: var(--muted-on-coupon); line-height: 1.4; }
+
+  /* ---------- back page ---------- */
+  .itl-landing .backpage-sec {
+    background: var(--ink); position: relative; overflow: hidden;
+    padding: 78px 0 84px;
+  }
+  .itl-landing .backpage-sec .floodglow { top: -14%; }
+  .itl-landing .backpage-intro { position: relative; z-index: 2; text-align: center; margin-bottom: 40px; }
+  .itl-landing .backpage-intro .coupon-eyebrow { color: var(--turf); margin-bottom: 14px; }
+  .itl-landing .backpage-intro h2 {
+    font-family: var(--display); font-weight: 900; color: var(--chalk);
+    font-size: clamp(30px, 7vw, 46px); line-height: 1.0; letter-spacing: -0.02em; margin-bottom: 14px;
+  }
+  .itl-landing .backpage-intro .lede { color: var(--muted-on-ink); max-width: 42ch; margin: 0 auto; font-size: 16px; }
+
+  .itl-landing .paper {
+    position: relative; z-index: 2;
+    background: var(--news); color: var(--news-ink);
+    max-width: 760px; margin: 0 auto;
+    border-radius: 4px;
+    padding: 22px 22px 16px;
+    box-shadow: 0 40px 90px -30px rgba(0,0,0,.85), 0 0 70px -30px rgba(244,179,44,.25);
+    opacity: 0; transform: translateY(26px) rotate(-.6deg);
+    transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1);
+  }
+  .itl-landing .paper.in { opacity: 1; transform: translateY(0) rotate(0); }
+
+  .itl-landing .masthead {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 10px; border-bottom: 3px solid var(--news-ink); padding-bottom: 8px; margin-bottom: 4px;
+  }
+  .itl-landing .masthead .mh-name {
+    font-family: var(--screamer); font-size: clamp(22px, 6vw, 34px);
+    letter-spacing: .01em; text-transform: uppercase; line-height: 1;
+  }
+  .itl-landing .masthead .mh-name b { color: var(--turf-deep); }
+  .itl-landing .masthead .mh-date {
+    font-family: var(--body); font-size: 10.5px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--news-muted); text-align: right;
+  }
+  .itl-landing .rule-thin { height: 1px; background: var(--news-line); margin: 4px 0 16px; }
+
+  .itl-landing .paper-grid { display: grid; gap: 22px; }
+  @media (min-width: 720px) { .itl-landing .paper-grid { grid-template-columns: 1.7fr 1fr; } }
+
+  .itl-landing .kicker-tag {
+    display: inline-block; font-family: var(--display); font-weight: 800;
+    font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    background: var(--news-ink); color: var(--news); padding: 4px 8px; border-radius: 3px; margin-bottom: 10px;
+  }
+  .itl-landing .screamer {
+    font-family: var(--screamer); text-transform: uppercase;
+    font-size: clamp(38px, 10vw, 62px); line-height: .9; letter-spacing: .005em; margin-bottom: 10px;
+  }
+  .itl-landing .deck { font-family: var(--news-serif); font-size: 16px; font-style: italic; color: #33302a; margin-bottom: 12px; line-height: 1.35; }
+  .itl-landing .byline {
+    font-family: var(--body); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--news-muted); border-top: 1px solid var(--news-line); border-bottom: 1px solid var(--news-line);
+    padding: 6px 0; margin-bottom: 14px;
+  }
+  .itl-landing .col-body { font-family: var(--news-serif); font-size: 14px; line-height: 1.55; color: #24221c; }
+  .itl-landing .col-body p { margin-bottom: 11px; }
+  .itl-landing .col-body p:first-of-type::first-letter {
+    font-family: var(--screamer); float: left; font-size: 46px; line-height: .8;
+    padding: 4px 8px 0 0; color: var(--news-ink);
+  }
+  .itl-landing .pullquote {
+    font-family: var(--display); font-weight: 800; font-size: 17px; line-height: 1.2;
+    border-left: 3px solid var(--turf); padding-left: 12px; margin: 14px 0 4px; color: var(--news-ink);
+  }
+
+  .itl-landing .sidebar { border-top: 3px solid var(--news-ink); padding-top: 10px; }
+  @media (min-width: 720px) { .itl-landing .sidebar { border-top: none; border-left: 1px solid var(--news-line); padding-top: 0; padding-left: 20px; } }
+  .itl-landing .side-h {
+    font-family: var(--display); font-weight: 900; font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+    margin-bottom: 8px; padding-bottom: 5px; border-bottom: 2px solid var(--news-ink);
+  }
+  .itl-landing .side-block { margin-bottom: 16px; }
+  .itl-landing .mini-row {
+    display: flex; align-items: center; gap: 8px; font-family: var(--news-serif); font-size: 13px;
+    padding: 4px 0; border-bottom: 1px dotted var(--news-line);
+  }
+  .itl-landing .mini-row .mp { font-family: var(--mono); font-weight: 700; font-size: 11px; width: 14px; color: var(--news-muted); }
+  .itl-landing .mini-row .mn { flex: 1; font-weight: 600; }
+  .itl-landing .mini-row .mpts { font-family: var(--mono); font-weight: 700; }
+  .itl-landing .side-note { font-family: var(--news-serif); font-size: 13px; line-height: 1.45; color: #24221c; }
+  .itl-landing .side-note b { font-family: var(--display); font-weight: 800; display: block; font-size: 13px; margin-bottom: 2px; }
+
+  .itl-landing .paper-foot {
+    margin-top: 16px; padding-top: 10px; border-top: 3px double var(--news-ink);
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    font-family: var(--body); font-size: 11px; color: var(--news-muted);
+  }
+  .itl-landing .paper-foot .gen b { color: var(--turf-deep); font-weight: 700; }
+  .itl-landing .paper-foot .share {
+    font-family: var(--display); font-weight: 800; font-size: 12px;
+    background: var(--turf); color: #06210F; padding: 6px 12px; border-radius: 999px;
+  }
+
+  /* ---------- closing ---------- */
+  .itl-landing .closing {
+    background: var(--ink); text-align: center; padding: 86px 22px 96px;
+    position: relative; overflow: hidden;
+  }
+  .itl-landing .closing .floodglow { top: -20%; }
+  .itl-landing .closing h3 {
+    position: relative; z-index: 2;
+    font-family: var(--display); font-weight: 900;
+    font-size: clamp(30px, 8vw, 52px); line-height: 1.0; letter-spacing: -0.025em;
+    color: var(--chalk); max-width: 16ch; margin: 0 auto 26px;
+  }
+  .itl-landing .closing h3 em { font-style: normal; color: var(--turf); }
+  .itl-landing .closing .btn-primary { position: relative; z-index: 2; }
+  .itl-landing .closing .fine { position: relative; z-index: 2; margin-top: 18px; font-size: 13px; color: var(--muted-on-ink); }
+
+  /* reveal helper for text blocks */
+  .itl-landing .rise { opacity: 0; transform: translateY(22px); transition: opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1); }
+  .itl-landing .rise.in { opacity: 1; transform: translateY(0); }
+
+  @keyframes itlPulse {
+    0% { box-shadow: 0 0 0 0 rgba(43,168,74,.5); }
+    70% { box-shadow: 0 0 0 8px rgba(43,168,74,0); }
+    100% { box-shadow: 0 0 0 0 rgba(43,168,74,0); }
+  }
+  @keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(255,107,94,.6); }
+    70% { box-shadow: 0 0 0 6px rgba(255,107,94,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,107,94,0); }
+  }
+
+  .itl-landing a:focus-visible, .itl-landing .btn:focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .itl-landing, .itl-landing * { animation: none !important; transition: none !important; }
+    .itl-landing .phone, .itl-landing .check, .itl-landing .rise, .itl-landing .tick, .itl-landing .paper { opacity: 1 !important; transform: none !important; }
+  }
+
+  /* button resets (CTAs are <button> so they trigger onGetStarted) */
+  .itl-landing .nav-cta, .itl-landing .btn { border: 0; cursor: pointer; }
+`
+
+export default function Landing({ onGetStarted }) {
+  const rootRef = useRef(null)
+
+  const scrollToHow = (e) => {
+    e.preventDefault()
+    const el = rootRef.current?.querySelector('#how')
+    if (!el) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' })
+  }
+
+  useEffect(() => {
+    const root = rootRef.current
+    if (!root) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    // scroll-triggered reveals (no scroll-jacking)
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return
+        const el = e.target
+        if (el.id === 'checklist') {
+          el.querySelectorAll('.check').forEach((c, i) => {
+            setTimeout(() => c.classList.add('in'), i * 140)
+          })
+        } else {
+          el.classList.add('in')
+        }
+        io.unobserve(el)
+      })
+    }, { threshold: 0.25, rootMargin: '0px 0px -8% 0px' })
+
+    ;['phone', 'coupon-copy', 'checklist', 'backpage-copy', 'backpage-paper', 'closing-copy']
+      .forEach((id) => { const el = root.querySelector('#' + id); if (el) io.observe(el) })
+
+    // rotating "Next to pick" fixture (mirrors the dashboard card)
+    const fixtures = [
+      { h: 'Everton',   a: 'Crystal Palace', dt: 'Sat 22 Aug \u00b7 15:00', lk: 'locks in 32 days' },
+      { h: 'Arsenal',   a: 'Spurs',          dt: 'Sun 23 Aug \u00b7 16:30', lk: 'locks in 33 days' },
+      { h: 'Man City',  a: 'Liverpool',      dt: 'Sat 29 Aug \u00b7 12:30', lk: 'locks in 39 days' },
+      { h: 'Newcastle', a: 'Chelsea',        dt: 'Sat 22 Aug \u00b7 17:30', lk: 'locks in 32 days' },
+      { h: 'Brighton',  a: 'Aston Villa',    dt: 'Sun 23 Aug \u00b7 14:00', lk: 'locks in 33 days' },
+    ]
+    const q = (id) => root.querySelector('#' + id)
+    const npHome = q('npHome'), npAway = q('npAway'), npDt = q('npDt'), npLk = q('npLk'), npFade = q('npFade')
+    let timer
+    if (npHome) {
+      let idx = 0
+      const paint = (f) => { npHome.textContent = f.h; npAway.textContent = f.a; npDt.textContent = f.dt; npLk.textContent = f.lk }
+      paint(fixtures[0])
+      timer = setInterval(() => {
+        idx = (idx + 1) % fixtures.length
+        if (reduce) { paint(fixtures[idx]); return }
+        npFade.classList.add('fade')
+        setTimeout(() => { paint(fixtures[idx]); npFade.classList.remove('fade') }, 360)
+      }, 3200)
+    }
+
+    return () => { io.disconnect(); if (timer) clearInterval(timer) }
+  }, [])
+
   return (
-    <div style={{ background: '#000', minHeight: '100vh', overflowX: 'hidden', position: 'relative' }}>
-      <Backdrop />
-      <style>{`
-        @keyframes floatPhone { 0%,100% { transform: rotate(-4deg) translateY(0); } 50% { transform: rotate(-4deg) translateY(-14px); } }
-        @keyframes pulseGlow { 0%,100% { opacity:.5; } 50% { opacity:1; } }
-        .cta-btn:hover { transform: scale(1.04); box-shadow: 0 8px 40px #00E05A55; }
-        .cta-btn:active { transform: scale(.98); }
-      `}</style>
-      {/* ── Sticky nav (appears on scroll) ── */}
-      <div style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        padding: '14px 20px',
-        background: 'rgba(0,0,0,.85)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid #111',
-        transform: scrolled ? 'translateY(0)' : 'translateY(-100%)',
-        transition: 'transform .3s ease',
-      }}>
-        <div style={{ fontSize: 17, fontWeight: 900, letterSpacing: '-.04em', color: '#fff' }}>In<em style={{ color: green, fontStyle: 'normal' }}>The</em>League</div>
-        <button className="cta-btn" onClick={onGetStarted} style={{ ...ctaStyle, padding: '10px 22px', fontSize: 13 }}>Start free</button>
-      </div>
+    <div className="itl-landing" ref={rootRef}>
+      <style>{CSS}</style>
 
-      {/* ── 1. HERO ── */}
-      <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '80px 20px 60px', position: 'relative' }}>
-        {/* Top nav */}
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px' }}>
-          <div style={{ fontSize: 18, fontWeight: 900, letterSpacing: '-.04em', color: '#fff' }}>In<em style={{ color: green, fontStyle: 'normal' }}>The</em>League</div>
-          <button onClick={onGetStarted} style={{ background: 'none', border: '1px solid #222', borderRadius: 500, padding: '9px 20px', color: '#aaa', font: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>Sign in</button>
-        </div>
+      <header className="topbar">
+        <div className="wordmark">InThe<span>League</span></div>
+        <button type="button" className="nav-cta" onClick={onGetStarted}>Start a pool</button>
+      </header>
 
-        {/* Glow */}
-        <div style={{ position: 'absolute', top: '30%', left: '50%', transform: 'translate(-50%,-50%)', width: 600, height: 600, background: 'radial-gradient(circle, #00E05A15 0%, transparent 65%)', animation: 'pulseGlow 4s ease-in-out infinite', pointerEvents: 'none' }}/>
+      <section className="hero">
+        <div className="pitch"></div>
+        <div className="floodglow"></div>
+        <div className="wrap hero-inner">
+          <div className="eyebrow"><span className="dot"></span> Free founding season</div>
+          <h1>Run the pool.<br /><span className="keep">Top the table.</span></h1>
+          <p className="sub">InTheLeague scores every prediction and ranks your mates in real time. <b>Every result moves the table</b> — and the group chat.</p>
+          <div className="cta-row">
+            <button type="button" className="btn btn-primary" onClick={onGetStarted}>Start a pool</button>
+            <a className="btn btn-ghost" href="#how" onClick={scrollToHow}>See how it works</a>
+          </div>
+          <p className="meta-line">Free to play · Championship kicks off <b>Aug 14</b> · Premier League <b>Aug 21</b></p>
 
-        <h1 style={{ fontFamily: "'Space Grotesk','Inter',sans-serif", fontWeight: 700, fontSize: 'clamp(42px,10vw,88px)', letterSpacing: '-.035em', lineHeight: 1, color: '#fff', textAlign: 'center', margin: 0, position: 'relative' }}>
-          Beat your mates.<br/><span style={{ color: green }}>All season long.</span>
-        </h1>
-        <p style={{ fontSize: 'clamp(15px,3.5vw,19px)', color: '#888', textAlign: 'center', maxWidth: 440, lineHeight: 1.6, margin: '24px 0 32px', position: 'relative' }}>
-                  {joinIntent ? "You've been invited to a league. Sign in and you're in — takes ten seconds." : 'Private score prediction leagues for your group chat. Set up in 60 seconds — free.'}
-        </p>
-        <button className="cta-btn" onClick={onGetStarted} style={{ ...ctaStyle, position: 'relative' }}>{joinIntent ? 'Join the league →' : 'Start your pool →'}</button>
+          <div className="phone-stage">
+            <div className="phone" id="phone">
+              <div className="notch"></div>
+              <div className="screen">
+                <div className="dash-card">
+                  <div className="dash-top">
+                    <div className="dash-eyebrow"><span className="d"></span> Premier League</div>
+                    <div className="players-pill">
+                      <span className="avs"><i style={{ background: '#3B7BE0' }}>LE</i><i style={{ background: '#2CE86A', color: '#062610' }}>RO</i></span>
+                      2 players
+                    </div>
+                  </div>
+                  <div className="dash-title">The Lads</div>
+                  <div className="dash-sub"><b>Rob</b> · Season 2026/27 · 380 fixtures</div>
+                  <div className="dash-hr"></div>
 
-        {/* Floating fixture card demo */}
-        <div style={{ marginTop: 64, animation: 'floatPhone 5s ease-in-out infinite', maxWidth: 420, width: '100%', position: 'relative' }}>
-          <div style={{ background: '#111', borderRadius: 18, padding: '14px 16px 16px', boxShadow: '0 40px 100px rgba(0,0,0,.9), 0 0 60px #00E05A11', border: '1px solid #1a1a1a' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#444', fontFamily: "'Share Tech Mono',monospace", letterSpacing: '.08em', marginBottom: 12 }}>
-              <span>SAT 22 AUG · 15:00</span>
-              <span style={{ color: '#FFD60A', background: '#221f00', borderRadius: 500, padding: '2px 8px', fontSize: 9, fontWeight: 700 }}>🔒 2H 14M</span>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', gap: 4 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <MiniKit primary="#EF0107" sleeves="#fff"/>
-                <div>
-                  <div style={{ fontFamily: "'Space Grotesk','Inter',sans-serif", fontWeight: 700, fontSize: 20, color: '#fff', letterSpacing: '.05em' }}>Arsenal</div>
-                  <div style={{ fontSize: 8, color: '#333', letterSpacing: '.12em', fontFamily: "'Share Tech Mono',monospace" }}>ARS</div>
+                  <div className="dash-stats">
+                    <div className="stat-big"><div className="n">32</div><div className="stat-lbl">Days to kickoff</div></div>
+                    <div className="stat-mid">
+                      <div className="r"><b>0</b><span>Exact scores</span></div>
+                      <div className="r"><b>4</b><span>Picks made</span></div>
+                    </div>
+                    <div className="stat-rank"><div className="n">2<sup>nd</sup></div><div className="stat-lbl">Your rank</div></div>
+                  </div>
+
+                  <div className="prog-top"><span className="l">Season progress</span><span className="r">Matchday 1 of 38</span></div>
+                  <div className="prog-bar"><span className="fill"></span><span className="runin"></span></div>
+                  <div className="prog-ticks"><span>MD1</span><span>MD10</span><span>MD19</span><span>MD29</span><span>MD38</span></div>
+                  <div className="prog-runin">The run-in · 2× points</div>
+                </div>
+
+                <div className="nextpick">
+                  <div className="np-label">⏱ Next to pick</div>
+                  <div className="np-fade" id="npFade">
+                    <div className="np-teams">
+                      <b id="npHome">Everton</b>
+                      <span className="np-mid">
+                        <span className="dt" id="npDt">Sat 22 Aug · 15:00</span>
+                        <span className="lk" id="npLk">locks in 32 days</span>
+                      </span>
+                      <b className="away" id="npAway">Crystal Palace</b>
+                    </div>
+                  </div>
+                  <div className="np-btn">Pick this match →</div>
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 4, padding: '0 8px' }}>
-                <LcdDigit value={demoH}/>
-                <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 20, color: '#2a2a2a' }}>:</span>
-                <LcdDigit value={demoA}/>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontFamily: "'Space Grotesk','Inter',sans-serif", fontWeight: 700, fontSize: 20, color: '#fff', letterSpacing: '.05em' }}>Chelsea</div>
-                  <div style={{ fontSize: 8, color: '#333', letterSpacing: '.12em', fontFamily: "'Share Tech Mono',monospace" }}>CHE</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="coupon" id="how">
+        <div className="wrap">
+          <div className="rise" id="coupon-copy">
+            <div className="coupon-eyebrow">While you watch the football</div>
+            <h2>We do the admin.<br />You do the bragging.</h2>
+            <p className="lede">No spreadsheets, no chasing, no arguments about who won. InTheLeague handles the scoring so the group chat can get on with the important part — the bragging.</p>
+            <p className="kicker">Set it up in a minute. <span>Rule it all season.</span></p>
+          </div>
+
+          <div className="checklist" id="checklist">
+            <div className="check">
+              <span className="tick">✓</span>
+              <span className="txt"><b>Scoring</b><span>Every prediction scored the second the whistle goes.</span></span>
+            </div>
+            <div className="check">
+              <span className="tick">✓</span>
+              <span className="txt"><b>Live standings</b><span>Your table updates in real time, match by match.</span></span>
+            </div>
+            <div className="check">
+              <span className="tick">✓</span>
+              <span className="txt"><b>Chips &amp; streaks</b><span>Doubles, wildcards and form streaks, tracked automatically.</span></span>
+            </div>
+            <div className="check">
+              <span className="tick">✓</span>
+              <span className="txt"><b>WhatsApp nudges</b><span>One tap reminds the mate who always forgets to pick.</span></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="backpage-sec">
+        <div className="floodglow"></div>
+        <div className="wrap">
+          <div className="backpage-intro rise" id="backpage-copy">
+            <div className="coupon-eyebrow">Every matchday</div>
+            <h2>The back page writes itself.</h2>
+            <p className="lede">The second full time hits, InTheLeague turns your pool's results into a proper matchday back page — headlines, table, star man and all. One tap drops it into the group chat.</p>
+          </div>
+
+          <div className="paper" id="backpage-paper">
+            <div className="masthead">
+              <div className="mh-name">The <b>Back Page</b></div>
+              <div className="mh-date">The Office League<br />Matchday 3 · Sat 5 Sep</div>
+            </div>
+            <div className="rule-thin"></div>
+
+            <div className="paper-grid">
+              <div className="lead">
+                <span className="kicker-tag">Matchday 3 verdict</span>
+                <div className="screamer">Dan does<br />it again</div>
+                <p className="deck">148 points and no sign of slowing — the Office League leader pulls clear while the chasing pack blink.</p>
+                <div className="byline">The Back Page · Generated by InTheLeague</div>
+                <div className="col-body">
+                  <p>Another matchday, another clean sweep for Dan M, who called four scorelines on the nose to move onto 148 and open a seven-point cushion at the top of The Office League.</p>
+                  <p>Behind him it was carnage. Sara K clung to second despite a howler on the north London derby, while a late flurry rescued a tidy haul for the mid-table pack. Spare a thought for whoever tipped Spurs to hold on.</p>
+                  <p className="pullquote">"Four on the spot. The rest are playing for second."</p>
                 </div>
-                <MiniKit primary="#034694" flip/>
               </div>
+
+              <aside className="sidebar">
+                <div className="side-block">
+                  <div className="side-h">Table Toppers</div>
+                  <div className="mini-row"><span className="mp">1</span><span className="mn">Dan M</span><span className="mpts">148</span></div>
+                  <div className="mini-row"><span className="mp">2</span><span className="mn">Sara K</span><span className="mpts">141</span></div>
+                  <div className="mini-row"><span className="mp">3</span><span className="mn">You</span><span className="mpts">137</span></div>
+                  <div className="mini-row"><span className="mp">4</span><span className="mn">Rob J</span><span className="mpts">129</span></div>
+                </div>
+                <div className="side-block">
+                  <div className="side-h">Star Man</div>
+                  <p className="side-note"><b>Dan M</b>Four exact scores and a double chip banked. Ruthless.</p>
+                </div>
+                <div className="side-block">
+                  <div className="side-h">Howler of the Week</div>
+                  <p className="side-note"><b>Anonymous</b>Backed Spurs with Arsenal 4–1 up. Bold. Wrong.</p>
+                </div>
+              </aside>
+            </div>
+
+            <div className="paper-foot">
+              <span className="gen">Written the moment full time hits · <b>InTheLeague</b></span>
+              <span className="share">Share to the chat →</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── 2. SOCIAL PROOF STRIP ── */}
-      <div style={{ borderTop: '1px solid #0d0d0d', borderBottom: '1px solid #0d0d0d', padding: '18px 20px', display: 'flex', gap: 'clamp(24px,7vw,64px)', justifyContent: 'center', flexWrap: 'wrap' }}>
-        {[
-          { icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#00E05A" strokeWidth="1.3"/><path d="M8 5v3l2 1.5" stroke="#00E05A" strokeWidth="1.3" strokeLinecap="round"/></svg>, t: '380 fixtures synced live' },
-          { icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 2h8v3a4 4 0 01-8 0V2z" stroke="#00E05A" strokeWidth="1.3"/><path d="M6 12h4M8 9v3M5 14h6" stroke="#00E05A" strokeWidth="1.3" strokeLinecap="round"/><path d="M12 3h2v1.5a2 2 0 01-2 2M4 3H2v1.5a2 2 0 002 2" stroke="#00E05A" strokeWidth="1.1"/></svg>, t: 'Built for the 2026/27 season' },
-          { icon: <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="#00E05A" strokeWidth="1.3"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="#00E05A" strokeWidth="1.3"/></svg>, t: 'Free to start — no card' },
-        ].map(({ icon, t }) => (
-          <span key={t} style={{ fontSize: 12, fontWeight: 600, color: '#666', letterSpacing: '.06em', textTransform: 'uppercase', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
-            {icon}{t}
-          </span>
-        ))}
-      </div>
-
-      {/* ── 3. HOW IT WORKS ── */}
-      <section style={{ padding: sectionPad, maxWidth: 920, margin: '0 auto' }}>
-        <Reveal>
-          <h2 style={h2Style}>Sixty seconds<br/><span style={{ color: green }}>to kickoff.</span></h2>
-        </Reveal>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 16, marginTop: 48 }}>
-          {[
-            { n: '01', t: 'Create a pool', d: 'Name it, pick your league. Premier League, Championship, World Cup — synced automatically.' },
-            { n: '02', t: 'Share one link', d: 'Drop it in the group chat. Your mates tap, sign in, done. No apps to download.' },
-            { n: '03', t: 'Talk trash all season', d: 'Everyone predicts scores. Points auto-calculate. The leaderboard settles every argument.' },
-          ].map((s, i) => (
-            <Reveal key={s.n} delay={i * .1}>
-              <div style={{ background: '#0d0d0d', border: '1px solid #161616', borderRadius: 16, padding: '28px 24px', height: '100%' }}>
-                <div style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 13, color: green, marginBottom: 14 }}>{s.n}</div>
-                <div style={{ fontSize: 19, fontWeight: 800, color: '#fff', marginBottom: 10, letterSpacing: '-.02em' }}>{s.t}</div>
-                <div style={{ fontSize: 14, color: '#666', lineHeight: 1.6 }}>{s.d}</div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
+      <section className="closing">
+        <div className="floodglow"></div>
+        <h3 className="rise" id="closing-copy">Your mates. Your calls. <em>Your bragging rights.</em></h3>
+        <button type="button" className="btn btn-primary" onClick={onGetStarted}>Start your pool free</button>
+        <p className="fine">Founding season is free for everyone · 2026/27</p>
       </section>
-
-      {/* ── 4. CHIPS ── */}
-      <section style={{ padding: sectionPad, background: 'radial-gradient(ellipse at 50% 0%, #0a1206 0%, #000 60%)' }}>
-        <div style={{ maxWidth: 920, margin: '0 auto', textAlign: 'center' }}>
-          <Reveal>
-            <h2 style={h2Style}>Five chips.<br/><span style={{ color: green }}>One shot at glory.</span></h2>
-            <p style={{ ...subStyle, margin: '16px auto 0' }}>
-              Play them at the perfect moment — or waste them like Dave wasted his Banker on a nil-nil.
-            </p>
-          </Reveal>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'clamp(8px,3vw,24px)', justifyContent: 'center', marginTop: 56 }}>
-            {CHIPS.map((c, i) => (
-              <Reveal key={c.id} delay={i * .08}>
-                <HexChip {...c} active={activeChip === c.id} onClick={() => setActiveChip(activeChip === c.id ? null : c.id)}/>
-              </Reveal>
-            ))}
-          </div>
-          <Reveal delay={.3}>
-            <div style={{ fontSize: 12, color: '#444', marginTop: 40 }}>Each chip: one use per season. Cinematic activation included. Regret optional.</div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ── 5. ORGANISER ── */}
-      <section style={{ padding: sectionPad, maxWidth: 920, margin: '0 auto' }}>
-        <Reveal>
-          <h2 style={h2Style}>Run the league<br/><span style={{ color: green }}>without doing the maths.</span></h2>
-          <p style={subStyle}>You're the commissioner. We handle everything else.</p>
-        </Reveal>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 16, marginTop: 48 }}>
-          {[
-            { e: '👋', t: 'One-tap nudges', d: '"Dave hasn\'t picked yet" — tap Nudge, paste into WhatsApp, done. No more chasing on a Friday night.' },
-            { e: '⚡', t: 'Auto-synced results', d: 'Real fixtures and results pulled live. Points calculate themselves. Zero spreadsheets.' },
-            { e: '👑', t: 'Full admin control', d: 'Approve members, remove ghosts, transfer ownership when you retire from the role.' },
-          ].map((f, i) => (
-            <Reveal key={f.t} delay={i * .1}>
-              <div style={{ background: '#0d0d0d', border: '1px solid #161616', borderRadius: 16, padding: '28px 24px', height: '100%' }}>
-                <div style={{ fontSize: 28, marginBottom: 14 }}>{f.e}</div>
-                <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', marginBottom: 10, letterSpacing: '-.02em' }}>{f.t}</div>
-                <div style={{ fontSize: 14, color: '#666', lineHeight: 1.6 }}>{f.d}</div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
-      {/* ── 6. FOUNDING SEASON ── */}
-      <section style={{ padding: sectionPad, maxWidth: 780, margin: '0 auto' }}>
-        <Reveal>
-          <h2 style={{ ...h2Style, textAlign: 'center' }}>Season one.<br/><span style={{ color: green }}>Completely free.</span></h2>
-          <p style={{ ...subStyle, textAlign: 'center', margin: '16px auto 0' }}>Every feature unlocked for founding pools. No card, no catch, no paywall — all season long.</p>
-        </Reveal>
-        <div style={{ maxWidth: 460, margin: '48px auto 0' }}>
-          <Reveal>
-            <div style={{ background: 'linear-gradient(160deg,#07180d,#0d0d0d 60%)', border: `1.5px solid ${green}`, borderRadius: 20, padding: '32px 28px', position: 'relative', boxShadow: '0 20px 80px #00E05A18' }}>
-              <div style={{ position: 'absolute', top: -11, right: 24, background: green, color: '#000', fontSize: 10, fontWeight: 900, letterSpacing: '.1em', padding: '4px 12px', borderRadius: 500 }}>FOUNDING SEASON</div>
-              <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: green, marginBottom: 8 }}>Season 2026/27</div>
-              <div style={{ fontSize: 40, fontWeight: 900, color: '#fff', letterSpacing: '-.04em' }}>£0</div>
-              <div style={{ fontSize: 12, color: '#444', marginBottom: 24 }}>for your whole pool · all season</div>
-              {['Unlimited players', 'Live leaderboard & matchday crowns', 'All 5 chips + The Run-In', 'Head-to-head rivalries', 'Auto-synced fixtures & results', 'Shareable matchday cards'].map(f => (
-                <div key={f} style={{ fontSize: 14, color: '#aaa', padding: '7px 0', display: 'flex', gap: 10 }}><span style={{ color: green }}>✓</span>{f}</div>
-              ))}
-              <button className="cta-btn" onClick={onGetStarted} style={{ ...ctaStyle, width: '100%', marginTop: 24 }}>Start your pool free →</button>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ── 7. FAQ ── */}
-      <section style={{ padding: sectionPad, maxWidth: 640, margin: '0 auto' }}>
-        <Reveal>
-          <h2 style={{ ...h2Style, marginBottom: 32 }}>Questions your<br/><span style={{ color: green }}>mates will ask.</span></h2>
-        </Reveal>
-        <Reveal delay={.1}>
-          <Faq q="Do my mates need to pay?" a="Nobody pays. Season one is completely free for every pool and every player — founding pools get the whole experience, all season."/>
-          <Faq q="Which leagues can we predict?" a="Premier League, Championship, League One and the World Cup — all with fixtures and results synced automatically. More leagues coming."/>
-          <Faq q="Is this gambling?" a="No. No money changes hands inside InTheLeague — it's score predictions for points and bragging rights only. What your group does at the pub is your business."/>
-          <Faq q="Can we set our own scoring rules?" a="The default is +3 exact score, +1 correct result — with chips and The Run-In layered on top. Custom scoring is on the roadmap."/>
-          <Faq q="What happens at the end of the season?" a="The final table is settled, a champion is crowned, and the group chat is unbearable for a week. Then you do it all again."/>
-        </Reveal>
-      </section>
-
-      {/* ── 8. FINAL CTA ── */}
-      <section style={{ padding: 'clamp(80px,16vw,160px) 20px', textAlign: 'center', borderTop: '1px solid #0d0d0d', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', bottom: '-40%', left: '50%', transform: 'translateX(-50%)', width: 700, height: 500, background: 'radial-gradient(ellipse, #00E05A12 0%, transparent 65%)', pointerEvents: 'none' }}/>
-        <Reveal>
-          <h2 style={{ ...h2Style, fontSize: 'clamp(36px,9vw,72px)' }}>The group chat<br/><span style={{ color: green }}>needs this.</span></h2>
-        </Reveal>
-        <Reveal delay={.15}>
-          <div style={{ margin: '48px 0' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.2em', textTransform: 'uppercase', color: '#444', marginBottom: 20 }}>Season kicks off in</div>
-            <Countdown/>
-          </div>
-        </Reveal>
-        <Reveal delay={.25}>
-          <button className="cta-btn" onClick={onGetStarted} style={{ ...ctaStyle, fontSize: 17, padding: '18px 44px' }}>Start your pool free →</button>
-          <div style={{ fontSize: 12, color: '#333', marginTop: 16 }}>No card. No downloads. Just bragging rights.</div>
-        </Reveal>
-      </section>
-
-      {/* Footer */}
-      <footer style={{ borderTop: '1px solid #0d0d0d', padding: '28px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-        <div style={{ fontSize: 14, fontWeight: 900, letterSpacing: '-.03em', color: '#fff' }}>In<em style={{ color: green, fontStyle: 'normal' }}>The</em>League</div>
-        <div style={{ fontSize: 11, color: '#333' }}>© 2026 InTheLeague · Made for the group chat</div>
-      </footer>
     </div>
   )
 }
-
