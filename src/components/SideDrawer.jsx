@@ -276,13 +276,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
             )}
 
     
-            <div style={{ ...rowStyle, opacity: .35, cursor: 'default' }}>
-              <div style={iconBox('#111')}>⚙️</div>
-              <div style={{ flex: 1 }}>
-                <div style={rowTitle}>Settings</div>
-                <div style={rowSub}>Coming soon</div>
-              </div>
-            </div>
+  
 
             <div style={{ height: 1, background: '#111', margin: '8px 0' }}/>
 
