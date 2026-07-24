@@ -61,7 +61,7 @@ const allMd = matchdayScores(fixtures, results, uids, allPicks || {}, allChips |
 
 const ord = n => n + (['th','st','nd','rd'][((n % 100) - 20) % 10] || ['th','st','nd','rd'][n % 100] || 'th')
 
-export default function LastTimeOut({ fixtures, results, allPicks, members, userId, poolId }) {
+export default function LastTimeOut({ fixtures, results, allPicks, allChips, members, userId, poolId }) {
  const recap = useMemo(() => {
     try {
       return computeRecap({ fixtures, results, allPicks, allChips, members, userId })
