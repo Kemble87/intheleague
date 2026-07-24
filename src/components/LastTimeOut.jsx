@@ -1,21 +1,13 @@
 import { useState, useEffect, useMemo } from 'react'
+import { matchdayScores } from '../lib/helpers'
 
 const GREEN = '#00E05A'
 const GOLD = '#FFD60A'
 const DISP = "'Space Grotesk','Inter',sans-serif"
 const MONO = "'Share Tech Mono',ui-monospace,monospace"
 
-// ── scoring: base points only (3 exact / 1 result) ──
-// TODO: swap in PoolHero logic if chips affect totals
-function scoreFixture(pick, res) {
-  if (pick?.h == null || pick?.a == null || res?.h == null || res?.a == null) return 0
-  const ph = +pick.h, pa = +pick.a, rh = +res.h, ra = +res.a
-  if (ph === rh && pa === ra) return 3
-  if (Math.sign(ph - pa) === Math.sign(rh - ra)) return 1
-  return 0
-}
 
-function computeRecap({ fixtures, results, allPicks, members, userId }) {
+function computeRecap({ fixtures, results, allPicks, allChips, members, userId }) {
   if (!fixtures?.length || !members?.length) return null
 
   // group fixtures by matchday
@@ -37,17 +29,18 @@ function computeRecap({ fixtures, results, allPicks, members, userId }) {
     return m?.name || m?.displayName || 'Player'
   }
 
-  const scoreSet = fixList => {
+const allMd = matchdayScores(fixtures, results, uids, allPicks || {}, allChips || {})
+  const sumUpTo = limit => {
     const s = {}
-    uids.forEach(uid => {
-      s[uid] = fixList.reduce((sum, f) => sum + scoreFixture(allPicks?.[uid]?.[f.id], results[f.id]), 0)
+    uids.forEach(uid => { s[uid] = 0 })
+    Object.entries(allMd).forEach(([m, { scores }]) => {
+      if (+m <= limit) uids.forEach(uid => { s[uid] += scores[uid] || 0 })
     })
     return s
   }
-
-  const mdScores = scoreSet(byMd[md])
-  const totalNow = scoreSet(fixtures.filter(f => f.matchday <= md))
-  const totalPrev = scoreSet(fixtures.filter(f => f.matchday < md))
+  const mdScores = allMd[md]?.scores || {}
+  const totalNow = sumUpTo(md)
+  const totalPrev = sumUpTo(md - 1)
 
   const rank = scores => [...uids].sort((a, b) => (scores[b] - scores[a]) || nameOf(a).localeCompare(nameOf(b)))
   const now = rank(totalNow), prev = rank(totalPrev)
@@ -69,9 +62,9 @@ function computeRecap({ fixtures, results, allPicks, members, userId }) {
 const ord = n => n + (['th','st','nd','rd'][((n % 100) - 20) % 10] || ['th','st','nd','rd'][n % 100] || 'th')
 
 export default function LastTimeOut({ fixtures, results, allPicks, members, userId, poolId }) {
-  const recap = useMemo(
-    () => computeRecap({ fixtures, results, allPicks, members, userId }),
-    [fixtures, results, allPicks, members, userId]
+ const recap = useMemo(
+    () => computeRecap({ fixtures, results, allPicks, allChips, members, userId }),
+    [fixtures, results, allPicks, allChips, members, userId]
   )
 
   const key = `ltoSeen-${poolId}`
