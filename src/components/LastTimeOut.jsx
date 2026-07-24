@@ -62,10 +62,15 @@ const allMd = matchdayScores(fixtures, results, uids, allPicks || {}, allChips |
 const ord = n => n + (['th','st','nd','rd'][((n % 100) - 20) % 10] || ['th','st','nd','rd'][n % 100] || 'th')
 
 export default function LastTimeOut({ fixtures, results, allPicks, members, userId, poolId }) {
- const recap = useMemo(
-    () => computeRecap({ fixtures, results, allPicks, allChips, members, userId }),
-    [fixtures, results, allPicks, allChips, members, userId]
-  )
+ const recap = useMemo(() => {
+    try {
+      return computeRecap({ fixtures, results, allPicks, allChips, members, userId })
+    } catch (e) {
+      console.error('LastTimeOut compute failed:', e)
+      alert('LTO error: ' + (e?.message || e))
+      return null
+    }
+  }, [fixtures, results, allPicks, allChips, members, userId])
 
   const key = `ltoSeen-${poolId}`
   const [show, setShow] = useState(false)
