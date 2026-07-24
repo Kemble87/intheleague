@@ -20,7 +20,7 @@ export default function PoolIntro({ pool, poolId }) {
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 100000,
-      background: '#000',
+      background: 'radial-gradient(ellipse 120% 60% at 50% -10%, rgba(44,232,106,.10), transparent 55%), radial-gradient(ellipse 90% 50% at 50% 115%, rgba(44,232,106,.05), transparent 60%), #050705',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
       opacity: leaving ? 0 : 1,
       transition: 'opacity .35s ease',
@@ -39,7 +39,7 @@ export default function PoolIntro({ pool, poolId }) {
         color: 'rgba(255,255,255,.4)', marginBottom: 16,
         animation: 'introEyebrow 1.1s ease both',
       }}>
-        Season 2026/27
+       {(pool?.sportName || 'Season 2026/27')} · 2026/27
       </div>
 
       <div style={{ position: 'relative', overflow: 'hidden', padding: '4px 12px' }}>
@@ -54,14 +54,15 @@ export default function PoolIntro({ pool, poolId }) {
         {/* floodlight sweep across the name */}
         <div className="pi-anim" style={{
           position: 'absolute', top: 0, bottom: 0, width: '38%',
-          background: `linear-gradient(90deg, transparent, ${pool?.accent || '#00E05A'}, transparent)`,
-
+         background: `linear-gradient(90deg, transparent, ${pool?.accent || '#00E05A'}66, transparent)`,
+          filter: 'blur(14px)',
+          mixBlendMode: 'screen',
           animation: 'introSweep 1.25s ease both', pointerEvents: 'none',
         }}/>
       </div>
 
-      <div className="pi-anim" style={{
-        width: 120, height: 2, marginTop: 22, borderRadius: 99,
+    <div className="pi-anim" style={{
+        width: 180, height: 2, marginTop: 22, borderRadius: 99,
         background: 'linear-gradient(90deg, transparent, #00E05A, transparent)',
         boxShadow: `0 0 18px ${pool?.accent || '#00E05A'}80`,
 
