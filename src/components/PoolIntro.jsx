@@ -39,7 +39,7 @@ export default function PoolIntro({ pool, poolId }) {
         color: 'rgba(255,255,255,.4)', marginBottom: 16,
         animation: 'introEyebrow 1.1s ease both',
       }}>
-       {(pool?.sportName || 'Season 2026/27')} · 2026/27
+       {pool?.sportName ? `${pool.sportName} · 2026/27` : 'Season 2026/27'}
       </div>
 
       <div style={{ position: 'relative', overflow: 'hidden', padding: '4px 12px' }}>
