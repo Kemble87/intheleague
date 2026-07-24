@@ -10,6 +10,7 @@ import OrgNudge from './OrgNudge'
 import Ticker from './Ticker'
 import ShareCard from './ShareCard'
 import PoolIntro from './PoolIntro'
+import LastTimeOut from './LastTimeOut'
 import DivisionTable from './DivisionTable'
 import Bulletin from './Bulletin'
 
@@ -95,6 +96,7 @@ export default function PoolView({ user, pool, poolId, onBack }) {
   return (
     <>
       <PoolIntro pool={pool} poolId={poolId} />
+      <LastTimeOut fixtures={fixtures} results={results} allPicks={allPicks} members={members} userId={user.uid} poolId={poolId} />
       <button className="back" onClick={onBack}>← All pools</button>
       <PoolHero pool={pool} fixtures={fixtures} picks={picks} results={results} members={members} userId={user.uid} allPicks={allPicks} allChips={allChips} onOpenPlayers={() => setShowPlayers(s => !s)} />
       {showPlayers && <Members poolId={poolId} pool={pool} userId={user.uid} />}
