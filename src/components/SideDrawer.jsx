@@ -136,7 +136,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
                       }}>{s.emoji}</div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 15, fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{pool.name}</div>
-                        <div style={{ fontSize: 12, color: '#555', marginTop: 2 }}>{s.name}</div>
+                        <div style={{ display: 'inline-block', fontSize: 10, fontWeight: 700, letterSpacing: '.06em', textTransform: 'uppercase', color: 'var(--green)', background: '#0d2b19', borderRadius: 999, padding: '2px 8px', marginTop: 4 }}>{s.name}</div>
                       </div>
                       {isActive
                         ? <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--green)', flexShrink: 0 }}/>
@@ -161,10 +161,12 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
                   window.prompt('Copy this link:', link)
                 }
               }} style={rowStyle}>
-                <div style={iconBox('#001a0d')}>👥</div>
+                <div style={iconBox()}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+                </div>
                 <div style={{ flex: 1 }}>
                   <div style={rowTitle}>Invite players</div>
-                  <div style={rowSub}>{activePoolId}</div>
+                  <div style={rowSub}>Share your pool link</div>
                 </div>
                 <span style={{ color: '#333', fontSize: 18 }}>›</span>
               </button>
@@ -172,8 +174,8 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
 
             {/* About the game */}
             <button onClick={() => setSection(section === 'rules' ? null : 'rules')} style={rowStyle}>
-              <div style={{ ...iconBox('#1a1400'), display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 2h8v3a4 4 0 01-8 0V2z" stroke="#FFD60A" strokeWidth="1.2"/><path d="M6 12h4M8 9v3M5 14h6" stroke="#FFD60A" strokeWidth="1.2" strokeLinecap="round"/><path d="M12 3h2v1.5a2 2 0 01-2 2M4 3H2v1.5a2 2 0 002 2" stroke="#FFD60A" strokeWidth="1"/></svg>
+              <div style={iconBox()}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 2h8v3a4 4 0 01-8 0V2z" stroke="var(--green)" strokeWidth="1.2"/><path d="M6 12h4M8 9v3M5 14h6" stroke="var(--green)" strokeWidth="1.2" strokeLinecap="round"/><path d="M12 3h2v1.5a2 2 0 01-2 2M4 3H2v1.5a2 2 0 002 2" stroke="var(--green)" strokeWidth="1"/></svg>
               </div>
               <div style={{ flex: 1 }}>
                 <div style={rowTitle}>About the game</div>
@@ -242,7 +244,9 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
             )}
             {/* Profile */}
             <button onClick={() => setSection(section === 'profile' ? null : 'profile')} style={rowStyle}>
-              <div style={iconBox('#111')}>👤</div>
+              <div style={iconBox()}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
               <div style={{ flex: 1 }}>
                 <div style={rowTitle}>Profile</div>
                 <div style={rowSub}>Change your display name</div>
@@ -271,7 +275,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
               </div>
             )}
 
-            {/* Settings — coming soon */}
+    
             <div style={{ ...rowStyle, opacity: .35, cursor: 'default' }}>
               <div style={iconBox('#111')}>⚙️</div>
               <div style={{ flex: 1 }}>
@@ -282,10 +286,9 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
 
             <div style={{ height: 1, background: '#111', margin: '8px 0' }}/>
 
-            {/* Sign out */}
-            <button onClick={() => signOut(auth)} style={{ ...rowStyle, color: '#ff4444' }}>
-              <div style={{ ...iconBox('#1a0000'), fontSize: 16 }}>→</div>
-              <div style={rowTitle}>Sign out</div>
+           {/* Sign out */}
+            <button onClick={() => signOut(auth)} style={{ ...rowStyle, justifyContent: 'center', padding: '18px 20px' }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#ff5555', opacity: .85 }}>Sign out</div>
             </button>
 
           </div>
@@ -307,8 +310,9 @@ const rowTitle = { fontSize: 15, fontWeight: 600, color: '#fff' }
 const secHd = { fontSize: 10, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#555', margin: '16px 0 10px' }
 const body = { fontSize: 12, color: '#888', lineHeight: 1.6, marginBottom: 4 }
 const rowSub = { fontSize: 12, color: '#555', marginTop: 2 }
-const iconBox = (bg) => ({
-  width: 40, height: 40, borderRadius: 10, background: bg,
+const iconBox = () => ({
+  width: 38, height: 38, borderRadius: 12, background: '#111813',
+  border: '1px solid #1c241e',
   display: 'flex', alignItems: 'center', justifyContent: 'center',
-  fontSize: 18, flexShrink: 0,
+  flexShrink: 0,
 })
