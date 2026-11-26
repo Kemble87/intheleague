@@ -71,7 +71,7 @@ export default function PoolView({ user, pool, poolId, onBack }) {
         const last = snap.exists() ? snap.val() : 0
         if (now - last < 45 * 60e3) return
         await set(syncRef, now)
-        await fetchAndStoreFixtures(pool.sport, poolId, rtdb)
+        await fetchAndStoreFixtures(pool.sport, poolId, rtdb, pool.window)
       } catch (e) { /* silent — manual sync still available */ }
     })()
   }, [fixtures, results, poolId, pool?.sport])
@@ -129,7 +129,7 @@ export default function PoolView({ user, pool, poolId, onBack }) {
 
       {isOrg && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 20 }}>
-          <a href={`https://wa.me/?text=${encodeURIComponent(`Join our ${pool.name} prediction league on InTheLeague — free all season: https://intheleague.app#join-${poolId}`)}`}
+          <a href={`https://wa.me/?text=${encodeURIComponent(`Join our ${pool.name} prediction league on InTheLeague — ${pool.format === 'festive' ? 'four matchdays over Christmas, free to play' : 'free to play'}: https://intheleague.app#join-${poolId}`)}`}
             target="_blank" rel="noreferrer"
             style={{ padding: '12px 10px', background: '#0d1a10', border: '1px solid #25D36644', borderRadius: 14, color: '#25D366', fontSize: 12.5, fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="#25D366"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5.1-1.3A10 10 0 1012 2zm0 18.2a8.2 8.2 0 01-4.2-1.2l-.3-.2-3 .8.8-3-.2-.3A8.2 8.2 0 1112 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.2-.7.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.4 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3a3 3 0 00-1 2.2 5.2 5.2 0 001.1 2.8 11.9 11.9 0 004.6 4 15 15 0 001.5.6 3.7 3.7 0 001.7.1 2.8 2.8 0 001.9-1.3 2.3 2.3 0 00.2-1.3c-.1-.2-.3-.2-.5-.4z"/></svg>

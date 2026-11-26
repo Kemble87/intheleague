@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { ref, onValue, set, update } from 'firebase/database'
 import { rtdb } from '../lib/firebase'
-import { SAMPLE_FIXTURES } from '../lib/constants'
 import { fmtKO, fmtDay, groupDays, countdown, calcPts, abbr, fetchAndStoreFixtures, loadFixtures, matchdayScores, runInStart } from '../lib/helpers'
 import Kit from './Kit'
 import Feed from './Feed'
@@ -312,7 +311,7 @@ const [h2h, setH2h] = useState(null)
 
   useEffect(() => {
     setLoading(true)
-    loadFixtures(poolId, rtdb).then(fx => { setFixtures(fx.length > 0 ? fx : SAMPLE_FIXTURES); setLoading(false) })
+    loadFixtures(poolId, rtdb).then(fx => { setFixtures(fx); setLoading(false) })
   }, [poolId])
 
   useEffect(() => {
@@ -492,7 +491,7 @@ const [h2h, setH2h] = useState(null)
             </div>
             {isOrg && (
               <button className="sync-btn" onClick={async () => {
-                try { const fx = await fetchAndStoreFixtures(pool.sport, poolId, rtdb); alert(fx.length > 0 ? `Synced ${fx.length} fixtures!` : 'No fixtures found') }
+                try { const fx = await fetchAndStoreFixtures(pool.sport, poolId, rtdb, pool.window); alert(fx.length > 0 ? `Synced ${fx.length} fixtures!` : 'No fixtures found') }
                 catch (e) { alert('Error: ' + e.message) }
               }}>⟳ Sync</button>
             )}
@@ -516,6 +515,11 @@ const [h2h, setH2h] = useState(null)
                   </div>
                 </div>
               ))}
+            </div>
+          ) : !fixtures.length ? (
+            <div style={{ textAlign: 'center', padding: '40px 20px', color: '#666', fontSize: 14, lineHeight: 1.6 }}>
+              <div style={{ color: '#aaa', fontWeight: 700, marginBottom: 6 }}>Fixtures are on their way</div>
+              We couldn't load the fixture list just now. Give it a minute and reopen the pool.
             </div>
           ) : days.map(day => (
             <div key={day.d}>

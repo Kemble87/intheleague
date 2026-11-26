@@ -38,7 +38,8 @@ export function initials(s) { return (s || '?').split(/[\s@]/)[0].slice(0, 2).to
 export function abbr(n) { n = n || 'TBD'; const w = String(n).split(' '); return w.length > 1 ? w.map(x => x[0]).join('').slice(0, 3).toUpperCase() : String(n).slice(0, 3).toUpperCase() }
 export function slugify(s) { return (s || 'pool').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 18) + '-' + Math.random().toString(36).slice(2, 5) }
 
-export async function fetchAndStoreFixtures(sport, poolId, rtdb) {
+// `win` (optional) = { from, to } matchday window — a short league only stores its own matchdays
+export async function fetchAndStoreFixtures(sport, poolId, rtdb, win) {
   const COMP_IDS = { PL: 'PL', CHAMP: 'ELC', L1: 'EL1', WC: 'WC' }
   const compId = COMP_IDS[sport]
   if (!compId) return []
@@ -50,7 +51,7 @@ export async function fetchAndStoreFixtures(sport, poolId, rtdb) {
     if (!res.ok) throw new Error('HTTP ' + res.status)
     const data = JSON.parse(text)
     const STAGE_MD = { LAST_32: 4, LAST_16: 5, QUARTER_FINALS: 6, SEMI_FINALS: 7, THIRD_PLACE: 8, FINAL: 8 }
-    const matches = (data.matches || []).map(m => ({
+    const all = (data.matches || []).map(m => ({
       id: 'm' + m.id,
       home: m.homeTeam?.shortName || m.homeTeam?.name || 'TBD',
       away: m.awayTeam?.shortName || m.awayTeam?.name || 'TBD',
@@ -62,6 +63,9 @@ export async function fetchAndStoreFixtures(sport, poolId, rtdb) {
       homeScore: m.score?.fullTime?.home ?? null,
       awayScore: m.score?.fullTime?.away ?? null,
     }))
+    const matches = win?.from ? all.filter(m => Number(m.matchday) >= win.from && Number(m.matchday) <= win.to) : all
+    // Never overwrite stored fixtures with an empty list (feed down / rate-limited)
+    if (!matches.length) return []
     const { ref, set, update } = await import('firebase/database')
     await set(ref(rtdb, 'pools/' + poolId + '/fixtures'), Object.fromEntries(matches.map(m => [m.id, m])))
     const results = {}
@@ -88,6 +92,8 @@ export async function loadFixtures(poolId, rtdb) {
 export function runInStart(fixtures) {
   const mds = (fixtures || []).map(f => Number(f.matchday)).filter(n => !isNaN(n) && n > 0)
   if (!mds.length) return Infinity
+  // Short leagues (e.g. the Festive League) have no run-in — every matchday is worth the same
+  if (new Set(mds).size < 10) return Infinity
   return Math.max(...mds) - 8
 }
 export function runInMult(matchday, fixtures) {

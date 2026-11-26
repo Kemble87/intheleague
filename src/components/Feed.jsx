@@ -38,7 +38,7 @@ export default function Feed({ pool, poolId, fixtures, results, allPicks, allChi
   if (!events.length) {
     return (
       <div style={{ textAlign: 'center', padding: '48px 24px', color: '#555' }}>
-        <div style={{ fontFamily: DISP, fontSize: 17, fontWeight: 700, color: '#888', marginBottom: 8 }}>The season starts here</div>
+        <div style={{ fontFamily: DISP, fontSize: 17, fontWeight: 700, color: '#888', marginBottom: 8 }}>The story starts here</div>
         <div style={{ fontSize: 14, lineHeight: 1.6 }}>Once picks are in and games kick off, your league's story writes itself — crowns, exact scores, chip drama and the back page all land here.</div>
       </div>
     )
