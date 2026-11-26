@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { FESTIVE_CHIPS } from '../lib/constants'
 import { FESTIVE_BADGES } from './FestiveBadges'
+import { FESTIVE_SCENES, festiveSceneStyles } from './FestiveScenes'
 import { ref, onValue, set } from 'firebase/database'
 import { rtdb } from '../lib/firebase'
 
@@ -399,7 +400,10 @@ function SceneCouponBuster() {
 // ── CINEMA MODAL ─────────────────────────────────────────────────────────────
 function CinemaModal({ chip, members, myId, onConfirm, onCancel }) {
   const [sheetUp, setSheetUp] = useState(false)
-  const delay = chip.id === 'banker' ? 1800 : chip.id === 'copycat' ? 2400 : chip.id === 'hth' ? 2400 : 900
+  const FestiveScene = chip.festive ? FESTIVE_SCENES[chip.id] : null
+  const delay = FestiveScene
+    ? ({ '2x': 1400, banker: 2300, hth: 2300, copycat: 2500, coupon: 1400 }[chip.id] || 1400)
+    : chip.id === 'banker' ? 1800 : chip.id === 'copycat' ? 2400 : chip.id === 'hth' ? 2400 : 900
 
   useEffect(() => {
     const t = setTimeout(() => setSheetUp(true), delay)
@@ -416,9 +420,9 @@ function CinemaModal({ chip, members, myId, onConfirm, onCancel }) {
 
   return (
     <>
-      <style>{sceneStyles}</style>
+      <style>{FestiveScene ? festiveSceneStyles : sceneStyles}</style>
       <div style={{ position:'fixed', inset:0, zIndex:9999, background:'#000', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' }}>
-        <div style={{ position:'absolute', inset:0 }}>{scenes[chip.id]}</div>
+        <div style={{ position:'absolute', inset:0 }}>{FestiveScene ? <FestiveScene members={members} myId={myId} /> : scenes[chip.id]}</div>
         <div style={{ position:'absolute', bottom:0, left:0, right:0, background:'#0d0d0d', borderTop:'1px solid #1a1a1a', borderRadius:'20px 20px 0 0', padding:'20px 20px 36px', zIndex:10, transform: sheetUp ? 'translateY(0)' : 'translateY(100%)', transition:'transform .35s cubic-bezier(.25,.46,.45,.94)' }}>
           <div style={{ width:28, height:3, background:'#222', borderRadius:99, margin:'0 auto 16px' }}/>
           <div style={{ fontSize:18, fontWeight:800, color:'#fff', letterSpacing:'-.02em', marginBottom:4 }}>{chip.name}</div>
@@ -427,7 +431,7 @@ function CinemaModal({ chip, members, myId, onConfirm, onCancel }) {
           <div style={{ display:'flex', gap:8 }}>
             <button onClick={onCancel} style={{ flex:1, padding:13, background:'#1a1a1a', border:'none', borderRadius:500, color:'#a0a0a0', font:'inherit', fontSize:13, fontWeight:600, cursor:'pointer' }}>Cancel</button>
             <button onClick={onConfirm} style={{ flex:2, padding:13, border:'none', borderRadius:500, color:'#000', font:'inherit', fontSize:13, fontWeight:800, cursor:'pointer', background:chip.color }}>
-              {chip.id === 'coupon' ? 'Choose matchday →' : 'Choose →'}
+              {chip.id === 'coupon' ? (chip.festive ? 'Choose round →' : 'Choose matchday →') : 'Choose →'}
             </button>
           </div>
         </div>
@@ -496,7 +500,7 @@ const ALL_CHIPS = CHIP_DEFS
 export default function Chips({ poolId, userId, members, fixtures, pool }) {
   const festive = pool?.format === 'festive'
   const defs = festive
-    ? ALL_CHIPS.map(c => ({ ...c, ...FESTIVE_CHIPS[c.id], Badge: FESTIVE_BADGES[c.id] || c.Badge, warning: 'One use this Festive League.' }))
+    ? ALL_CHIPS.map(c => ({ ...c, ...FESTIVE_CHIPS[c.id], Badge: FESTIVE_BADGES[c.id] || c.Badge, festive: true, warning: 'One use this Festive League.' }))
     : ALL_CHIPS
   const [used, setUsed] = useState({})
   const [confirming, setConfirming] = useState(null)
