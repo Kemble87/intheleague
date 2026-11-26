@@ -150,7 +150,7 @@ function SceneBanker() {
         <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', zIndex:2, animation:'score-reveal 1.9s ease forwards' }}>
           <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.12em', textTransform:'uppercase', color:'#FFD700', opacity:.7, marginBottom:4 }}>Your banker</div>
           <div style={{ fontFamily:'ui-monospace,monospace', fontSize:'clamp(32px,8vw,48px)', fontWeight:900, color:'#FFD700', textShadow:'0 0 20px #FF8800' }}>2 – 1</div>
-          <div style={{ fontSize:11, color:'rgba(255,255,255,.4)', fontWeight:600, marginTop:4 }}>Arsenal v Chelsea</div>
+          <div style={{ fontSize:11, color:'rgba(255,255,255,.66)', fontWeight:600, marginTop:4 }}>Arsenal v Chelsea</div>
         </div>
         {bolts.map((t,i) => <div key={i} style={{ position:'absolute', top:t+'%', right:0, width:16, height:5, background:'#0055CC', borderRadius:'2px 0 0 2px', zIndex:5, animation:'bolt-slide-r 1.9s cubic-bezier(.25,.46,.45,.94) forwards' }}/>)}
         <div style={{ position:'absolute', top:0, left:0, width:'55%', height:'100%', background:'#001A44', borderRight:'2px solid #0055CC', transformOrigin:'left center', transform:'perspective(600px) rotateY(-95deg)', animation:'vault-door-shut 1.5s .3s cubic-bezier(.4,0,.2,1) forwards', zIndex:4 }}>
@@ -213,7 +213,7 @@ function SceneHTH() {
           <div style={{ width:7, height:7, borderRadius:'50%', background:'#9966FF', position:'absolute', zIndex:2, boxShadow:'0 0 8px #9966FF' }}/>
           <div style={{ position:'absolute', bottom:22, textAlign:'center' }}>
             <div style={{ fontFamily:'ui-monospace,monospace', fontSize:22, fontWeight:700, color:'#fff' }}>{time}</div>
-            <div style={{ fontSize:8, fontWeight:700, letterSpacing:'.2em', textTransform:'uppercase', color:'#6600CC', marginTop:2 }}>Half Time</div>
+            <div style={{ fontSize:8, fontWeight:700, letterSpacing:'.2em', textTransform:'uppercase', color:'#b794ff', marginTop:2 }}>Half Time</div>
           </div>
         </div>
         <div style={{ position:'absolute', top:0, left:'50%', transform:'translateX(-50%)', width:60, opacity:0, pointerEvents:'none', zIndex:10, animation:'bolt-strike-down .4s 1.75s ease forwards, glow-pulse-bolt .3s 1.75s ease' }}>
@@ -263,17 +263,17 @@ function SceneCopycat({ members, myId }) {
         </div>
         {picks.map((p,i) => (
           <div key={i} style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:10, fontSize:'clamp(12px,3vw,15px)', fontWeight:700, marginBottom:8 }}>
-            <span style={{ color:'#444', minWidth:'clamp(50px,14vw,90px)', textAlign:'right' }}>{p.home}</span>
+            <span style={{ color:'#969696', minWidth:'clamp(50px,14vw,90px)', textAlign:'right' }}>{p.home}</span>
             <div style={{ display:'flex', alignItems:'center', gap:5, minWidth:52, justifyContent:'center' }}>
               <span style={{ fontFamily:'ui-monospace,monospace', fontSize:'clamp(18px,5vw,26px)', fontWeight:700, color: revealed.includes(`${i}-h`) ? '#fff' : '#111', background: revealed.includes(`${i}-h`) ? '#1a1a1a' : '#111', borderRadius:4, padding:'2px 7px', minWidth:32, textAlign:'center', transition:'color .12s, background .12s' }}>
                 {revealed.includes(`${i}-h`) ? p.h : '?'}
               </span>
-              <span style={{ color:'#222', fontSize:16 }}>–</span>
+              <span style={{ color:'#6b6b6b', fontSize:16 }}>–</span>
               <span style={{ fontFamily:'ui-monospace,monospace', fontSize:'clamp(18px,5vw,26px)', fontWeight:700, color: revealed.includes(`${i}-a`) ? '#fff' : '#111', background: revealed.includes(`${i}-a`) ? '#1a1a1a' : '#111', borderRadius:4, padding:'2px 7px', minWidth:32, textAlign:'center', transition:'color .12s, background .12s' }}>
                 {revealed.includes(`${i}-a`) ? p.a : '?'}
               </span>
             </div>
-            <span style={{ color:'#444', minWidth:'clamp(50px,14vw,90px)', textAlign:'left' }}>{p.away}</span>
+            <span style={{ color:'#969696', minWidth:'clamp(50px,14vw,90px)', textAlign:'left' }}>{p.away}</span>
           </div>
         ))}
         <div style={{ fontSize:12, fontWeight:700, letterSpacing:'.2em', textTransform:'uppercase', color:'#00CCDD', marginTop:20, animation:'copy-done .4s 2.2s ease both', opacity:0 }}>Picks copied</div>
@@ -353,11 +353,11 @@ function SceneCouponBuster() {
         <div style={{ background:'#f5f5f5', padding:'10px 12px', borderTop:'1px solid #e0e0e0' }}>
           <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
             <span style={{ fontSize:9, fontWeight:700, color:'#888', textTransform:'uppercase', letterSpacing:'.1em' }}>Chip</span>
-            <span style={{ fontSize:9, fontWeight:800, color: phase >= 2 ? '#1a6b1a' : '#CC0000', fontFamily:'ui-monospace,monospace' }}>{phase >= 2 ? '✓ Applied' : 'Coupon Buster'}</span>
+            <span style={{ fontSize:9, fontWeight:800, color: phase >= 2 ? '#4caf50' : '#CC0000', fontFamily:'ui-monospace,monospace' }}>{phase >= 2 ? '✓ Applied' : 'Coupon Buster'}</span>
           </div>
           <div style={{ display:'flex', justifyContent:'space-between', paddingTop:6, borderTop:'1px solid #ddd' }}>
             <span style={{ fontSize:11, fontWeight:900, color:'#111', textTransform:'uppercase', letterSpacing:'.06em' }}>Total</span>
-            <span style={{ fontSize:14, fontWeight:900, color: phase >= 3 ? '#1a6b1a' : '#111', fontFamily:'ui-monospace,monospace', transition:'color .3s' }}>{phase >= 3 ? '5 pts' : '4 pts'}</span>
+            <span style={{ fontSize:14, fontWeight:900, color: phase >= 3 ? '#4caf50' : '#111', fontFamily:'ui-monospace,monospace', transition:'color .3s' }}>{phase >= 3 ? '5 pts' : '4 pts'}</span>
           </div>
         </div>
         <div style={{ height:8, background:'#f5f5f5', borderRadius:'0 0 3px 3px', borderTop:'2px dashed #ddd' }}/>
@@ -378,7 +378,7 @@ function SceneCouponBuster() {
         <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', pointerEvents:'none' }}>
           <div style={{
             fontFamily:'Inter,system-ui', fontSize:36, fontWeight:900, letterSpacing:'.08em',
-            color:'#1a6b1a', border:'5px solid #1a6b1a', borderRadius:4, padding:'4px 14px',
+            color:'#4caf50', border:'5px solid #1a6b1a', borderRadius:4, padding:'4px 14px',
             transform:'rotate(6deg)',
             opacity: phase >= 2 ? 1 : 0,
             transition:'opacity .4s cubic-bezier(.22,1,.36,1)',
@@ -420,10 +420,10 @@ function CinemaModal({ chip, members, myId, onConfirm, onCancel }) {
         <div style={{ position:'absolute', bottom:0, left:0, right:0, background:'#0d0d0d', borderTop:'1px solid #1a1a1a', borderRadius:'20px 20px 0 0', padding:'20px 20px 36px', zIndex:10, transform: sheetUp ? 'translateY(0)' : 'translateY(100%)', transition:'transform .35s cubic-bezier(.25,.46,.45,.94)' }}>
           <div style={{ width:28, height:3, background:'#222', borderRadius:99, margin:'0 auto 16px' }}/>
           <div style={{ fontSize:18, fontWeight:800, color:'#fff', letterSpacing:'-.02em', marginBottom:4 }}>{chip.name}</div>
-          <div style={{ fontSize:13, color:'#444', lineHeight:1.5, marginBottom:4 }}>{chip.desc}</div>
-          <div style={{ fontSize:11, color:'#882222', marginBottom:18 }}>⚠ {chip.warning}</div>
+          <div style={{ fontSize:13, color:'#969696', lineHeight:1.5, marginBottom:4 }}>{chip.desc}</div>
+          <div style={{ fontSize:11, color:'#ff7b7b', marginBottom:18 }}>⚠ {chip.warning}</div>
           <div style={{ display:'flex', gap:8 }}>
-            <button onClick={onCancel} style={{ flex:1, padding:13, background:'#1a1a1a', border:'none', borderRadius:500, color:'#555', font:'inherit', fontSize:13, fontWeight:600, cursor:'pointer' }}>Cancel</button>
+            <button onClick={onCancel} style={{ flex:1, padding:13, background:'#1a1a1a', border:'none', borderRadius:500, color:'#a0a0a0', font:'inherit', fontSize:13, fontWeight:600, cursor:'pointer' }}>Cancel</button>
             <button onClick={onConfirm} style={{ flex:2, padding:13, border:'none', borderRadius:500, color:'#000', font:'inherit', fontSize:13, fontWeight:800, cursor:'pointer', background:chip.color }}>
               {chip.id === 'coupon' ? 'Choose matchday →' : 'Choose →'}
             </button>
@@ -597,18 +597,18 @@ const data = { usedAt: Date.now(), ...extraData }
           <div style={{ width:'100%', maxWidth:480, background:'#111', borderRadius:'20px 20px 0 0', padding:'24px 20px 40px' }}>
             <div style={{ width:28, height:3, background:'#333', borderRadius:99, margin:'0 auto 20px' }}/>
             <div style={{ fontSize:18, fontWeight:800, color:'#fff', marginBottom:6 }}>⚡ Choose your matchday</div>
-            <div style={{ fontSize:13, color:'#555', marginBottom:20 }}>Your points for this matchday will be doubled.</div>
+            <div style={{ fontSize:13, color:'#a0a0a0', marginBottom:20 }}>Your points for this matchday will be doubled.</div>
             <div style={{ display:'flex', flexDirection:'column', gap:8, maxHeight:'50vh', overflowY:'auto' }}>
               {displayMatchdays.map(md => (
                 <button key={md} onClick={() => activate(CHIP_DEFS.find(c=>c.id==='2x'), { matchday: md })}
                   style={{ padding:'14px 16px', background: stepData.matchday===md ? '#0d2b19' : '#1a1a1a', border: stepData.matchday===md ? '1px solid var(--green)' : '1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:15, fontWeight:700, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                   <span>Matchday {md}</span>
-                  <span style={{ fontSize:12, color:'#555' }}>2× points</span>
+                  <span style={{ fontSize:12, color:'#a0a0a0' }}>2× points</span>
                 </button>
               ))}
-              {displayMatchdays.length === 0 && <div style={{ color:'#444', fontSize:14, textAlign:'center', padding:'20px 0' }}>No upcoming matchdays found. Sync fixtures first.</div>}
+              {displayMatchdays.length === 0 && <div style={{ color:'#969696', fontSize:14, textAlign:'center', padding:'20px 0' }}>No upcoming matchdays found. Sync fixtures first.</div>}
             </div>
-            <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#555', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
+            <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#a0a0a0', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
           </div>
         </div>
       )}
@@ -619,18 +619,18 @@ const data = { usedAt: Date.now(), ...extraData }
           <div style={{ width:'100%', maxWidth:480, background:'#111', borderRadius:'20px 20px 0 0', padding:'24px 20px 40px' }}>
             <div style={{ width:28, height:3, background:'#333', borderRadius:99, margin:'0 auto 20px' }}/>
             <div style={{ fontSize:18, fontWeight:800, color:'#fff', marginBottom:6 }}>🏦 Choose your banker match</div>
-            <div style={{ fontSize:13, color:'#555', marginBottom:20 }}>Your points on this match will be tripled. Pick wisely.</div>
+            <div style={{ fontSize:13, color:'#a0a0a0', marginBottom:20 }}>Your points on this match will be tripled. Pick wisely.</div>
             <div style={{ display:'flex', flexDirection:'column', gap:8, maxHeight:'50vh', overflowY:'auto' }}>
               {displayMatches.map(f => (
                 <button key={f.id} onClick={() => activate(CHIP_DEFS.find(c=>c.id==='banker'), { fixtureId: f.id, home: f.home, away: f.away })}
                   style={{ padding:'12px 16px', background:'#1a1a1a', border:'1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
                   <span>{f.home} v {f.away}</span>
-                  <span style={{ fontSize:11, color:'#555', whiteSpace:'nowrap' }}>MD{f.matchday}</span>
+                  <span style={{ fontSize:11, color:'#a0a0a0', whiteSpace:'nowrap' }}>MD{f.matchday}</span>
                 </button>
               ))}
-              {displayMatches.length === 0 && <div style={{ color:'#444', fontSize:14, textAlign:'center', padding:'20px 0' }}>No upcoming matches found. Sync fixtures first.</div>}
+              {displayMatches.length === 0 && <div style={{ color:'#969696', fontSize:14, textAlign:'center', padding:'20px 0' }}>No upcoming matches found. Sync fixtures first.</div>}
             </div>
-            <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#555', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
+            <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#a0a0a0', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
           </div>
         </div>
       )}
@@ -641,9 +641,9 @@ const data = { usedAt: Date.now(), ...extraData }
           <div style={{ width:'100%', maxWidth:480, background:'#111', borderRadius:'20px 20px 0 0', padding:'24px 20px 40px' }}>
             <div style={{ width:28, height:3, background:'#333', borderRadius:99, margin:'0 auto 20px' }}/>
             <div style={{ fontSize:18, fontWeight:800, color:'#fff', marginBottom:6 }}>🐱 Choose who to copy</div>
-            <div style={{ fontSize:13, color:'#555', marginBottom:20 }}>Their picks for the next matchday will be copied to you. They won't know.</div>
+            <div style={{ fontSize:13, color:'#a0a0a0', marginBottom:20 }}>Their picks for the next matchday will be copied to you. They won't know.</div>
             {teammates.length === 0 ? (
-              <div style={{ color:'#444', fontSize:14, textAlign:'center', padding:'20px 0' }}>You need at least one other player in the pool to use Copycat.</div>
+              <div style={{ color:'#969696', fontSize:14, textAlign:'center', padding:'20px 0' }}>You need at least one other player in the pool to use Copycat.</div>
             ) : (
               <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
                 {teammates.map(([uid, m]) => (
@@ -661,7 +661,7 @@ const data = { usedAt: Date.now(), ...extraData }
                 ))}
               </div>
             )}
-            <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#555', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
+            <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#a0a0a0', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
           </div>
         </div>
       )}
@@ -672,21 +672,21 @@ const data = { usedAt: Date.now(), ...extraData }
           <div style={{ width:'100%', maxWidth:480, background:'#111', borderRadius:'20px 20px 0 0', padding:'24px 20px 40px' }}>
             <div style={{ width:28, height:3, background:'#333', borderRadius:99, margin:'0 auto 20px' }}/>
             <div style={{ fontSize:18, fontWeight:800, color:'#fff', marginBottom:6 }}>⏱ Choose your matchday</div>
-            <div style={{ fontSize:13, color:'#555', marginBottom:20 }}>You can change all your picks at half time for this matchday.</div>
+            <div style={{ fontSize:13, color:'#a0a0a0', marginBottom:20 }}>You can change all your picks at half time for this matchday.</div>
             <div style={{ display:'flex', flexDirection:'column', gap:8, maxHeight:'50vh', overflowY:'auto' }}>
               {displayMatchdays.length === 0
-                ? <div style={{ color:'#444', fontSize:14, textAlign:'center', padding:'20px 0' }}>No matchdays found. Sync fixtures first.</div>
+                ? <div style={{ color:'#969696', fontSize:14, textAlign:'center', padding:'20px 0' }}>No matchdays found. Sync fixtures first.</div>
                 : displayMatchdays.map(md => (
                   <button key={md}
                     onClick={() => activate(CHIP_DEFS.find(c => c.id === 'hth'), { matchday: md })}
                     style={{ padding:'14px 16px', background:'#1a1a1a', border:'1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:15, fontWeight:700, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                     <span>Matchday {md}</span>
-                    <span style={{ fontSize:12, color:'#555' }}>Half time edits unlocked</span>
+                    <span style={{ fontSize:12, color:'#a0a0a0' }}>Half time edits unlocked</span>
                   </button>
                 ))
               }
             </div>
-            <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#555', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
+            <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#a0a0a0', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
           </div>
         </div>
       )}
@@ -697,21 +697,21 @@ const data = { usedAt: Date.now(), ...extraData }
           <div style={{ width:'100%', maxWidth:480, background:'#111', borderRadius:'20px 20px 0 0', padding:'24px 20px 40px' }}>
             <div style={{ width:28, height:3, background:'#333', borderRadius:99, margin:'0 auto 20px' }}/>
             <div style={{ fontSize:18, fontWeight:800, color:'#fff', marginBottom:6 }}>🎟 Choose your matchday</div>
-            <div style={{ fontSize:13, color:'#555', marginBottom:20 }}>Your worst result that matchday gets rescued — upgraded to the next points tier.</div>
+            <div style={{ fontSize:13, color:'#a0a0a0', marginBottom:20 }}>Your worst result that matchday gets rescued — upgraded to the next points tier.</div>
             <div style={{ display:'flex', flexDirection:'column', gap:8, maxHeight:'50vh', overflowY:'auto' }}>
               {displayMatchdays.length === 0
-                ? <div style={{ color:'#444', fontSize:14, textAlign:'center', padding:'20px 0' }}>No matchdays found. Sync fixtures first.</div>
+                ? <div style={{ color:'#969696', fontSize:14, textAlign:'center', padding:'20px 0' }}>No matchdays found. Sync fixtures first.</div>
                 : displayMatchdays.map(md => (
                   <button key={md}
                     onClick={() => activate(CHIP_DEFS.find(c => c.id === 'coupon'), { matchday: md })}
                     style={{ padding:'14px 16px', background:'#1a1a1a', border:'1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:15, fontWeight:700, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                     <span>Matchday {md}</span>
-                    <span style={{ fontSize:12, color:'#555' }}>Worst result rescued</span>
+                    <span style={{ fontSize:12, color:'#a0a0a0' }}>Worst result rescued</span>
                   </button>
                 ))
               }
             </div>
-            <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#555', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
+            <button onClick={() => setChipStep(null)} style={{ width:'100%', marginTop:16, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#a0a0a0', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Cancel</button>
           </div>
         </div>
       )}

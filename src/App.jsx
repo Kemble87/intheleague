@@ -8,6 +8,8 @@ import SideDrawer from './components/SideDrawer'
 import Backdrop from './components/Backdrop'
 import Spectate from './components/Spectate'
 import Toast from './components/Toast'
+import FestiveLights from './components/FestiveLights'
+import { isFestiveSeason } from './lib/constants'
 export default function App() {
   const [user, setUser] = useState(undefined)
   const [activePool, setActivePool] = useState(null)
@@ -28,7 +30,7 @@ export default function App() {
   const watchMatch = window.location.hash.match(/^#watch-(.+)$/)
   if (watchMatch) return <Spectate poolId={watchMatch[1]} />
   if (user === undefined) return (
-    <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: '#000', color: '#333' }}>
+    <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: '#000', color: '#8c8c8c' }}>
       Loading…
     </div>
   )
@@ -36,10 +38,11 @@ export default function App() {
     if (showLogin) return <Login initialMode={authMode} />
     return <Landing onGetStarted={openLogin} />
   }
+  const festive = isFestiveSeason()
   const invLink = activePool ? `https://intheleague.app#join-${activePool}` : null
   return (
-    <div style={{ background: '#000', minHeight: '100vh', position: 'relative' }}>
-      <Backdrop />      <Toast />
+    <div className={festive ? 'festive' : undefined} style={{ background: '#000', minHeight: '100vh', position: 'relative' }}>
+      <Backdrop festive={festive} />      <Toast />
       <div style={{ position: 'relative', zIndex: 1 }}>
       <div className="nav">
         <div className="nav-logo">In<em>The</em>League</div>
@@ -53,6 +56,7 @@ export default function App() {
           />
         </div>
       </div>
+      {festive && <FestiveLights />}
       <Dashboard
         user={user}
         onPoolChange={setActivePool}

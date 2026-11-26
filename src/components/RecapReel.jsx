@@ -157,7 +157,7 @@ function Floodlights({ t, name }) {
         ))}
       </svg>
       <div style={{ position: 'absolute', top: '46%', left: 0, right: 0, textAlign: 'center', opacity: prog(t, 600, 1000) * (1 - prog(t, 1000, 1200)) }}>
-        <div style={{ fontFamily: MONO, fontSize: 'clamp(9px,2.6vw,13px)', letterSpacing: '.3em', color: '#666' }}>{(name || 'YOUR LEAGUE').toUpperCase()}</div>
+        <div style={{ fontFamily: MONO, fontSize: 'clamp(9px,2.6vw,13px)', letterSpacing: '.3em', color: '#a8a8a8' }}>{(name || 'YOUR LEAGUE').toUpperCase()}</div>
       </div>
       <div style={{ position: 'absolute', inset: 0, background: '#eafff2', opacity: flare * 0.9, pointerEvents: 'none' }} />
     </div>
@@ -170,7 +170,7 @@ function Headline({ t, winner, md }) {
   const name = (winner || 'ROB').toUpperCase()
   return (
     <div style={{ position: 'absolute', inset: 0, padding: '0 7%', display: 'flex', flexDirection: 'column', justifyContent: 'center', opacity: 1 - out, transform: `translateX(${out * -20}px)` }}>
-      <div style={{ fontFamily: MONO, fontSize: 'clamp(9px,2.6vw,13px)', letterSpacing: '.24em', color: '#666', marginBottom: '3%', opacity: prog(local, 100, 400) }}>MATCHDAY {md ?? 7}</div>
+      <div style={{ fontFamily: MONO, fontSize: 'clamp(9px,2.6vw,13px)', letterSpacing: '.24em', color: '#a8a8a8', marginBottom: '3%', opacity: prog(local, 100, 400) }}>MATCHDAY {md ?? 7}</div>
       {[name, 'TAKES', 'THE CROWN'].map((w, i) => {
         const wp = easeOut(prog(local, i * 130, i * 130 + 380))
         const isCrown = i === 2
@@ -197,11 +197,11 @@ function ExactScene({ t, exact, winner }) {
   if (!exact) return null
   return (
     <div style={{ position: 'absolute', inset: 0, padding: '0 7%', display: 'flex', flexDirection: 'column', justifyContent: 'center', opacity: (1 - out) * inP }}>
-      <div style={{ fontFamily: MONO, fontSize: 'clamp(9px,2.6vw,13px)', letterSpacing: '.2em', color: '#666', marginBottom: '4%' }}>EXACT SCORE · +3</div>
+      <div style={{ fontFamily: MONO, fontSize: 'clamp(9px,2.6vw,13px)', letterSpacing: '.2em', color: '#a8a8a8', marginBottom: '4%' }}>EXACT SCORE · +3</div>
       <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: '4%', background: '#050505', border: '2px solid #1a1a1a', borderRadius: 12, padding: '6% 4%', alignSelf: 'flex-start' }}>
-        <span style={{ fontFamily: MONO, fontSize: 'clamp(12px,3.4vw,18px)', color: '#777' }}>{abbr(exact.home)}</span>
+        <span style={{ fontFamily: MONO, fontSize: 'clamp(12px,3.4vw,18px)', color: '#b0b0b0' }}>{abbr(exact.home)}</span>
         <span style={{ fontFamily: MONO, fontSize: 'clamp(30px,9vw,46px)', color: GREEN, textShadow: `0 0 ${8 + burst * 10}px #00ff44` }}>{exact.h}:{exact.a}</span>
-        <span style={{ fontFamily: MONO, fontSize: 'clamp(12px,3.4vw,18px)', color: '#777' }}>{abbr(exact.away)}</span>
+        <span style={{ fontFamily: MONO, fontSize: 'clamp(12px,3.4vw,18px)', color: '#b0b0b0' }}>{abbr(exact.away)}</span>
         {burst > 0 && [...Array(10)].map((_, i) => {
           const a = i * 36
           const r = 30 + burst * 60
@@ -220,7 +220,7 @@ function TableScene({ t, table }) {
   const rows = (table || []).slice(0, 4)
   return (
     <div style={{ position: 'absolute', inset: 0, padding: '0 7%', display: 'flex', flexDirection: 'column', justifyContent: 'center', opacity: 1 - out }}>
-      <div style={{ fontFamily: MONO, fontSize: 'clamp(9px,2.6vw,13px)', letterSpacing: '.2em', color: '#666', marginBottom: '5%' }}>AS IT STANDS</div>
+      <div style={{ fontFamily: MONO, fontSize: 'clamp(9px,2.6vw,13px)', letterSpacing: '.2em', color: '#a8a8a8', marginBottom: '5%' }}>AS IT STANDS</div>
       {rows.map((r, i) => {
         const rp = easeOut(prog(local, i * 140, i * 140 + 450))
         const colors = [GOLD, '#C0C0C0', '#CD7F32', '#555']
@@ -247,7 +247,7 @@ function ChipScene({ t, chip }) {
   const won = chip.pts > 0
   return (
     <div style={{ position: 'absolute', inset: 0, padding: '0 7%', display: 'flex', flexDirection: 'column', justifyContent: 'center', opacity: (1 - out) * inP, transform: `translateY(${(1 - inP) * 20}px)` }}>
-      <div style={{ fontFamily: MONO, fontSize: 'clamp(9px,2.6vw,13px)', letterSpacing: '.2em', color: '#666', marginBottom: '4%' }}>CHIP WATCH</div>
+      <div style={{ fontFamily: MONO, fontSize: 'clamp(9px,2.6vw,13px)', letterSpacing: '.2em', color: '#a8a8a8', marginBottom: '4%' }}>CHIP WATCH</div>
       <div style={{ fontFamily: DISP, fontSize: 'clamp(24px,7vw,38px)', fontWeight: 800, color: '#fff', lineHeight: 1.05 }}>{chip.who} played</div>
       <div style={{ fontFamily: DISP, fontSize: 'clamp(24px,7vw,38px)', fontWeight: 800, color: BLUE, lineHeight: 1.05 }}>{chip.name}</div>
       <div style={{ fontFamily: DISP, fontSize: 'clamp(22px,6.5vw,34px)', fontWeight: 800, color: won ? GREEN : RED, marginTop: '4%' }}>{won ? `+${chip.pts} — nailed it.` : 'It backfired.'}</div>

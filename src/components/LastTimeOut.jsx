@@ -119,7 +119,7 @@ export default function LastTimeOut({ fixtures, results, allPicks, allChips, mem
         @media (prefers-reduced-motion: reduce) { .lto-a { animation: none !important; opacity: 1 !important; transform: none !important; } }
       `}</style>
 
-      <div className="lto-a" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '.28em', color: 'rgba(255,255,255,.45)', textTransform: 'uppercase', animation: 'ltoUp .5s ease both' }}>
+      <div className="lto-a" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '.28em', color: 'rgba(255,255,255,.68)', textTransform: 'uppercase', animation: 'ltoUp .5s ease both' }}>
         Matchday {recap.md} · Last Time Out
       </div>
 
@@ -140,14 +140,14 @@ export default function LastTimeOut({ fixtures, results, allPicks, allChips, mem
             👑 {crown.name} took the crown · {crown.pts}pts
           </div>
           {spoon && (
-            <div style={{ fontFamily: DISP, fontSize: 13, fontWeight: 600, color: '#777', marginTop: 8 }}>
+            <div style={{ fontFamily: DISP, fontSize: 13, fontWeight: 600, color: '#b0b0b0', marginTop: 8 }}>
               🥄 The spoon goes to {spoon.name}. {spoon.pts}pts. No comment.
             </div>
           )}
         </div>
       )}
 
-      <div style={{ position: 'absolute', bottom: 'calc(env(safe-area-inset-bottom, 20px) + 16px)', fontFamily: MONO, fontSize: 10, letterSpacing: '.2em', color: 'rgba(255,255,255,.25)', textTransform: 'uppercase' }}>
+      <div style={{ position: 'absolute', bottom: 'calc(env(safe-area-inset-bottom, 20px) + 16px)', fontFamily: MONO, fontSize: 10, letterSpacing: '.2em', color: 'rgba(255,255,255,.6)', textTransform: 'uppercase' }}>
         Tap to continue
       </div>
     </div>

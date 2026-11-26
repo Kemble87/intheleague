@@ -29,7 +29,7 @@ function MemberRow({ uid, member, isMe, canManage, poolId, onTransfer }) {
   return (
     <>
       <div style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 0', borderBottom:'1px solid #111' }}>
-        <div style={{ width:36, height:36, borderRadius:'50%', background: isMe ? 'var(--green)' : '#1a1a1a', color: isMe ? '#000' : '#555', display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, fontWeight:800, flexShrink:0 }}>
+        <div style={{ width:36, height:36, borderRadius:'50%', background: isMe ? 'var(--green)' : '#1a1a1a', color: isMe ? '#000' : '#a0a0a0', display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, fontWeight:800, flexShrink:0 }}>
           {initials(member.name)}
         </div>
         <div style={{ flex:1, minWidth:0 }}>
@@ -66,7 +66,7 @@ function MemberRow({ uid, member, isMe, canManage, poolId, onTransfer }) {
       {confirming === 'transfer' && (
         <div style={{ background:'#0d0a00', border:'1px solid #332200', borderRadius:8, padding:'12px 14px', marginBottom:8 }}>
           <div style={{ fontSize:13, color:'#fff', marginBottom:4 }}>Make <strong>{member.name}</strong> the organiser?</div>
-          <div style={{ fontSize:12, color:'#555', marginBottom:10 }}>You'll become a regular member. This can't be undone without them transferring it back.</div>
+          <div style={{ fontSize:12, color:'#a0a0a0', marginBottom:10 }}>You'll become a regular member. This can't be undone without them transferring it back.</div>
           <div style={{ display:'flex', gap:8 }}>
             <button onClick={() => setConfirming(null)} style={{ flex:1, padding:'8px', background:'#1a1a1a', border:'none', borderRadius:500, color:'#aaa', font:'inherit', fontSize:13, fontWeight:600, cursor:'pointer' }}>Cancel</button>
             <button onClick={transferOwnership} disabled={busy} style={{ flex:2, padding:'8px', background:'#FFD700', border:'none', borderRadius:500, color:'#000', font:'inherit', fontSize:13, fontWeight:700, cursor:'pointer' }}>{busy ? 'Transferring…' : 'Yes, transfer'}</button>
@@ -94,7 +94,7 @@ export default function Members({ poolId, pool, userId }) {
     <div style={{ marginBottom:20 }}>
       <button onClick={() => setOpen(o => !o)} style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 16px', background:'#111', border:'1px solid #1a1a1a', borderRadius: open ? '12px 12px 0 0' : 12, color:'#fff', font:'inherit', fontSize:14, fontWeight:700, cursor:'pointer' }}>
         <span>👥 Players · {members.length}</span>
-        <span style={{ color:'#444', fontSize:12 }}>{open ? '▲' : '▼'}</span>
+        <span style={{ color:'#969696', fontSize:12 }}>{open ? '▲' : '▼'}</span>
       </button>
       {open && (
         <div style={{ background:'#0d0d0d', border:'1px solid #1a1a1a', borderTop:'none', borderRadius:'0 0 12px 12px', padding:'0 16px' }}>

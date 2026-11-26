@@ -7,7 +7,7 @@ import { SPORTS } from '../lib/constants'
 const SCORING_RULES = [
   { pts: 3, label: 'Exact score', eg: 'Pick 2–1, result is 2–1', color: '#1DB954' },
   { pts: 1, label: 'Correct result', eg: 'Pick 2–1, result is 3–0 (both home wins)', color: '#FFD60A' },
-  { pts: 0, label: 'Wrong', eg: 'Pick 2–1, result is 0–1', color: '#444' },
+  { pts: 0, label: 'Wrong', eg: 'Pick 2–1, result is 0–1', color: '#969696' },
 ]
 
 const CHIP_RULES = [
@@ -98,7 +98,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
                 <div style={{ fontSize: 17, fontWeight: 800, color: '#fff', letterSpacing: '-.02em' }}>
                   {user?.displayName || user?.email?.split('@')[0]}
                 </div>
-                <div style={{ fontSize: 12, color: '#555', marginTop: 2 }}>{user?.email}</div>
+                <div style={{ fontSize: 12, color: '#a0a0a0', marginTop: 2 }}>{user?.email}</div>
               </div>
             </div>
             <button onClick={() => setOpen(false)} style={{
@@ -114,7 +114,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
             {/* Switch pool */}
             {pools?.length > 0 && (
               <div style={{ padding: '12px 20px 4px' }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#333', marginBottom: 8 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#8c8c8c', marginBottom: 8 }}>
                   Your pools
                 </div>
                 {pools.map(pool => {
@@ -140,7 +140,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
                       </div>
                       {isActive
                         ? <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--green)', flexShrink: 0 }}/>
-                        : <span style={{ color: '#333', fontSize: 18 }}>›</span>
+                        : <span style={{ color: '#8c8c8c', fontSize: 18 }}>›</span>
                       }
                     </button>
                   )
@@ -168,7 +168,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
                   <div style={rowTitle}>Invite players</div>
                   <div style={rowSub}>Share your pool link</div>
                 </div>
-                <span style={{ color: '#333', fontSize: 18 }}>›</span>
+                <span style={{ color: '#8c8c8c', fontSize: 18 }}>›</span>
               </button>
             )}
 
@@ -181,7 +181,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
                 <div style={rowTitle}>About the game</div>
                 <div style={rowSub}>Scoring, chips and everything else</div>
               </div>
-              <span style={{ color: '#333', fontSize: 12 }}>{section === 'rules' ? '▲' : '▼'}</span>
+              <span style={{ color: '#8c8c8c', fontSize: 12 }}>{section === 'rules' ? '▲' : '▼'}</span>
             </button>
             {section === 'rules' && (
               <div style={{ margin: '0 20px 8px', background: '#161616', borderRadius: 12, padding: '16px', border: '1px solid #262626' }}>
@@ -206,7 +206,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
                     </div>
                     <div>
                       <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{r.label}</div>
-                      <div style={{ fontSize: 11, color: '#666', marginTop: 1, lineHeight: 1.4 }}>{r.eg}</div>
+                      <div style={{ fontSize: 11, color: '#a8a8a8', marginTop: 1, lineHeight: 1.4 }}>{r.eg}</div>
                     </div>
                   </div>
                 ))}
@@ -218,7 +218,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
                     <div style={{ width: 6, borderRadius: 3, background: c.color, flexShrink: 0, opacity: .8 }}/>
                     <div>
                       <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>{c.name}</div>
-                      <div style={{ fontSize: 11, color: '#666', marginTop: 1, lineHeight: 1.5 }}>{c.desc}</div>
+                      <div style={{ fontSize: 11, color: '#a8a8a8', marginTop: 1, lineHeight: 1.5 }}>{c.desc}</div>
                     </div>
                   </div>
                 ))}
@@ -236,7 +236,7 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
                 ].map(f => (
                   <div key={f.t} style={{ marginBottom: 10 }}>
                     <div style={{ fontSize: 13, fontWeight: 800, color: '#fff' }}>{f.t}</div>
-                    <div style={{ fontSize: 11, color: '#666', marginTop: 1, lineHeight: 1.5 }}>{f.d}</div>
+                    <div style={{ fontSize: 11, color: '#a8a8a8', marginTop: 1, lineHeight: 1.5 }}>{f.d}</div>
                   </div>
                 ))}
 
@@ -251,11 +251,11 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
                 <div style={rowTitle}>Profile</div>
                 <div style={rowSub}>Change your display name</div>
               </div>
-              <span style={{ color: '#333', fontSize: 12 }}>{section === 'profile' ? '▲' : '▼'}</span>
+              <span style={{ color: '#8c8c8c', fontSize: 12 }}>{section === 'profile' ? '▲' : '▼'}</span>
             </button>
             {section === 'profile' && (
               <div style={{ margin: '0 20px 8px', background: '#222', borderRadius: 12, padding: '14px 16px', border: '1px solid #333' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: '#333', marginBottom: 10 }}>Display name</div>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.1em', textTransform: 'uppercase', color: '#8c8c8c', marginBottom: 10 }}>Display name</div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <input
                     value={displayName}
@@ -301,9 +301,9 @@ const rowStyle = {
   cursor: 'pointer', textAlign: 'left',
 }
 const rowTitle = { fontSize: 15, fontWeight: 600, color: '#fff' }
-const secHd = { fontSize: 10, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#555', margin: '16px 0 10px' }
+const secHd = { fontSize: 10, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: '#a0a0a0', margin: '16px 0 10px' }
 const body = { fontSize: 12, color: '#888', lineHeight: 1.6, marginBottom: 4 }
-const rowSub = { fontSize: 12, color: '#555', marginTop: 2 }
+const rowSub = { fontSize: 12, color: '#a0a0a0', marginTop: 2 }
 const iconBox = () => ({
   width: 38, height: 38, borderRadius: 12, background: '#111813',
   border: '1px solid #1c241e',

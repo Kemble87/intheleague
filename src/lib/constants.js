@@ -9,6 +9,10 @@ export const SPORTS = {
 // Festive League — a short, self-contained competition over the Christmas matchdays
 export const FESTIVE = { from: 17, to: 20, label: 'Festive League', dates: '26 Dec – 7 Jan' }
 
+export const FESTIVE_ROUNDS = { 17: 'Boxing Day', 18: 'Twixmas', 19: 'New Year', 20: 'The Decider' }
+// The festive look switches itself off the day after the Festive League ends
+export const isFestiveSeason = () => Date.now() < Date.UTC(2027, 0, 8)
+
 export const COMP_IDS = { PL: 'PL', CHAMP: 'ELC', L1: 'EL1', WC: 'WC', SN: null }
 
 export const SAMPLE_FIXTURES = [

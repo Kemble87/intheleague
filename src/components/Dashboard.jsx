@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { collection, query, where, onSnapshot, doc, setDoc, arrayUnion, updateDoc, increment, getDoc } from 'firebase/firestore'
 import { db, rtdb } from '../lib/firebase'
 import { ref, get } from 'firebase/database'
-import { SPORTS, ACCENTS, FESTIVE } from '../lib/constants'
+import { SPORTS, ACCENTS, FESTIVE, isFestiveSeason } from '../lib/constants'
 
 import { slugify, initials, fetchAndStoreFixtures } from '../lib/helpers'
 
@@ -267,7 +267,7 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
     <div className="main">
       <div className="dash-hero">
         <div className="dash-greeting">{new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, <em>{first}</em>.</div>
-        <div className="dash-sub">Pick your scores. Beat your mates.</div>
+        <div className="dash-sub">{isFestiveSeason() ? 'Pick your scores. Beat your mates. Finish top of the tree.' : 'Pick your scores. Beat your mates.'}</div>
       </div>
       {pools.length > 0 && (
         <div className="pro-strip">
@@ -275,8 +275,8 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M9 1L3 9.5h4L7 15l6-8.5H9L9 1z" stroke="#00E05A" strokeWidth="1.3" strokeLinejoin="round"/></svg>
           </div>
           <div className="pro-strip-text">
-            <div className="pro-strip-title">Season one · free for everyone</div>
-            <div className="pro-strip-sub">Every feature unlocked for founding pools</div>
+            <div className="pro-strip-title">{isFestiveSeason() ? `🎄 The ${FESTIVE.label} · ${FESTIVE.dates}` : 'Season one · free for everyone'}</div>
+            <div className="pro-strip-sub">{isFestiveSeason() ? 'Four rounds. Everyone starts on zero. Free to play.' : 'Every feature unlocked for founding pools'}</div>
           </div>
         </div>
       )}
@@ -319,7 +319,7 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
                   </div>
                   <div className="pool-card-name">{pool.name}</div>
                   {meta[pool.id]?.nextKO && (
-                    <div style={{ fontFamily: "'Share Tech Mono',ui-monospace,monospace", fontSize: 10, letterSpacing: '.1em', color: 'rgba(255,255,255,.35)', marginTop: 6 }}>
+                    <div style={{ fontFamily: "'Share Tech Mono',ui-monospace,monospace", fontSize: 10, letterSpacing: '.1em', color: 'rgba(255,255,255,.62)', marginTop: 6 }}>
                       NEXT KICKOFF · {meta[pool.id].nextKO.toUpperCase()}
                     </div>
                   )}
@@ -335,7 +335,7 @@ export default function Dashboard({ user, onPoolChange, onPoolsChange }) {
                     {mlist.slice(0, 5).map(([uid, m]) => (
                       <div key={uid} className="player-av" title={m.name}>{initials(m.name)}</div>
                     ))}
-                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,.4)', marginLeft: 4 }}>
+                    <span style={{ fontSize: 12, color: 'rgba(255,255,255,.66)', marginLeft: 4 }}>
                       {mlist.length} player{mlist.length !== 1 ? 's' : ''}
                     </span>
                   </div>
