@@ -493,34 +493,83 @@ const CSS = `@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@
   .itl-landing .rounds { background: var(--ink); padding: 64px 0 72px; position: relative; }
   .itl-landing .rounds-head { text-align: center; margin-bottom: 30px; }
   .itl-landing .rounds-head .coupon-eyebrow { color: var(--berry); margin-bottom: 12px; }
+  .itl-landing .rounds-foot { position: relative; }
   .itl-landing .rounds-head h2 {
     font-family: var(--display); font-weight: 900; color: var(--chalk);
     font-size: clamp(28px, 7vw, 44px); line-height: 1.02; letter-spacing: -0.02em;
   }
   .itl-landing .rounds-head p { color: var(--muted-on-ink); font-size: 15px; margin-top: 12px; }
+  /* the advent calendar */
+  .itl-landing .calendar {
+    position: relative; max-width: 860px; margin: 0 auto; padding: 34px 16px 20px;
+    border-radius: 20px; border: 1px solid rgba(244,179,44,.35);
+    background:
+      radial-gradient(circle at 12% 18%, rgba(244,179,44,.16) 0 1.5px, transparent 2px),
+      radial-gradient(circle at 78% 12%, rgba(246,245,239,.14) 0 1.5px, transparent 2px),
+      radial-gradient(circle at 34% 82%, rgba(246,245,239,.12) 0 1.5px, transparent 2px),
+      radial-gradient(circle at 90% 70%, rgba(244,179,44,.14) 0 1.5px, transparent 2px),
+      linear-gradient(180deg, #123a22 0%, #0c2616 100%);
+    background-size: 140px 140px, 180px 180px, 160px 160px, 200px 200px, auto;
+    box-shadow: 0 30px 60px -30px rgba(0,0,0,.8);
+  }
+  .itl-landing .calendar::before { /* snow settled on top */
+    content: ""; position: absolute; left: 10px; right: 10px; top: -9px; height: 22px;
+    background:
+      radial-gradient(circle at 12px 0, #F6F5EF 11px, transparent 12px) 0 9px / 26px 22px repeat-x,
+      linear-gradient(#F6F5EF, #F6F5EF) 0 0 / 100% 10px no-repeat;
+    border-radius: 12px 12px 0 0;
+  }
+  .itl-landing .cal-title {
+    text-align: center; font-family: var(--mono); font-size: 11px; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--amber); margin-bottom: 16px;
+  }
   .itl-landing .doors { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-  @media (min-width: 820px) { .itl-landing .doors { grid-template-columns: repeat(4, 1fr); gap: 16px; } }
+  @media (min-width: 760px) { .itl-landing .doors { grid-template-columns: repeat(4, 1fr); gap: 14px; } .itl-landing .calendar { padding: 36px 20px 22px; } }
   .itl-landing .door {
-    position: relative; padding: 18px 16px 16px; border-radius: 14px;
-    background: linear-gradient(180deg, #18201a 0%, var(--ink-soft) 100%);
-    border: 1px dashed rgba(246,245,239,.22); overflow: hidden;
+    position: relative; min-height: 196px; perspective: 1200px; border: 0; background: none;
+    padding: 0; text-align: left; cursor: pointer; font: inherit; color: inherit; display: block; width: 100%;
+    -webkit-tap-highlight-color: transparent;
   }
-  .itl-landing .door::after { /* door knob */
-    content: ""; position: absolute; right: 12px; top: 50%; width: 6px; height: 6px;
-    border-radius: 50%; background: var(--amber); opacity: .7;
+  .itl-landing .door:focus-visible { outline: 2px solid var(--amber); outline-offset: 3px; border-radius: 12px; }
+  .itl-landing .door .inside {
+    position: absolute; inset: 0; border-radius: 12px; padding: 16px 14px 14px 48px;
+    background: var(--coupon-card); box-shadow: inset 0 0 0 1px var(--coupon-line), inset 0 6px 18px rgba(0,0,0,.18);
+    display: flex; flex-direction: column; justify-content: center;
   }
-  .itl-landing .door .num {
-    font-family: var(--screamer); font-size: 46px; line-height: .9; color: var(--turf);
-  }
-  .itl-landing .door:nth-child(even) .num { color: var(--berry); }
   .itl-landing .door .when {
-    font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
-    color: var(--amber); margin-top: 12px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #B4232C;
   }
   .itl-landing .door .name {
-    font-family: var(--display); font-weight: 800; font-size: 16px; color: var(--chalk); margin-top: 4px;
+    font-family: var(--display); font-weight: 900; font-size: 19px; color: var(--news-ink); margin-top: 4px; line-height: 1.1;
   }
-  .itl-landing .door .note { font-size: 12.5px; color: var(--muted-on-ink); margin-top: 6px; line-height: 1.45; padding-right: 14px; }
+  .itl-landing .door .note { font-size: 12.5px; color: var(--muted-on-coupon); margin-top: 7px; line-height: 1.45; }
+  .itl-landing .door .flap {
+    position: absolute; inset: 0; border-radius: 12px; transform-origin: left center;
+    transition: transform .8s cubic-bezier(.3,.9,.3,1), box-shadow .8s ease;
+    background: linear-gradient(160deg, #B4232C 0%, #7E141C 100%);
+    box-shadow: 0 8px 18px -8px rgba(0,0,0,.7);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .itl-landing .door:nth-child(even) .flap { background: linear-gradient(160deg, #1E7D37 0%, #12501F 100%); }
+  .itl-landing .door .flap::before { /* stitched edge */
+    content: ""; position: absolute; inset: 7px; border-radius: 8px; border: 1.5px dashed rgba(244,179,44,.65);
+  }
+  .itl-landing .door .flap::after { /* knob */
+    content: ""; position: absolute; right: 16px; top: 50%; width: 9px; height: 9px; margin-top: -4px;
+    border-radius: 50%; background: radial-gradient(circle at 35% 35%, #FFE7A3, var(--amber) 60%, #9A6B0E);
+  }
+  .itl-landing .door .star { color: var(--amber); font-size: 13px; letter-spacing: .5em; margin-right: -.5em; }
+  .itl-landing .door .num {
+    font-family: var(--screamer); font-size: 76px; line-height: .95; color: #FFE7A3;
+    text-shadow: 0 3px 0 rgba(0,0,0,.25);
+  }
+  .itl-landing .door .hint {
+    font-family: var(--mono); font-size: 9px; letter-spacing: .16em; text-transform: uppercase;
+    color: rgba(255,231,163,.75); margin-top: 6px;
+  }
+  .itl-landing .door.open .flap { transform: rotateY(-80deg); box-shadow: 12px 0 22px -6px rgba(0,0,0,.5); }
+  .itl-landing .door.open .hint { opacity: 0; }
+  @media (prefers-reduced-motion: reduce) { .itl-landing .door .flap { transition: none; } }
   .itl-landing .rounds-foot {
     text-align: center; margin-top: 26px; font-family: var(--display); font-weight: 700;
     font-size: 14px; color: var(--chalk);
@@ -567,6 +616,12 @@ const FLAKES = Array.from({ length: 26 }, (_, i) => {
     '--w': (r(7) * 40 - 20).toFixed(0) + 'px',
   }
 })
+const DOORS = [
+  { when: '26–27 Dec', name: 'Boxing Day', note: 'Seven games on the day itself. Picks in before the leftovers.' },
+  { when: '29–30 Dec', name: 'Twixmas', note: 'Nobody knows what day it is. The table does.' },
+  { when: '1–3 Jan', name: 'New Year', note: 'New year, same mate who forgets his picks.' },
+  { when: '5–7 Jan', name: 'The Decider', note: 'Last round. Winner takes the bragging rights.' },
+]
 function timeLeft(now) {
   const ms = KICKOFF - now
   if (ms <= 0) return null
@@ -578,6 +633,22 @@ export default function Landing({ onGetStarted }) {
   useEffect(() => {
     const iv = setInterval(() => setLeft(timeLeft(Date.now())), 30000)
     return () => clearInterval(iv)
+  }, [])
+  // Advent doors: swing open one by one when the calendar scrolls into view
+  const [open, setOpen] = useState([false, false, false, false])
+  useEffect(() => {
+    const el = rootRef.current?.querySelector('#calendar')
+    if (!el) return
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const timers = []
+    const io = new IntersectionObserver((entries) => {
+      if (!entries.some(e => e.isIntersecting)) return
+      io.disconnect()
+      DOORS.forEach((_, i) => timers.push(setTimeout(
+        () => setOpen(o => o.map((v, k) => (k === i ? true : v))), still ? 0 : 500 + i * 420)))
+    }, { threshold: 0.35 })
+    io.observe(el)
+    return () => { io.disconnect(); timers.forEach(clearTimeout) }
   }, [])
   const daysOut = left ? left.d + (left.h || left.m ? 1 : 0) : 0
   const lockText = left ? `locks in ${daysOut} day${daysOut === 1 ? '' : 's'}` : 'under way'
@@ -736,15 +807,30 @@ export default function Landing({ onGetStarted }) {
       <section className="rounds">
         <div className="wrap">
           <div className="rounds-head">
-            <div className="coupon-eyebrow">Four doors to open</div>
+            <div className="coupon-eyebrow">Open the doors</div>
             <h2>Four rounds. One winner.</h2>
             <p>Every round is a full set of Premier League fixtures. Miss one and the table will remind you.</p>
           </div>
-          <div className="doors">
-            <div className="door"><div className="num">1</div><div className="when">26–27 Dec</div><div className="name">Boxing Day</div><div className="note">Seven games on the day itself. Picks in before the leftovers.</div></div>
-            <div className="door"><div className="num">2</div><div className="when">29–30 Dec</div><div className="name">Twixmas</div><div className="note">Nobody knows what day it is. The table does.</div></div>
-            <div className="door"><div className="num">3</div><div className="when">1–3 Jan</div><div className="name">New Year</div><div className="note">New year, same mate who forgets his picks.</div></div>
-            <div className="door"><div className="num">4</div><div className="when">5–7 Jan</div><div className="name">The Decider</div><div className="note">Last round. Winner takes the bragging rights.</div></div>
+          <div className="calendar" id="calendar">
+            <div className="cal-title">★ The football advent calendar ★</div>
+            <div className="doors">
+              {DOORS.map((d, i) => (
+                <button type="button" key={d.name} className={'door' + (open[i] ? ' open' : '')}
+                  aria-expanded={open[i]} aria-label={`Round ${i + 1}: ${d.name}, ${d.when}`}
+                  onClick={() => setOpen(o => o.map((v, k) => (k === i ? !v : v)))}>
+                  <span className="inside">
+                    <span className="when">{d.when}</span>
+                    <span className="name">{d.name}</span>
+                    <span className="note">{d.note}</span>
+                  </span>
+                  <span className="flap" aria-hidden="true">
+                    <span className="star">★★★</span>
+                    <span className="num">{i + 1}</span>
+                    <span className="hint">Tap to open</span>
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
           <div className="rounds-foot">Champion crowned <span>7 January</span></div>
         </div>
