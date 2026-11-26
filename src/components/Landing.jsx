@@ -119,7 +119,7 @@ const CSS = `@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@
     font-family: var(--display); font-weight: 900;
     font-size: clamp(40px, 11vw, 74px);
     line-height: .96; letter-spacing: -0.03em;
-    color: var(--chalk); margin: 0 auto 20px; max-width: 14ch;
+    color: var(--chalk); margin: 0 auto 20px; max-width: 16ch;
   }
   .itl-landing h1 .keep { color: var(--turf); }
 
@@ -665,7 +665,7 @@ export default function Landing({ onGetStarted }) {
         <div className="snow" aria-hidden="true">{FLAKES.map((f, i) => <i key={i} style={f} />)}</div>
         <div className="wrap hero-inner">
           <div className="eyebrow"><span className="dot"></span> The Festive League · 26 Dec – 7 Jan</div>
-          <h1>Win Christmas.<br /><span className="keep">Top the table.</span></h1>
+          <h1>Top of the tree<br /><span className="keep">at Christmas.</span></h1>
           <p className="sub">Four matchdays, thirteen days, one table of mates. Predict every score from Boxing Day to the new year. <b>Everyone starts on zero</b>, and one of you gets to be unbearable until next December.</p>
           {left ? (
             <div className="countdown" role="timer" aria-label={`Kick-off in ${left.d} days, ${left.h} hours`}>
