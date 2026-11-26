@@ -1,4 +1,4 @@
-exports.handler = async function(event) {
+export async function handler(event) {
   const API_KEY = process.env.FOOTBALL_DATA_API_KEY
   if (!API_KEY) return { statusCode: 500, body: JSON.stringify({ error: 'API key not configured' }) }
   const { comp, season, type } = event.queryStringParameters || {}
