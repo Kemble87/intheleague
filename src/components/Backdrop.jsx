@@ -1,7 +1,7 @@
 // Cinematic stadium-night ambience — fixed layer behind all app content.
 // Pure CSS/SVG: pitch geometry, breathing floodlights, drifting particles.
-export default function Backdrop() {
-  const particles = Array.from({ length: 14 }, (_, i) => ({
+export default function Backdrop({ festive = false }) {
+  const particles = Array.from({ length: festive ? 30 : 14 }, (_, i) => ({
     left: (i * 7.3 + 4) % 100,
     size: 1.5 + (i % 3),
     dur: 22 + (i % 7) * 6,
@@ -19,6 +19,13 @@ export default function Backdrop() {
           12%  { opacity: var(--op); }
           88%  { opacity: var(--op); }
           100% { transform: translateY(-108vh) translateX(4vw); opacity: 0; }
+        }
+        @keyframes bdSnow {
+          0%   { transform: translateY(-6vh) translateX(0); opacity: 0; }
+          10%  { opacity: var(--op); }
+          50%  { transform: translateY(52vh) translateX(3vw); }
+          90%  { opacity: var(--op); }
+          100% { transform: translateY(108vh) translateX(-1vw); opacity: 0; }
         }
         @media (prefers-reduced-motion: reduce) {
           .bd-anim { animation: none !important; }
@@ -44,6 +51,12 @@ export default function Backdrop() {
         animation: 'bdFlood 23s ease-in-out infinite',
       }}/>
 
+      {festive && <>
+        {/* Festive warmth — berry glow one side, gold the other */}
+        <div style={{ position: 'absolute', top: '18vh', left: '-30vw', width: '70vw', height: '70vh', background: 'radial-gradient(ellipse, rgba(229,72,77,.07) 0%, transparent 62%)' }}/>
+        <div style={{ position: 'absolute', top: '45vh', right: '-30vw', width: '70vw', height: '70vh', background: 'radial-gradient(ellipse, rgba(255,214,10,.045) 0%, transparent 62%)' }}/>
+      </>}
+
       {/* Pitch geometry — giant centre circle + halfway line, viewed from the gods */}
       <svg viewBox="0 0 1000 1400" preserveAspectRatio="xMidYMin slice" style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: 'max(1100px, 130vw)', height: '100%', opacity: 1 }}>
         <g stroke="#ffffff" strokeOpacity="0.055" fill="none" strokeWidth="2">
@@ -59,12 +72,12 @@ export default function Backdrop() {
       {/* Drifting atmosphere particles */}
       {particles.map((p, i) => (
         <div key={i} className="bd-anim" style={{
-          position: 'absolute', bottom: 0, left: `${p.left}%`,
+          position: 'absolute', ...(festive ? { top: 0 } : { bottom: 0 }), left: `${p.left}%`,
           width: p.size, height: p.size, borderRadius: '50%',
-          background: '#cfe0ff',
+          background: festive ? '#ffffff' : '#cfe0ff',
           filter: 'blur(0.5px)',
-          '--op': p.op,
-          animation: `bdDrift ${p.dur}s linear ${p.delay}s infinite`,
+          '--op': festive ? p.op * 2.4 : p.op,
+          animation: `${festive ? 'bdSnow' : 'bdDrift'} ${festive ? p.dur * 0.55 : p.dur}s linear ${p.delay}s infinite`,
           opacity: 0,
         }}/>
       ))}

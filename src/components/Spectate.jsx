@@ -29,13 +29,13 @@ export default function Spectate({ poolId }) {
 
   if (missing) return (
     <Shell>
-      <div style={{ textAlign: 'center', padding: '30vh 20px 0', color: '#555', fontSize: 15 }}>
+      <div style={{ textAlign: 'center', padding: '30vh 20px 0', color: '#a0a0a0', fontSize: 15 }}>
         This league is private or doesn't exist.
         <div style={{ marginTop: 24 }}><CtaLink label="Start your own pool free →" /></div>
       </div>
     </Shell>
   )
-  if (!pool) return <Shell><div style={{ textAlign: 'center', padding: '40vh 0', color: '#333', fontFamily: "'Share Tech Mono',monospace", fontSize: 12, letterSpacing: '.2em' }}>LOADING…</div></Shell>
+  if (!pool) return <Shell><div style={{ textAlign: 'center', padding: '40vh 0', color: '#8c8c8c', fontFamily: "'Share Tech Mono',monospace", fontSize: 12, letterSpacing: '.2em' }}>LOADING…</div></Shell>
 
   const members = Object.entries(pool.members || {})
 
@@ -61,12 +61,12 @@ export default function Spectate({ poolId }) {
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 0 26px' }}>
         <div style={{ fontSize: 17, fontWeight: 900, letterSpacing: '-.04em', color: '#fff' }}>In<em style={{ color: GREEN, fontStyle: 'normal' }}>The</em>League</div>
-        <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 10, letterSpacing: '.16em', color: '#666', border: '1px solid #222', borderRadius: 500, padding: '5px 12px' }}>SPECTATOR VIEW</span>
+        <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 10, letterSpacing: '.16em', color: '#a8a8a8', border: '1px solid #222', borderRadius: 500, padding: '5px 12px' }}>SPECTATOR VIEW</span>
       </div>
 
       {/* Hero-lite */}
       <div style={{ marginBottom: 20 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,.5)', marginBottom: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,.72)', marginBottom: 10 }}>
           <span style={{ width: 5, height: 5, borderRadius: '50%', background: GREEN, display: 'inline-block' }}/>
           Season 2026/27 · {members.length} player{members.length !== 1 ? 's' : ''}
         </div>
@@ -78,10 +78,10 @@ export default function Spectate({ poolId }) {
       <Ticker pool={pool} members={members} allChips={allChips} fixtures={fixtures} allPicks={allPicks} results={results} />
 
       {/* Table */}
-      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#444', margin: '4px 0 12px' }}>Live standings</div>
+      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: '#969696', margin: '4px 0 12px' }}>Live standings</div>
       {board.map((row, i) => (
         <div key={row.uid} style={{ display: 'flex', alignItems: 'center', gap: 12, background: i === 0 && row.pts > 0 ? 'linear-gradient(90deg,#171303,#0d0d0d)' : '#0d0d0d', border: `1px solid ${i === 0 && row.pts > 0 ? '#FFD60A33' : '#161616'}`, borderRadius: 14, padding: '13px 14px', marginBottom: 8 }}>
-          <div style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, background: i < 3 && row.pts > 0 ? rankColors[i] + '1a' : '#161616', border: `1.5px solid ${i < 3 && row.pts > 0 ? rankColors[i] + '55' : '#222'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DISP, fontSize: 13, fontWeight: 700, color: i < 3 && row.pts > 0 ? rankColors[i] : '#555' }}>{i + 1}</div>
+          <div style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0, background: i < 3 && row.pts > 0 ? rankColors[i] + '1a' : '#161616', border: `1.5px solid ${i < 3 && row.pts > 0 ? rankColors[i] + '55' : '#222'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: DISP, fontSize: 13, fontWeight: 700, color: i < 3 && row.pts > 0 ? rankColors[i] : '#a0a0a0' }}>{i + 1}</div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 700, color: '#fff' }}>
               <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{row.name}</span>
@@ -92,7 +92,7 @@ export default function Spectate({ poolId }) {
                 </span>
               )}
             </div>
-            <div style={{ fontSize: 11, color: '#555', marginTop: 2 }}>{row.exact} exact score{row.exact !== 1 ? 's' : ''}</div>
+            <div style={{ fontSize: 11, color: '#a0a0a0', marginTop: 2 }}>{row.exact} exact score{row.exact !== 1 ? 's' : ''}</div>
           </div>
           <div style={{ fontFamily: DISP, fontSize: 22, fontWeight: 700, color: i === 0 && row.pts > 0 ? GREEN : '#ddd' }}>{row.pts}</div>
         </div>
@@ -101,7 +101,7 @@ export default function Spectate({ poolId }) {
       {/* CTA */}
       <div style={{ background: 'linear-gradient(160deg,#07180d,#0d0d0d 60%)', border: `1.5px solid ${GREEN}`, borderRadius: 18, padding: '26px 22px', textAlign: 'center', margin: '28px 0 40px', boxShadow: '0 20px 80px #00E05A14' }}>
         <div style={{ fontFamily: DISP, fontSize: 22, fontWeight: 700, color: '#fff', letterSpacing: '-.02em', lineHeight: 1.15 }}>Your group chat needs one of these.</div>
-        <div style={{ fontSize: 13, color: '#777', margin: '10px 0 20px', lineHeight: 1.6 }}>Free score prediction leagues — set up in 60 seconds.</div>
+        <div style={{ fontSize: 13, color: '#b0b0b0', margin: '10px 0 20px', lineHeight: 1.6 }}>Free score prediction leagues — set up in 60 seconds.</div>
         <CtaLink label="Start your own pool free →" />
       </div>
     </Shell>

@@ -36,7 +36,7 @@ export default function PoolIntro({ pool, poolId }) {
 
       <div className="pi-anim" style={{
         fontSize: 10, fontWeight: 700, letterSpacing: '.24em', textTransform: 'uppercase',
-        color: 'rgba(255,255,255,.4)', marginBottom: 16,
+        color: 'rgba(255,255,255,.66)', marginBottom: 16,
         animation: 'introEyebrow 1.1s ease both',
       }}>
        {pool?.format === 'festive' ? 'Festive League · 2026/27' : pool?.sportName ? `${pool.sportName} · 2026/27` : 'Season 2026/27'}

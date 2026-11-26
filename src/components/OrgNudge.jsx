@@ -116,12 +116,12 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
       <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {missing.map(([uid, m]) => (
           <div key={uid} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: '#555', flexShrink: 0 }}>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: '#1a1a1a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, color: '#a0a0a0', flexShrink: 0 }}>
               {initials(m.name)}
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{m.name}</div>
-              <div style={{ fontSize: 11, color: '#444', marginTop: 1 }}>No picks yet</div>
+              <div style={{ fontSize: 11, color: '#969696', marginTop: 1 }}>No picks yet</div>
             </div>
             <button onClick={() => nudgeWhatsApp(m.name?.split(' ')[0] || m.name)} style={nudgeBtn}>
               Nudge 👋
@@ -139,7 +139,7 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 700, color: '#fff' }}>{m.name}</div>
-                <div style={{ fontSize: 11, color: '#555', marginTop: 1 }}>{picked} of {mdFixtures.length} picked</div>
+                <div style={{ fontSize: 11, color: '#a0a0a0', marginTop: 1 }}>{picked} of {mdFixtures.length} picked</div>
               </div>
               <button onClick={() => nudgeWhatsApp(m.name?.split(' ')[0] || m.name)} style={nudgeBtn}>
                 Nudge 👋
@@ -149,7 +149,7 @@ export default function OrgNudge({ pool, poolId, members, allPicks, fixtures, re
         })}
       </div>
 
-      <div style={{ fontSize: 11, color: '#333', marginTop: 14, borderTop: '1px solid #111', paddingTop: 12 }}>
+      <div style={{ fontSize: 11, color: '#8c8c8c', marginTop: 14, borderTop: '1px solid #111', paddingTop: 12 }}>
         Nudge opens WhatsApp with the message ready — Nudge all copies it for anywhere else.
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { ref, onValue, set, update } from 'firebase/database'
 import { rtdb } from '../lib/firebase'
+import { FESTIVE_ROUNDS } from '../lib/constants'
 import { fmtKO, fmtDay, groupDays, countdown, calcPts, abbr, fetchAndStoreFixtures, loadFixtures, matchdayScores, runInStart } from '../lib/helpers'
 import Kit from './Kit'
 import Feed from './Feed'
@@ -92,19 +93,19 @@ function MatchdaySummary({ fixtures, picks, results, matchday, allPicks, members
     <>
           {revealed.length > 0 && members && members.length > 1 && (
         <div style={{ marginBottom: 10 }}>
-          <button onClick={() => setShowAll(o => !o)} style={{ width: '100%', padding: '10px 14px', background: 'none', border: '1px solid #1a1a1a', borderRadius: showAll ? '12px 12px 0 0' : 12, color: '#777', font: 'inherit', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          <button onClick={() => setShowAll(o => !o)} style={{ width: '100%', padding: '10px 14px', background: 'none', border: '1px solid #1a1a1a', borderRadius: showAll ? '12px 12px 0 0' : 12, color: '#b0b0b0', font: 'inherit', fontSize: 12, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
             <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z" stroke="#00E05A" strokeWidth="1.2"/><circle cx="8" cy="8" r="2" stroke="#00E05A" strokeWidth="1.2"/></svg>
             {showAll ? 'Hide' : 'See'} everyone's picks
-            <span style={{ color: '#444', fontSize: 10 }}>{showAll ? '▲' : '▼'}</span>
+            <span style={{ color: '#969696', fontSize: 10 }}>{showAll ? '▲' : '▼'}</span>
           </button>
           {showAll && (
             <div style={{ border: '1px solid #1a1a1a', borderTop: 'none', borderRadius: '0 0 12px 12px', padding: '12px 10px', background: '#0a0a0a', overflowX: 'auto' }}>
               <table style={{ borderCollapse: 'separate', borderSpacing: '4px 5px', minWidth: '100%' }}>
                 <thead>
                   <tr>
-                    <th style={{ textAlign: 'left', fontSize: 9, fontWeight: 700, letterSpacing: '.1em', color: '#444', padding: '0 4px' }}>MATCH</th>
+                    <th style={{ textAlign: 'left', fontSize: 9, fontWeight: 700, letterSpacing: '.1em', color: '#969696', padding: '0 4px' }}>MATCH</th>
                     {members.map(([uid, m]) => (
-                      <th key={uid} style={{ fontSize: 9, fontWeight: 800, letterSpacing: '.06em', color: uid === userId ? '#00E05A' : '#666', padding: '0 2px', whiteSpace: 'nowrap' }}>
+                      <th key={uid} style={{ fontSize: 9, fontWeight: 800, letterSpacing: '.06em', color: uid === userId ? '#00E05A' : '#a8a8a8', padding: '0 2px', whiteSpace: 'nowrap' }}>
                         {(m.name || '?').split(' ')[0].slice(0, 5).toUpperCase()}
                       </th>
                     ))}
@@ -125,7 +126,7 @@ function MatchdaySummary({ fixtures, picks, results, matchday, allPicks, members
                           const col = s === 3 ? '#00ff66' : s === 1 ? '#8fd6a8' : s === 0 ? '#555' : '#777'
                           return (
                             <td key={uid} style={{ textAlign: 'center' }}>
-                              <span style={{ display: 'inline-block', minWidth: 34, fontFamily: "'Share Tech Mono',ui-monospace,monospace", fontSize: 12, color: p?.h != null ? col : '#2a2a2a', background: s === 3 ? '#00E05A14' : '#060606', border: `1px solid ${s === 3 ? '#00E05A44' : '#1a1a1a'}`, borderRadius: 6, padding: '3px 5px', textShadow: s === 3 ? '0 0 6px #00ff4444' : 'none' }}>
+                              <span style={{ display: 'inline-block', minWidth: 34, fontFamily: "'Share Tech Mono',ui-monospace,monospace", fontSize: 12, color: p?.h != null ? col : '#6b6b6b', background: s === 3 ? '#00E05A14' : '#060606', border: `1px solid ${s === 3 ? '#00E05A44' : '#1a1a1a'}`, borderRadius: 6, padding: '3px 5px', textShadow: s === 3 ? '0 0 6px #00ff4444' : 'none' }}>
                                 {p?.h != null ? `${p.h}:${p.a}` : '–'}
                               </span>
                             </td>
@@ -158,7 +159,7 @@ function MatchdaySummary({ fixtures, picks, results, matchday, allPicks, members
         <div className="split-bar-wrap">
           <div className="split-bar-label">
             <span style={{ color: '#4488FF' }}>Home {Math.round(nh / total * 100)}%</span>
-            <span style={{ color: '#444' }}>Draw {Math.round(nd / total * 100)}%</span>
+            <span style={{ color: '#969696' }}>Draw {Math.round(nd / total * 100)}%</span>
             <span style={{ color: '#FF3B5C' }}>Away {Math.round(na / total * 100)}%</span>
           </div>
           <div className="split-bar">
@@ -232,7 +233,7 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, use
               textShadow: locked && hasRes ? '0 0 8px #ff440066' : display?.h != null ? '0 0 8px #00ff4466' : 'none'
             }}>{display?.h ?? '–'}</div>
           </div>
-          <span style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:'clamp(16px,5vw,22px)', color:'#2a2a2a', lineHeight:1, padding:'0 1px', marginBottom:2 }}>:</span>
+          <span style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:'clamp(16px,5vw,22px)', color:'#6b6b6b', lineHeight:1, padding:'0 1px', marginBottom:2 }}>:</span>
           <div style={{ width:44, height:56, background:'#060606', border:'1.5px solid #1a1a1a', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
             <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(0deg,rgba(0,0,0,.1) 0px,rgba(0,0,0,.1) 1px,transparent 1px,transparent 3px)', pointerEvents:'none', zIndex:1 }}/>
             {(!locked || isOrg) && <input ref={awayRef} inputMode="numeric" value={display?.a ?? ''} onChange={e => onChange('a', e.target.value)} disabled={locked && !isOrg} aria-label={fx.away} style={{ position:'absolute', inset:0, opacity:0, cursor: locked&&!isOrg?'not-allowed':'pointer', zIndex:3, fontSize:32, textAlign:'center', background:'none', border:'none', WebkitAppearance:'none' }}/>}
@@ -261,7 +262,7 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, use
       {!revealed && members && members.length > 1 && (
         <div style={{ display:'flex', alignItems:'center', gap:7, padding:'8px 14px 10px', borderTop:'1px solid #0a0a0a' }}>
           <svg width="10" height="10" viewBox="0 0 16 16" fill="none"><rect x="3" y="7" width="10" height="7" rx="1.5" stroke="#333" strokeWidth="1.3"/><path d="M5.5 7V5a2.5 2.5 0 015 0v2" stroke="#333" strokeWidth="1.3"/></svg>
-          <span style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:10, letterSpacing:'.12em', color:'#333' }}>PICKS HIDDEN UNTIL KICKOFF</span>
+          <span style={{ fontFamily:"'Share Tech Mono',ui-monospace,monospace", fontSize:10, letterSpacing:'.12em', color:'#8c8c8c' }}>PICKS HIDDEN UNTIL KICKOFF</span>
         </div>
       )}
       {revealed && allPicks && members && members.length > 1 && (
@@ -475,10 +476,10 @@ const [h2h, setH2h] = useState(null)
                   if (i > 0) setMatchday(String(mdays[i - 1]))
                   else setMatchday('ALL')
                 }}
-                style={{ width: 36, height: 36, background: 'none', border: 'none', borderRadius: 8, color: '#666', fontSize: 18, cursor: 'pointer', flexShrink: 0 }}
+                style={{ width: 36, height: 36, background: 'none', border: 'none', borderRadius: 8, color: '#a8a8a8', fontSize: 18, cursor: 'pointer', flexShrink: 0 }}
               >‹</button>
               <div style={{ flex: 1, textAlign: 'center', fontFamily: "'Space Grotesk','Inter',sans-serif", fontSize: 14, fontWeight: 700, color: '#fff', letterSpacing: '-.01em' }}>
-                {matchday === 'ALL' ? 'All matchdays' : `Matchday ${matchday}`}
+                {matchday === 'ALL' ? (pool.format === 'festive' ? 'All four rounds' : 'All matchdays') : pool.format === 'festive' && FESTIVE_ROUNDS[matchday] ? `Round ${mdays.findIndex(m => String(m) === String(matchday)) + 1} · ${FESTIVE_ROUNDS[matchday]}` : `Matchday ${matchday}`}
               </div>
               <button
                 onClick={() => {
@@ -486,7 +487,7 @@ const [h2h, setH2h] = useState(null)
                   const i = mdays.indexOf(Number(matchday))
                   if (i < mdays.length - 1) setMatchday(String(mdays[i + 1]))
                 }}
-                style={{ width: 36, height: 36, background: 'none', border: 'none', borderRadius: 8, color: '#666', fontSize: 18, cursor: 'pointer', flexShrink: 0 }}
+                style={{ width: 36, height: 36, background: 'none', border: 'none', borderRadius: 8, color: '#a8a8a8', fontSize: 18, cursor: 'pointer', flexShrink: 0 }}
               >›</button>
             </div>
             {isOrg && (
@@ -517,7 +518,7 @@ const [h2h, setH2h] = useState(null)
               ))}
             </div>
           ) : !fixtures.length ? (
-            <div style={{ textAlign: 'center', padding: '40px 20px', color: '#666', fontSize: 14, lineHeight: 1.6 }}>
+            <div style={{ textAlign: 'center', padding: '40px 20px', color: '#a8a8a8', fontSize: 14, lineHeight: 1.6 }}>
               <div style={{ color: '#aaa', fontWeight: 700, marginBottom: 6 }}>Fixtures are on their way</div>
               We couldn't load the fixture list just now. Give it a minute and reopen the pool.
             </div>
@@ -548,7 +549,7 @@ const [h2h, setH2h] = useState(null)
                 <svg width="20" height="15" viewBox="0 0 12 9" fill="none"><path d="M1 8h10M1 8L.5 2.5 3.5 5 6 1l2.5 4 3-2.5L11 8" stroke="#FFD60A" strokeWidth="1" strokeLinejoin="round" strokeLinecap="round"/></svg>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontFamily: "'Space Grotesk','Inter',sans-serif", fontSize: 14, fontWeight: 700, color: '#FFD60A' }}>You won Matchday {doneMd}</div>
-                  <div style={{ fontSize: 11, color: '#777' }}>{top} points. The crown is yours.</div>
+                  <div style={{ fontSize: 11, color: '#b0b0b0' }}>{top} points. The crown is yours.</div>
                 </div>
                 <button onClick={() => document.querySelector('.sharecard-btn')?.click()} style={{ padding: '9px 14px', background: '#FFD60A', border: 'none', borderRadius: 500, color: '#000', font: 'inherit', fontSize: 12, fontWeight: 800, cursor: 'pointer', flexShrink: 0 }}>Rub it in →</button>
               </div>
@@ -570,6 +571,7 @@ const [h2h, setH2h] = useState(null)
                 const colors = { 0: '#FFD60A', 1: '#C0C0C0', 2: '#CD7F32' }
                 return (
                   <div key={r.uid} style={{ display:'flex', flexDirection:'column', alignItems:'center', width:92 }}>
+                    {pool.format === 'festive' && pos === 0 && <div aria-hidden="true" style={{ fontSize:20, lineHeight:1, marginBottom:4 }}>🎄</div>}
                     <div style={{ width:40, height:40, borderRadius:'50%', background:colors[pos]+'1a', border:`1.5px solid ${colors[pos]}66`, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:14, fontWeight:700, color:colors[pos], marginBottom:8 }}>
                       {(r.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
                     </div>
@@ -637,9 +639,9 @@ const [h2h, setH2h] = useState(null)
                   <div className="board-detail" style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                     <span>{row.exact} exact</span>
                     {streak >= 3 && <span style={{ color: '#ff6600', fontWeight: 700 }}>· {streak} on the spin</span>}
-                    {i > 0 && gap > 0 && <span style={{ color: '#666' }}>· {gap} pt{gap !== 1 ? 's' : ''} behind</span>}
-                    {i === 0 && row.pts > 0 && board.length > 1 && <span style={{ color: '#FFD60A' }}>· leading</span>}
-                    {chipsPlayed > 0 && <span style={{ color: '#555' }}>· {chipsPlayed} chip{chipsPlayed !== 1 ? 's' : ''} played</span>}
+                    {i > 0 && gap > 0 && <span style={{ color: '#a8a8a8' }}>· {gap} pt{gap !== 1 ? 's' : ''} behind</span>}
+                    {i === 0 && row.pts > 0 && board.length > 1 && <span style={{ color: '#FFD60A' }}>{pool.format === 'festive' ? '· 🎄 top of the tree' : '· leading'}</span>}
+                    {chipsPlayed > 0 && <span style={{ color: '#a0a0a0' }}>· {chipsPlayed} chip{chipsPlayed !== 1 ? 's' : ''} played</span>}
                   </div>
                 </div>
                 {liveMd != null && rankDelta[row.uid] != null && rankDelta[row.uid] !== 0 && (
@@ -658,7 +660,7 @@ const [h2h, setH2h] = useState(null)
             )
           })}
           {board.length === 1 && (
-            <div style={{ textAlign: 'center', padding: '28px 20px', color: '#444', fontSize: 13, lineHeight: 1.6 }}>
+            <div style={{ textAlign: 'center', padding: '28px 20px', color: '#969696', fontSize: 13, lineHeight: 1.6 }}>
               It's lonely at the top. Invite your mates from the menu — the leaderboard comes alive with rivals.
             </div>
           )}
@@ -692,7 +694,7 @@ const [h2h, setH2h] = useState(null)
             <div style={{ marginBottom: 16 }}>
               <div style={{ display:'flex', justifyContent:'space-between', marginBottom: 6 }}>
                 <span style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:16, fontWeight:700, color: a >= b ? 'var(--green)' : '#888' }}>{a}</span>
-                <span style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'#444', alignSelf:'center' }}>{label}</span>
+                <span style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'#969696', alignSelf:'center' }}>{label}</span>
                 <span style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:16, fontWeight:700, color: b > a ? '#FF3B5C' : '#888' }}>{b}</span>
               </div>
               <div style={{ display:'flex', height:4, borderRadius:99, overflow:'hidden', background:'#161616' }}>
@@ -713,14 +715,14 @@ const [h2h, setH2h] = useState(null)
                   <div style={{ fontSize:13, fontWeight:700, color:'#fff' }}>{myName}</div>
                 </div>
                 <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:30, fontWeight:700, color:'#fff', letterSpacing:'-.02em' }}>
-                  {myWins}<span style={{ color:'#333', padding:'0 8px', fontSize:20 }}>—</span>{theirWins}
+                  {myWins}<span style={{ color:'#8c8c8c', padding:'0 8px', fontSize:20 }}>—</span>{theirWins}
                 </div>
                 <div style={{ textAlign:'center' }}>
                   <div style={{ width:52, height:52, borderRadius:'50%', background:'#FF3B5C1a', border:'1.5px solid #FF3B5C55', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:17, fontWeight:700, color:'#FF3B5C', margin:'0 auto 8px' }}>{rivalName.slice(0,2).toUpperCase()}</div>
                   <div style={{ fontSize:13, fontWeight:700, color:'#fff' }}>{rivalName}</div>
                 </div>
               </div>
-              <div style={{ textAlign:'center', fontSize:10, fontWeight:700, letterSpacing:'.16em', textTransform:'uppercase', color:'#444', marginBottom:24 }}>
+              <div style={{ textAlign:'center', fontSize:10, fontWeight:700, letterSpacing:'.16em', textTransform:'uppercase', color:'#969696', marginBottom:24 }}>
                 Matchday record{ties > 0 ? ` · ${ties} shared` : ''}
               </div>
 
@@ -730,20 +732,20 @@ const [h2h, setH2h] = useState(null)
               {/* Streak + blowout */}
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginTop:20 }}>
                 <div style={{ background:'#0d0d0d', border:'1px solid #1a1a1a', borderRadius:12, padding:'14px 14px' }}>
-                  <div style={{ fontSize:9, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'#444', marginBottom:6 }}>Current streak</div>
-                  <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:15, fontWeight:700, color: streakOwner === 'me' ? 'var(--green)' : streakOwner === 'them' ? '#FF3B5C' : '#555' }}>
+                  <div style={{ fontSize:9, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'#969696', marginBottom:6 }}>Current streak</div>
+                  <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:15, fontWeight:700, color: streakOwner === 'me' ? 'var(--green)' : streakOwner === 'them' ? '#FF3B5C' : '#a0a0a0' }}>
                     {streakOwner ? `${streakOwner === 'me' ? myName : rivalName} · ${streak} straight` : 'All square'}
                   </div>
                 </div>
                 <div style={{ background:'#0d0d0d', border:'1px solid #1a1a1a', borderRadius:12, padding:'14px 14px' }}>
-                  <div style={{ fontSize:9, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'#444', marginBottom:6 }}>Biggest blowout</div>
-                  <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:15, fontWeight:700, color: blow.md ? (blow.mine ? 'var(--green)' : '#FF3B5C') : '#555' }}>
+                  <div style={{ fontSize:9, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'#969696', marginBottom:6 }}>Biggest blowout</div>
+                  <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:15, fontWeight:700, color: blow.md ? (blow.mine ? 'var(--green)' : '#FF3B5C') : '#a0a0a0' }}>
                     {blow.md ? `MD${blow.md} · by ${blow.margin}` : 'Nothing yet'}
                   </div>
                 </div>
               </div>
 
-              <button onClick={() => setH2h(null)} style={{ width:'100%', marginTop:22, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#555', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Close</button>
+              <button onClick={() => setH2h(null)} style={{ width:'100%', marginTop:22, padding:14, background:'none', border:'1px solid #222', borderRadius:500, color:'#a0a0a0', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer' }}>Close</button>
             </div>
           </div>
         )

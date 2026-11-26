@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { matchdayScores, runInStart } from '../lib/helpers'
+import { chipNames } from '../lib/constants'
 
 
 const DISP = "'Space Grotesk','Inter',sans-serif"
@@ -51,7 +52,7 @@ export default function Bulletin({ pool, poolId, members, fixtures, results, all
     const leadChanged = leaderBefore && leaderNow && leaderBefore !== leaderNow
     const gap = after.length > 1 ? after[0][1] - after[1][1] : 0
 
-    const CHIP_NAMES = { '2x': 'the 2x Multiplier', banker: 'the Banker', hth: 'Half Time Hero', copycat: 'Copycat', coupon: 'the Coupon Buster' }
+    const CHIP_NAMES = chipNames(pool, { '2x': 'the 2x Multiplier', banker: 'the Banker', hth: 'Half Time Hero', copycat: 'Copycat', coupon: 'the Coupon Buster' })
     const chipPlays = []
     Object.entries(allChips || {}).forEach(([uid, chips]) => {
       Object.entries(chips || {}).forEach(([cid, data]) => {
@@ -134,16 +135,16 @@ export default function Bulletin({ pool, poolId, members, fixtures, results, all
       }}>
         <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 3h9v11H3.5A1.5 1.5 0 012 12.5V3z" stroke="#00E05A" strokeWidth="1.2"/><path d="M11 6h2.5v6.5a1.5 1.5 0 01-3 0" stroke="#00E05A" strokeWidth="1.2"/><path d="M4.5 6h4M4.5 8.5h4M4.5 11h2.5" stroke="#00E05A" strokeWidth="1.1" strokeLinecap="round"/></svg>
         The Back Page — Matchday {story.md} wrap
-        <span style={{ color: '#444', fontSize: 11 }}>{open ? '▲' : '▼'}</span>
+        <span style={{ color: '#969696', fontSize: 11 }}>{open ? '▲' : '▼'}</span>
       </button>
 
       {open && (
         <div style={{ border: '1px solid #1e1e1e', borderTop: 'none', borderRadius: '0 0 14px 14px', padding: '20px 20px 22px', background: '#0a0a0a', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', inset: 0, background: 'repeating-linear-gradient(0deg,rgba(255,255,255,.008) 0px,rgba(255,255,255,.008) 1px,transparent 1px,transparent 3px)', pointerEvents: 'none' }}/>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '2px solid #1e1e1e', paddingBottom: 8, marginBottom: 14 }}>
-          <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '.22em', color: '#555', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginRight: 10 }}>THE {(pool?.name || 'INTHELEAGUE').replace(/^the\s+/i, '').toUpperCase()} GAZETTE</span>
+          <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '.22em', color: '#a0a0a0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginRight: 10 }}>THE {(pool?.name || 'INTHELEAGUE').replace(/^the\s+/i, '').toUpperCase()} GAZETTE</span>
 
-            <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '.14em', color: '#3a3a3a' }}>MD{story.md} · FULL TIME EDITION</span>
+            <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '.14em', color: '#8c8c8c' }}>MD{story.md} · FULL TIME EDITION</span>
           </div>
           <div style={{ fontFamily: BEBAS, fontSize: 'clamp(30px,8.5vw,44px)', color: '#fff', letterSpacing: '.02em', lineHeight: .96, marginBottom: 10 }}>
             {story.headline}
@@ -164,7 +165,7 @@ export default function Bulletin({ pool, poolId, members, fixtures, results, all
           }} style={{ width: '100%', marginTop: 16, padding: '12px 16px', background: '#0d1a10', border: '1px solid #25D36644', borderRadius: 12, color: '#25D366', font: 'inherit', fontSize: 13, fontWeight: 700, cursor: 'pointer' }}>
             Send the back page to the group →
           </button>
-          <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '.16em', color: '#333', marginTop: 14, textAlign: 'center' }}>■ FILED AUTOMATICALLY AT FULL TIME ■</div>
+          <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '.16em', color: '#8c8c8c', marginTop: 14, textAlign: 'center' }}>■ FILED AUTOMATICALLY AT FULL TIME ■</div>
 
         </div>
       )}

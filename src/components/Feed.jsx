@@ -37,7 +37,7 @@ export default function Feed({ pool, poolId, fixtures, results, allPicks, allChi
 
   if (!events.length) {
     return (
-      <div style={{ textAlign: 'center', padding: '48px 24px', color: '#555' }}>
+      <div style={{ textAlign: 'center', padding: '48px 24px', color: '#a0a0a0' }}>
         <div style={{ fontFamily: DISP, fontSize: 17, fontWeight: 700, color: '#888', marginBottom: 8 }}>The story starts here</div>
         <div style={{ fontSize: 14, lineHeight: 1.6 }}>Once picks are in and games kick off, your league's story writes itself — crowns, exact scores, chip drama and the back page all land here.</div>
       </div>
@@ -64,11 +64,11 @@ export default function Feed({ pool, poolId, fixtures, results, allPicks, allChi
         if (e.type === 'deadline') {
           return (
             <div key={i} onClick={onGoPicks} style={{ cursor: 'pointer', padding: '4px 0 22px', borderBottom: '1px solid #141414', marginBottom: 22 }}>
-              <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '.18em', color: '#555', marginBottom: 8 }}>{e.kicker} IN</div>
+              <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '.18em', color: '#a0a0a0', marginBottom: 8 }}>{e.kicker} IN</div>
               <div style={{ fontFamily: MONO, fontSize: 'clamp(40px,12vw,60px)', fontWeight: 700, color: GREEN, lineHeight: 1, letterSpacing: '.02em' }}>
                 <Countdown target={e.lockTs} />
               </div>
-              <div style={{ fontSize: 13, color: '#777', marginTop: 10 }}>{e.headline} · {e.sub}</div>
+              <div style={{ fontSize: 13, color: '#b0b0b0', marginTop: 10 }}>{e.headline} · {e.sub}</div>
             </div>
           )
         }
@@ -77,13 +77,13 @@ export default function Feed({ pool, poolId, fixtures, results, allPicks, allChi
         return (
           <div key={i} style={{ display: 'flex', gap: 14, marginBottom: 26 }}>
             {/* timestamp rail */}
-            <div style={{ width: 42, flexShrink: 0, fontFamily: MONO, fontSize: 12, color: '#3d3d3d', paddingTop: e.kicker ? 22 : 2, textAlign: 'right' }}>
+            <div style={{ width: 42, flexShrink: 0, fontFamily: MONO, fontSize: 12, color: '#8c8c8c', paddingTop: e.kicker ? 22 : 2, textAlign: 'right' }}>
               {timeAgo(e.ts)}
             </div>
             {/* content */}
             <div style={{ flex: 1, minWidth: 0, borderBottom: '1px solid #111', paddingBottom: 26, marginBottom: -26 }}>
               {e.gold && <div style={{ width: 44, height: 3, borderRadius: 2, background: '#FFD60A', marginBottom: 12 }} />}
-              {e.kicker && <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '.14em', color: e.gold ? '#FFD60A' : '#4a4a4a', marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.kicker}</div>}
+              {e.kicker && <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '.14em', color: e.gold ? '#FFD60A' : '#9a9a9a', marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.kicker}</div>}
               <div style={{ fontFamily: DISP, fontSize: e.gold ? 26 : 21, fontWeight: 700, color: '#fff', letterSpacing: '-.02em', lineHeight: 1.1 }}>
                 {e.headline}
               </div>
@@ -91,9 +91,9 @@ export default function Feed({ pool, poolId, fixtures, results, allPicks, allChi
               {/* LCD chip for exact scores */}
               {e.lcd && (
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginTop: 10, background: '#050505', border: '1px solid #1a1a1a', borderRadius: 8, padding: '5px 10px' }}>
-                  <span style={{ fontFamily: MONO, fontSize: 11, color: '#666' }}>{abbr(e.lcd.home)}</span>
+                  <span style={{ fontFamily: MONO, fontSize: 11, color: '#a8a8a8' }}>{abbr(e.lcd.home)}</span>
                   <span style={{ fontFamily: MONO, fontSize: 15, color: GREEN, textShadow: '0 0 6px #00ff4444' }}>{e.lcd.h}:{e.lcd.a}</span>
-                  <span style={{ fontFamily: MONO, fontSize: 11, color: '#666' }}>{abbr(e.lcd.away)}</span>
+                  <span style={{ fontFamily: MONO, fontSize: 11, color: '#a8a8a8' }}>{abbr(e.lcd.away)}</span>
                 </div>
               )}
 
@@ -103,7 +103,7 @@ export default function Feed({ pool, poolId, fixtures, results, allPicks, allChi
                   {e.sub}
                 </button>
               ) : e.sub ? (
-                <div style={{ fontSize: 13.5, color: '#777', marginTop: 6, lineHeight: 1.5 }}>{e.sub}</div>
+                <div style={{ fontSize: 13.5, color: '#b0b0b0', marginTop: 6, lineHeight: 1.5 }}>{e.sub}</div>
               ) : null}
             </div>
           </div>

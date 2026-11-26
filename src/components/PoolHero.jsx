@@ -62,8 +62,8 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
 
   return (
     <div style={{
-      background: grad,
-      border: '1px solid #1a1a1a',
+      background: festive ? 'linear-gradient(165deg, #154226 0%, #0d2516 48%, #0a0f0b 100%)' : grad,
+      border: festive ? '1px solid rgba(255,214,10,.28)' : '1px solid #1a1a1a',
       borderRadius: 18,
       padding: '28px 22px 22px',
       position: 'relative',
@@ -73,6 +73,10 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
     }}>
       {/* accent corner glow */}
       <div style={{ position:'absolute', top:-120, right:-120, width:280, height:280, background:`radial-gradient(circle, ${accent}14 0%, transparent 65%)`, pointerEvents:'none' }}/>
+      {festive && <>
+        <div className="fest-snowcap" aria-hidden="true" />
+        <div style={{ position:'absolute', bottom:-110, left:-110, width:260, height:260, background:'radial-gradient(circle, rgba(229,72,77,.16) 0%, transparent 65%)', pointerEvents:'none' }}/>
+      </>}
       {/* dark fade at bottom */}
       <div style={{ position:'absolute', bottom:0, left:0, right:0, height:'50%', background:'linear-gradient(to top,rgba(0,0,0,.35),transparent)', pointerEvents:'none' }}/>
 
@@ -86,13 +90,13 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
           ))}
         </div>
         <span style={{ fontSize:12, fontWeight:700, color:'rgba(255,255,255,.7)' }}>{members.length} player{members.length!==1?'s':''}</span>
-        <span style={{ fontSize:10, color:'rgba(255,255,255,.4)' }}>▾</span>
+        <span style={{ fontSize:10, color:'rgba(255,255,255,.66)' }}>▾</span>
       </button>
 
       {/* Eyebrow */}
-      <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:11, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.55)', marginBottom:10 }}>
+      <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:11, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.74)', marginBottom:10 }}>
         <span style={{ width:5, height:5, borderRadius:'50%', background:accent, display:'inline-block' }}/>
-        {sport.name}
+        {festive ? <span style={{ color:'#FFD60A' }}>★ Festive League</span> : sport.name}
       </div>
 
       {/* Pool name */}
@@ -104,7 +108,7 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
       <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'rgba(255,255,255,.6)', fontWeight:500, marginBottom:22, position:'relative', zIndex:1, flexWrap:'wrap' }}>
         <strong style={{ color:'#fff', fontWeight:700 }}>{me?.name?.split(' ')[0] || 'You'}</strong>
         <span style={{ width:3, height:3, borderRadius:'50%', background:'rgba(255,255,255,.4)', display:'inline-block' }}/>
-        <span>{festive ? `${FESTIVE.label} · ${FESTIVE.dates}` : 'Season 2026/27'}</span>
+        <span>{festive ? `${sport.name} · ${FESTIVE.dates}` : 'Season 2026/27'}</span>
         <span style={{ width:3, height:3, borderRadius:'50%', background:'rgba(255,255,255,.4)', display:'inline-block' }}/>
         <span>{fixtures.length} fixtures</span>
       </div>
@@ -123,12 +127,12 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
             {showCountdown ? (
               <>
                 <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:64, fontWeight:700, color:accent, letterSpacing:'-.04em', lineHeight:1 }}>{daysToKO}</div>
-                <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.35)', marginTop:2 }}>Days to kickoff</div>
+                <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.62)', marginTop:2 }}>Days to kickoff</div>
               </>
             ) : (
               <>
                 <div style={{ fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:'clamp(50px,15vw,72px)', fontWeight:700, color:accent, letterSpacing:'-.05em', lineHeight:1 }}>{totalPts}</div>
-                <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.35)', marginTop:2 }}>Points</div>
+                <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.62)', marginTop:2 }}>Points</div>
               </>
             )}
           </div>
@@ -139,11 +143,11 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
           <div style={{ display:'flex', flexDirection:'column', gap:10, justifyContent:'flex-end', paddingBottom:2 }}>
             <div style={{ display:'flex', alignItems:'baseline', gap:8 }}>
               <div style={{ fontSize:18, fontWeight:900, color:'#fff', letterSpacing:'-.03em', lineHeight:1, minWidth:32 }}>{exactPts}</div>
-              <div style={{ fontSize:10, fontWeight:600, letterSpacing:'.1em', textTransform:'uppercase', color:'rgba(255,255,255,.35)' }}>Exact scores</div>
+              <div style={{ fontSize:10, fontWeight:600, letterSpacing:'.1em', textTransform:'uppercase', color:'rgba(255,255,255,.62)' }}>Exact scores</div>
             </div>
             <div style={{ display:'flex', alignItems:'baseline', gap:8 }}>
               <div style={{ fontSize:18, fontWeight:900, color:'#fff', letterSpacing:'-.03em', lineHeight:1, minWidth:32 }}>{picksMade}</div>
-              <div style={{ fontSize:10, fontWeight:600, letterSpacing:'.1em', textTransform:'uppercase', color:'rgba(255,255,255,.35)' }}>Picks made</div>
+              <div style={{ fontSize:10, fontWeight:600, letterSpacing:'.1em', textTransform:'uppercase', color:'rgba(255,255,255,.62)' }}>Picks made</div>
             </div>
           </div>
 
@@ -155,7 +159,7 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
                 <div style={{ fontSize:'clamp(30px,9vw,40px)', fontWeight:900, color:'#FFD60A', letterSpacing:'-.04em', lineHeight:1 }}>
                   {rank}<span style={{ fontSize:18, fontWeight:700, color:'rgba(255,212,10,.6)', verticalAlign:'super', marginLeft:1 }}>{ordinal(rank).replace(String(rank),'')}</span>
                 </div>
-                <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.35)', marginTop:2 }}>Your rank</div>
+                <div style={{ fontSize:10, fontWeight:700, letterSpacing:'.14em', textTransform:'uppercase', color:'rgba(255,255,255,.62)', marginTop:2 }}>Your rank</div>
               </div>
             </>
           )}
@@ -164,7 +168,7 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
         {/* Matchday progress */}
         <div>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:7 }}>
-            <span style={{ fontSize:10, fontWeight:700, letterSpacing:'.12em', textTransform:'uppercase', color:'rgba(255,255,255,.4)' }}>{fullSeason ? 'Season progress' : 'League progress'}</span>
+            <span style={{ fontSize:10, fontWeight:700, letterSpacing:'.12em', textTransform:'uppercase', color:'rgba(255,255,255,.66)' }}>{fullSeason ? 'Season progress' : 'League progress'}</span>
             <span style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,.6)', letterSpacing:'.04em' }}>{fullSeason ? `Matchday ${currentMD} of ${totalMD}` : mdDone ? `Round ${mdDone} of ${totalMD}` : `${totalMD} matchdays`}</span>
           </div>
           <div style={{ height:5, background:'rgba(255,255,255,.12)', borderRadius:999, overflow:'hidden', position:'relative' }}>

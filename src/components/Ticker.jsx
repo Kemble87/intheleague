@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { calcPts, matchdayScores, runInStart } from '../lib/helpers'
+import { chipNames } from '../lib/constants'
 
 const MONO = "'Share Tech Mono',ui-monospace,monospace"
 const CHIP_NAMES = { '2x': '2× MULTIPLIER', banker: 'THE BANKER', hth: 'HALF TIME HERO', copycat: 'COPYCAT', coupon: 'COUPON BUSTER' }
@@ -25,7 +26,7 @@ export default function Ticker({ pool, members, allChips, fixtures, allPicks, re
     }
     Object.entries(allChips || {}).forEach(([uid, chips]) => {
       Object.entries(chips || {}).forEach(([chipId, data]) => {
-        const cn = CHIP_NAMES[chipId]
+        const cn = (chipNames(pool, CHIP_NAMES)[chipId] || '').toUpperCase()
         if (!cn) return
         const md = data?.matchday && data.matchday !== 'ALL' ? ` ON MD${data.matchday}` : ''
         out.push({ text: `${nameOf(uid)} PLAYED ${cn}${md}`, color: '#00E05A' })
@@ -40,7 +41,7 @@ export default function Ticker({ pool, members, allChips, fixtures, allPicks, re
         if (ranked[0] && ranked[0][1] > 0) {
           out.push({ text: `${nameOf(ranked[0][0])} TAKES MATCHDAY ${md} · ${ranked[0][1]} PTS`, color: '#FFD60A' })
           const last = ranked[ranked.length - 1]
-          if (last && last[0] !== ranked[0][0]) out.push({ text: `WOODEN SPOON MD${md}: ${nameOf(last[0])} · ${last[1]} PTS`, color: '#8a4a4a' })
+          if (last && last[0] !== ranked[0][0]) out.push({ text: `WOODEN SPOON MD${md}: ${nameOf(last[0])} · ${last[1]} PTS`, color: '#e39a9a' })
         }
       }
       const totals = members.map(([uid, m]) => {
@@ -56,8 +57,8 @@ export default function Ticker({ pool, members, allChips, fixtures, allPicks, re
         out.push({ text: `${totals[0].name} LEADS ON ${totals[0].pts} PTS${gap > 0 ? ` · ${gap} CLEAR` : ''}`, color: '#FFD60A' })
       }
     }
-    out.push({ text: `${(fixtures || []).length || 380} FIXTURES SYNCED LIVE`, color: '#555' })
-    if (!out.some(i => i.color === '#00E05A')) out.push({ text: 'FIVE CHIPS · ONE SHOT AT GLORY', color: '#555' })
+    out.push({ text: `${(fixtures || []).length || 380} FIXTURES SYNCED LIVE`, color: '#a0a0a0' })
+    if (!out.some(i => i.color === '#00E05A')) out.push({ text: 'FIVE CHIPS · ONE SHOT AT GLORY', color: '#a0a0a0' })
     return out
   }, [pool, members, allChips, fixtures, allPicks, results])
 
@@ -76,7 +77,7 @@ export default function Ticker({ pool, members, allChips, fixtures, allPicks, re
             {items.map((item, i) => (
               <span key={rep + '-' + i} style={{ fontFamily: MONO, fontSize: 12, letterSpacing: '.1em', color: item.color, textShadow: `0 0 8px ${item.color}55`, padding: '0 14px', display: 'inline-flex', alignItems: 'center', gap: 14 }}>
                 {item.text}
-                <span style={{ color: '#222', textShadow: 'none' }}>···</span>
+                <span style={{ color: '#6b6b6b', textShadow: 'none' }}>···</span>
               </span>
             ))}
           </div>

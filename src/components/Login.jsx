@@ -58,7 +58,7 @@ const CSS = `
   padding:13px 14px; margin-bottom:11px; color:var(--chalk); font-family:var(--body); font-size:15px;
   transition:border-color .15s ease, box-shadow .15s ease;
 }
-.itl-auth .inp::placeholder{ color:#6d7269; }
+.itl-auth .inp::placeholder{ color:#a3a89f; }
 .itl-auth .inp:focus{ outline:none; border-color:var(--turf); box-shadow:0 0 0 3px rgba(44,232,106,.15); }
 
 .itl-auth .auth-err{ color:var(--err); font-size:13px; font-weight:500; margin:2px 0 12px; }
