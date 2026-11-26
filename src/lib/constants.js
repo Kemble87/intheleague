@@ -6,6 +6,9 @@ export const SPORTS = {
     SN:   { name: 'Six Nations',     short: '6N',  emoji: '🏉', grad: 'linear-gradient(135deg,#003300,#006600)', soon: true },
 }
 
+// Festive League — a short, self-contained competition over the Christmas matchdays
+export const FESTIVE = { from: 17, to: 20, label: 'Festive League', dates: '26 Dec – 7 Jan' }
+
 export const COMP_IDS = { PL: 'PL', CHAMP: 'ELC', L1: 'EL1', WC: 'WC', SN: null }
 
 export const SAMPLE_FIXTURES = [

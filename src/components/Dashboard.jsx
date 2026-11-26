@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { collection, query, where, onSnapshot, doc, setDoc, arrayUnion, updateDoc, increment, getDoc } from 'firebase/firestore'
 import { db, rtdb } from '../lib/firebase'
 import { ref, get } from 'firebase/database'
-import { SPORTS, ACCENTS } from '../lib/constants'
+import { SPORTS, ACCENTS, FESTIVE } from '../lib/constants'
 
 import { slugify, initials, fetchAndStoreFixtures } from '../lib/helpers'
 
@@ -11,6 +11,7 @@ import PoolView from './PoolView'
 function CreateModal({ user, onClose, onCreate }) {
   const [name, setName] = useState('')
     const [sport, setSport] = useState('PL')
+  const [format, setFormat] = useState('festive')
   const [accent, setAccent] = useState(ACCENTS[0])
 
   const [busy, setBusy] = useState(false)
@@ -20,15 +21,18 @@ function CreateModal({ user, onClose, onCreate }) {
     if (!name.trim()) return
     setBusy(true)
     const id = slugify(name)
+    const festive = sport === 'PL' && format === 'festive'
+    const win = festive ? { from: FESTIVE.from, to: FESTIVE.to } : null
     await setDoc(doc(db, 'pools', id), {
             name: name.trim(), sport, accent, code: id,
 
       createdBy: user.uid, createdAt: Date.now(),
       members: { [user.uid]: { name: user.displayName || user.email, joinedAt: Date.now(), isOrganiser: true } },
       memberCount: 1,
+      ...(festive ? { format: 'festive', window: win } : {}),
     })
     await setDoc(doc(db, 'users', user.uid), { pools: arrayUnion(id) }, { merge: true })
-        fetchAndStoreFixtures(sport, id, rtdb).catch(() => {})
+        fetchAndStoreFixtures(sport, id, rtdb, win).catch(() => {})
     setCode(id)
     onCreate(id)
     setBusy(false)
@@ -73,6 +77,26 @@ function CreateModal({ user, onClose, onCreate }) {
             </div>
           ))}
         </div>
+        {sport === 'PL' && (
+          <>
+            <label className="modal-label" style={{ marginTop: 16 }}>Format</label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+              {[
+                { k: 'festive', t: FESTIVE.label, s: `4 matchdays · ${FESTIVE.dates}` },
+                { k: 'season', t: 'Rest of season', s: 'Every matchday to May' },
+              ].map(o => (
+                <button key={o.k} type="button" onClick={() => setFormat(o.k)} style={{
+                  textAlign: 'left', padding: '12px 12px', borderRadius: 12, cursor: 'pointer',
+                  background: format === o.k ? 'rgba(0,224,90,.10)' : '#0d0d0d',
+                  border: format === o.k ? '1.5px solid #00E05A' : '1.5px solid #1c1c1c',
+                }}>
+                  <div style={{ fontSize: 13.5, fontWeight: 700, color: '#fff' }}>{o.t}</div>
+                  <div style={{ fontSize: 11, color: '#888', marginTop: 3 }}>{o.s}</div>
+                </button>
+              ))}
+            </div>
+          </>
+        )}
                 <label className="modal-label" style={{ marginTop: 16 }}>Pool colour</label>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 4 }}>
           {ACCENTS.map(c => (

@@ -1,4 +1,5 @@
 import { calcPts, runInMult, runInStart, matchdayScores } from '../lib/helpers'
+import { FESTIVE } from '../lib/constants'
 
 import { SPORTS } from '../lib/constants'
 
@@ -46,8 +47,14 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
   const currentMD = playedFixtures.length > 0
     ? Math.max(...playedFixtures.map(f => f.matchday || 1))
     : 1
-  const progress = Math.round((currentMD / totalMD) * 100)
+  // Position within this pool's own matchdays (a short league might run MD17–20)
+  const festive = pool?.format === 'festive'
+  const fullSeason = matchdays.length >= 30 || !matchdays.length
+  const mdDone = playedFixtures.length > 0 ? matchdays.filter(m => Number(m) <= Number(currentMD)).length : 0
+  const progress = fullSeason ? Math.round((currentMD / totalMD) * 100) : Math.round((mdDone / totalMD) * 100)
   const riStart = runInStart(fixtures)
+  const hasRunIn = isFinite(riStart)
+  const ticks = fullSeason ? ['MD1','MD10','MD19','MD29','MD38'] : matchdays.map(m => 'MD' + m)
   const riLeft = isFinite(riStart) ? Math.max(0, Math.min(100, ((riStart - 1) / totalMD) * 100)) : 100
 
   const playerList = members.slice(0, 3)
@@ -97,7 +104,7 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
       <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:'rgba(255,255,255,.6)', fontWeight:500, marginBottom:22, position:'relative', zIndex:1, flexWrap:'wrap' }}>
         <strong style={{ color:'#fff', fontWeight:700 }}>{me?.name?.split(' ')[0] || 'You'}</strong>
         <span style={{ width:3, height:3, borderRadius:'50%', background:'rgba(255,255,255,.4)', display:'inline-block' }}/>
-        <span>Season 2026/27</span>
+        <span>{festive ? `${FESTIVE.label} · ${FESTIVE.dates}` : 'Season 2026/27'}</span>
         <span style={{ width:3, height:3, borderRadius:'50%', background:'rgba(255,255,255,.4)', display:'inline-block' }}/>
         <span>{fixtures.length} fixtures</span>
       </div>
@@ -157,8 +164,8 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
         {/* Matchday progress */}
         <div>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:7 }}>
-            <span style={{ fontSize:10, fontWeight:700, letterSpacing:'.12em', textTransform:'uppercase', color:'rgba(255,255,255,.4)' }}>Season progress</span>
-            <span style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,.6)', letterSpacing:'.04em' }}>Matchday {currentMD} of {totalMD}</span>
+            <span style={{ fontSize:10, fontWeight:700, letterSpacing:'.12em', textTransform:'uppercase', color:'rgba(255,255,255,.4)' }}>{fullSeason ? 'Season progress' : 'League progress'}</span>
+            <span style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,.6)', letterSpacing:'.04em' }}>{fullSeason ? `Matchday ${currentMD} of ${totalMD}` : mdDone ? `Round ${mdDone} of ${totalMD}` : `${totalMD} matchdays`}</span>
           </div>
           <div style={{ height:5, background:'rgba(255,255,255,.12)', borderRadius:999, overflow:'hidden', position:'relative' }}>
             {/* Run-in zone — final nine matchdays */}
@@ -166,16 +173,18 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
             <div style={{ position:'relative', height:'100%', borderRadius:999, background: progress >= riLeft ? `linear-gradient(to right,${accent},#FF3B5C)` : `linear-gradient(to right,${accent},${accent}aa)`, width: progress+'%', transition:'width .6s ease' }}/>
           </div>
           <div style={{ display:'flex', justifyContent:'space-between', marginTop:5 }}>
-            {['MD1','MD10','MD19','MD29','MD38'].map((md, i, arr) => (
-              <span key={md} style={{ fontSize:9, color: i === arr.length - 1 ? 'rgba(255,59,92,.75)' : 'rgba(255,255,255,.2)', fontWeight:600, letterSpacing:'.04em' }}>{md}</span>
+            {ticks.map((md, i, arr) => (
+              <span key={md} style={{ fontSize:9, color: hasRunIn && i === arr.length - 1 ? 'rgba(255,59,92,.75)' : 'rgba(255,255,255,.2)', fontWeight:600, letterSpacing:'.04em' }}>{md}</span>
             ))}
           </div>
+          {hasRunIn && (
           <div style={{ display:'flex', justifyContent:'flex-end', marginTop:6 }}>
             <span style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:9, fontWeight:700, letterSpacing:'.12em', color:'rgba(255,59,92,.85)' }}>
               <span style={{ width:8, height:8, borderRadius:2, background:'rgba(255,59,92,.25)', border:'1px solid rgba(255,59,92,.6)', display:'inline-block' }}/>
               THE RUN-IN · 2× POINTS
             </span>
           </div>
+          )}
         </div>
       </div>
         )

@@ -519,14 +519,14 @@ export default function Landing({ onGetStarted }) {
         <div className="pitch"></div>
         <div className="floodglow"></div>
         <div className="wrap hero-inner">
-          <div className="eyebrow"><span className="dot"></span> Free founding season</div>
+          <div className="eyebrow"><span className="dot"></span> Festive League · free to play</div>
           <h1>Run the pool.<br /><span className="keep">Top the table.</span></h1>
           <p className="sub">InTheLeague scores every prediction and ranks your mates in real time. <b>Every result moves the table</b> — and the group chat.</p>
           <div className="cta-row">
             <button type="button" className="btn btn-primary" onClick={() => onGetStarted('up')}>Start a pool</button>
             <a className="btn btn-ghost" href="#how" onClick={scrollToHow}>See how it works</a>
           </div>
-          <p className="meta-line">Free to play · Championship kicks off <b>Aug 14</b> · Premier League <b>Aug 21</b></p>
+          <p className="meta-line">Free to play · Four matchdays · <b>26 Dec</b> to <b>7 Jan</b> · Everyone starts on zero</p>
 
           <div className="phone-stage">
             <div className="phone" id="phone">
@@ -671,7 +671,7 @@ export default function Landing({ onGetStarted }) {
         <div className="floodglow"></div>
         <h3 className="rise" id="closing-copy">Your mates. Your calls. <em>Your bragging rights.</em></h3>
         <button type="button" className="btn btn-primary" onClick={() => onGetStarted('up')}>Start your pool free</button>
-        <p className="fine">Founding season is free for everyone · 2026/27</p>
+        <p className="fine">The Festive League is free for everyone · 26 Dec – 7 Jan</p>
       </section>
     </div>
   )
