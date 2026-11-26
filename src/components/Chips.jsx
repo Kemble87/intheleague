@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { FESTIVE_CHIPS } from '../lib/constants'
+import { FESTIVE_BADGES } from './FestiveBadges'
 import { ref, onValue, set } from 'firebase/database'
 import { rtdb } from '../lib/firebase'
 
@@ -495,7 +496,7 @@ const ALL_CHIPS = CHIP_DEFS
 export default function Chips({ poolId, userId, members, fixtures, pool }) {
   const festive = pool?.format === 'festive'
   const defs = festive
-    ? ALL_CHIPS.map(c => ({ ...c, ...FESTIVE_CHIPS[c.id], warning: 'One use this Festive League.' }))
+    ? ALL_CHIPS.map(c => ({ ...c, ...FESTIVE_CHIPS[c.id], Badge: FESTIVE_BADGES[c.id] || c.Badge, warning: 'One use this Festive League.' }))
     : ALL_CHIPS
   const [used, setUsed] = useState({})
   const [confirming, setConfirming] = useState(null)
@@ -582,11 +583,6 @@ const data = { usedAt: Date.now(), ...extraData }
                 <chip.Badge active={isActive} />
               </button>
               {isUsed && <div className="chip-used-badge">{usedLabel}</div>}
-              {festive && (
-                <div className="chip-fest-name" style={{ opacity: isUsed ? .5 : 1 }}>
-                  <span aria-hidden="true">{chip.emoji}</span> {chip.name}
-                </div>
-              )}
             </div>
           )
         })}
