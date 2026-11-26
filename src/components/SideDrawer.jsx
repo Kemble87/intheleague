@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { FESTIVE_CHIPS } from '../lib/constants'
 import { signOut } from 'firebase/auth'
 import { auth } from '../lib/firebase'
 import { initials } from '../lib/helpers'
@@ -18,7 +19,10 @@ const CHIP_RULES = [
   { emoji:'🎟', name:'Coupon Buster',   desc:'Your worst result of a matchday is rescued — upgraded to the next points tier (0→1, 1→3).', color:'#4CAF50' },
 ]
 
+const CHIP_IDS = ['2x', 'banker', 'hth', 'copycat', 'coupon']
+
 export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, invLink }) {
+  const festiveRules = (pools || []).find(p => p.id === activePoolId)?.format === 'festive'
   const [open, setOpen] = useState(false)
   const [section, setSection] = useState(null)
   const [displayName, setDisplayName] = useState(user?.displayName || '')
@@ -212,8 +216,8 @@ export default function SideDrawer({ user, pools, activePoolId, onSwitchPool, in
                 ))}
 
                 {/* Chips */}
-                <div style={secHd}>Chips — one use each per season</div>
-                {CHIP_RULES.map(c => (
+                <div style={secHd}>{festiveRules ? 'Festive chips — one use each, one per round' : 'Chips — one use each per season'}</div>
+                {(festiveRules ? CHIP_RULES.map((c, i) => ({ ...c, name: `${FESTIVE_CHIPS[CHIP_IDS[i]].emoji} ${FESTIVE_CHIPS[CHIP_IDS[i]].name}`, desc: FESTIVE_CHIPS[CHIP_IDS[i]].desc })) : CHIP_RULES).map(c => (
                   <div key={c.name} style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
                     <div style={{ width: 6, borderRadius: 3, background: c.color, flexShrink: 0, opacity: .8 }}/>
                     <div>

@@ -119,6 +119,7 @@ export default function PoolView({ user, pool, poolId, onBack }) {
         userId={user.uid}
         members={members}
         fixtures={fixtures}
+        pool={pool}
       />
 
       {/* ── Extras: table, wrap, sharing ── */}

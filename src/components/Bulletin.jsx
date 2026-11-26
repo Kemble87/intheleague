@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { matchdayScores, runInStart } from '../lib/helpers'
+import { chipNames } from '../lib/constants'
 
 
 const DISP = "'Space Grotesk','Inter',sans-serif"
@@ -51,7 +52,7 @@ export default function Bulletin({ pool, poolId, members, fixtures, results, all
     const leadChanged = leaderBefore && leaderNow && leaderBefore !== leaderNow
     const gap = after.length > 1 ? after[0][1] - after[1][1] : 0
 
-    const CHIP_NAMES = { '2x': 'the 2x Multiplier', banker: 'the Banker', hth: 'Half Time Hero', copycat: 'Copycat', coupon: 'the Coupon Buster' }
+    const CHIP_NAMES = chipNames(pool, { '2x': 'the 2x Multiplier', banker: 'the Banker', hth: 'Half Time Hero', copycat: 'Copycat', coupon: 'the Coupon Buster' })
     const chipPlays = []
     Object.entries(allChips || {}).forEach(([uid, chips]) => {
       Object.entries(chips || {}).forEach(([cid, data]) => {

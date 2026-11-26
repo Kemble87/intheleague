@@ -1,6 +1,7 @@
 // Derives a timestamped event stream for the League Feed from existing pool data.
 // No new writes — everything here is computed from fixtures/results/picks/chips.
 import { matchdayScores, calcPts, runInStart } from './helpers'
+import { chipNames, FESTIVE_CHIPS } from './constants'
 
 const CHIP_LABELS = {
   '2x': { label: '2× Multiplier', kind: '2×' },
@@ -126,7 +127,7 @@ export function buildFeed({ pool, poolId, fixtures, results, allPicks, allChips,
         type: 'chip',
         ts: (endTs || now) - 1,
         kicker: `CHIP · ${meta.kind}`,
-        headline: `${firstName(members, uid)} played ${meta.label}`,
+        headline: `${firstName(members, uid)} played ${pool?.format === 'festive' && FESTIVE_CHIPS[cid] ? FESTIVE_CHIPS[cid].the : meta.label}`,
         sub: played
           ? (pts > 0 ? `Returned ${pts} points.` : 'It backfired. Nought to show.')
           : `On Matchday ${md}. Watch this space.`,
@@ -206,7 +207,7 @@ export function buildRecapData({ pool, poolId, fixtures, results, allPicks, allC
     return { name: nameOf(uid), pts: totalsAfter[uid] || 0, move }
   })
 
-  const CHIP_NAMES = { '2x': 'the 2× Multiplier', banker: 'the Banker', hth: 'Half Time Hero', copycat: 'Copycat', coupon: 'the Coupon Buster' }
+  const CHIP_NAMES = chipNames(pool, { '2x': 'the 2× Multiplier', banker: 'the Banker', hth: 'Half Time Hero', copycat: 'Copycat', coupon: 'the Coupon Buster' })
   let chip = null
   for (const [uid, chips] of Object.entries(allChips || {})) {
     for (const [cid, data] of Object.entries(chips || {})) {

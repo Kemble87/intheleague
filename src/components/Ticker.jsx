@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { calcPts, matchdayScores, runInStart } from '../lib/helpers'
+import { chipNames } from '../lib/constants'
 
 const MONO = "'Share Tech Mono',ui-monospace,monospace"
 const CHIP_NAMES = { '2x': '2× MULTIPLIER', banker: 'THE BANKER', hth: 'HALF TIME HERO', copycat: 'COPYCAT', coupon: 'COUPON BUSTER' }
@@ -25,7 +26,7 @@ export default function Ticker({ pool, members, allChips, fixtures, allPicks, re
     }
     Object.entries(allChips || {}).forEach(([uid, chips]) => {
       Object.entries(chips || {}).forEach(([chipId, data]) => {
-        const cn = CHIP_NAMES[chipId]
+        const cn = (chipNames(pool, CHIP_NAMES)[chipId] || '').toUpperCase()
         if (!cn) return
         const md = data?.matchday && data.matchday !== 'ALL' ? ` ON MD${data.matchday}` : ''
         out.push({ text: `${nameOf(uid)} PLAYED ${cn}${md}`, color: '#00E05A' })

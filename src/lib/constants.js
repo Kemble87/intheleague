@@ -13,6 +13,19 @@ export const FESTIVE_ROUNDS = { 17: 'Boxing Day', 18: 'Twixmas', 19: 'New Year',
 // The festive look switches itself off the day after the Festive League ends
 export const isFestiveSeason = () => Date.now() < Date.UTC(2027, 0, 8)
 
+// Festive League names for the five chips — same rules, Christmas wrapping
+export const FESTIVE_CHIPS = {
+  '2x':    { name: 'Double Helpings',     the: 'Double Helpings',      emoji: '🍽️', desc: 'Double your points for every pick in one round.' },
+  banker:  { name: 'Star on the Tree',    the: 'the Star on the Tree', emoji: '⭐', desc: 'Triple your points on one specific match.' },
+  hth:     { name: 'Half-Time Mince Pie', the: 'the Half-Time Mince Pie', emoji: '🥧', desc: 'Change all your picks at half time for one round.' },
+  copycat: { name: 'Secret Santa',        the: 'Secret Santa',         emoji: '🎅', desc: "Quietly copy another player's picks for one round. They won't know." },
+  coupon:  { name: 'Christmas Miracle',   the: 'a Christmas Miracle',  emoji: '✨', desc: 'Your worst result of the round is rescued — upgraded to the next points tier.' },
+}
+// Map of chip id → name to use in sentences ("Leon played …"), festive-aware
+export const chipNames = (pool, base) => pool?.format === 'festive'
+  ? Object.fromEntries(Object.keys(base).map(id => [id, FESTIVE_CHIPS[id]?.the || base[id]]))
+  : base
+
 export const COMP_IDS = { PL: 'PL', CHAMP: 'ELC', L1: 'EL1', WC: 'WC', SN: null }
 
 export const SAMPLE_FIXTURES = [

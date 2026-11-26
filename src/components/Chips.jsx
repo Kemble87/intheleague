@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { FESTIVE_CHIPS } from '../lib/constants'
 import { ref, onValue, set } from 'firebase/database'
 import { rtdb } from '../lib/firebase'
 
@@ -488,8 +489,14 @@ const CHIP_DEFS = [
   { id:'coupon', name:'Coupon Buster',   color:'#4CAF50', desc:'Your worst result this matchday is rescued — upgraded to the next points tier.', warning:'One use per season.', Badge:BadgeCouponBuster },
 ]
 
+const ALL_CHIPS = CHIP_DEFS
+
 // ── MAIN EXPORT ──────────────────────────────────────────────────────────────
-export default function Chips({ poolId, userId, members, fixtures }) {
+export default function Chips({ poolId, userId, members, fixtures, pool }) {
+  const festive = pool?.format === 'festive'
+  const defs = festive
+    ? ALL_CHIPS.map(c => ({ ...c, ...FESTIVE_CHIPS[c.id], warning: 'One use this Festive League.' }))
+    : ALL_CHIPS
   const [used, setUsed] = useState({})
   const [confirming, setConfirming] = useState(null)
   const [chipStep, setChipStep] = useState(null) // '2x-pick-md' | 'banker-pick-match' | 'copycat-pick-player'
@@ -510,7 +517,7 @@ export default function Chips({ poolId, userId, members, fixtures }) {
     }
     const targetMd = mdOf(extraData)
     if (targetMd != null) {
-      const clash = CHIP_DEFS.find(c => c.id !== chip.id && mdOf(used[c.id]) === targetMd)
+      const clash = defs.find(c => c.id !== chip.id && mdOf(used[c.id]) === targetMd)
       if (clash) { alert(`One chip per matchday — you've already played ${clash.name} on Matchday ${targetMd}. Pick a different matchday.`); return }
     }
 const data = { usedAt: Date.now(), ...extraData }
@@ -555,9 +562,9 @@ const data = { usedAt: Date.now(), ...extraData }
 
   return (
     <div className="chips-section">
-      <div className="chips-title">Your chips</div>
+      <div className="chips-title">{festive ? '🎁 Your festive chips' : 'Your chips'}</div>
       <div className="chips-grid">
-        {CHIP_DEFS.map(chip => {
+        {defs.map(chip => {
           const isUsed = !!used[chip.id]
           const isActive = confirming?.id === chip.id
           // Show chip-specific used info
@@ -575,6 +582,11 @@ const data = { usedAt: Date.now(), ...extraData }
                 <chip.Badge active={isActive} />
               </button>
               {isUsed && <div className="chip-used-badge">{usedLabel}</div>}
+              {festive && (
+                <div className="chip-fest-name" style={{ opacity: isUsed ? .5 : 1 }}>
+                  <span aria-hidden="true">{chip.emoji}</span> {chip.name}
+                </div>
+              )}
             </div>
           )
         })}
@@ -600,7 +612,7 @@ const data = { usedAt: Date.now(), ...extraData }
             <div style={{ fontSize:13, color:'#a0a0a0', marginBottom:20 }}>Your points for this matchday will be doubled.</div>
             <div style={{ display:'flex', flexDirection:'column', gap:8, maxHeight:'50vh', overflowY:'auto' }}>
               {displayMatchdays.map(md => (
-                <button key={md} onClick={() => activate(CHIP_DEFS.find(c=>c.id==='2x'), { matchday: md })}
+                <button key={md} onClick={() => activate(defs.find(c=>c.id==='2x'), { matchday: md })}
                   style={{ padding:'14px 16px', background: stepData.matchday===md ? '#0d2b19' : '#1a1a1a', border: stepData.matchday===md ? '1px solid var(--green)' : '1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:15, fontWeight:700, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                   <span>Matchday {md}</span>
                   <span style={{ fontSize:12, color:'#a0a0a0' }}>2× points</span>
@@ -622,7 +634,7 @@ const data = { usedAt: Date.now(), ...extraData }
             <div style={{ fontSize:13, color:'#a0a0a0', marginBottom:20 }}>Your points on this match will be tripled. Pick wisely.</div>
             <div style={{ display:'flex', flexDirection:'column', gap:8, maxHeight:'50vh', overflowY:'auto' }}>
               {displayMatches.map(f => (
-                <button key={f.id} onClick={() => activate(CHIP_DEFS.find(c=>c.id==='banker'), { fixtureId: f.id, home: f.home, away: f.away })}
+                <button key={f.id} onClick={() => activate(defs.find(c=>c.id==='banker'), { fixtureId: f.id, home: f.home, away: f.away })}
                   style={{ padding:'12px 16px', background:'#1a1a1a', border:'1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:14, fontWeight:600, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', justifyContent:'space-between', gap:8 }}>
                   <span>{f.home} v {f.away}</span>
                   <span style={{ fontSize:11, color:'#a0a0a0', whiteSpace:'nowrap' }}>MD{f.matchday}</span>
@@ -650,7 +662,7 @@ const data = { usedAt: Date.now(), ...extraData }
                   <button key={uid} onClick={() => {
                     // Copy their picks for the next upcoming matchday
                     const nextMD = displayMatchdays[0]
-                    activate(CHIP_DEFS.find(c=>c.id==='copycat'), { targetUid: uid, targetName: m.name, matchday: nextMD })
+                    activate(defs.find(c=>c.id==='copycat'), { targetUid: uid, targetName: m.name, matchday: nextMD })
                   }}
                     style={{ padding:'14px 16px', background:'#1a1a1a', border:'1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:15, fontWeight:600, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', gap:12 }}>
                     <div style={{ width:36, height:36, borderRadius:'50%', background:'#00CCDD22', border:'1px solid #00CCDD44', display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, fontWeight:800, color:'#00CCDD', flexShrink:0 }}>
@@ -678,7 +690,7 @@ const data = { usedAt: Date.now(), ...extraData }
                 ? <div style={{ color:'#969696', fontSize:14, textAlign:'center', padding:'20px 0' }}>No matchdays found. Sync fixtures first.</div>
                 : displayMatchdays.map(md => (
                   <button key={md}
-                    onClick={() => activate(CHIP_DEFS.find(c => c.id === 'hth'), { matchday: md })}
+                    onClick={() => activate(defs.find(c => c.id === 'hth'), { matchday: md })}
                     style={{ padding:'14px 16px', background:'#1a1a1a', border:'1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:15, fontWeight:700, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                     <span>Matchday {md}</span>
                     <span style={{ fontSize:12, color:'#a0a0a0' }}>Half time edits unlocked</span>
@@ -703,7 +715,7 @@ const data = { usedAt: Date.now(), ...extraData }
                 ? <div style={{ color:'#969696', fontSize:14, textAlign:'center', padding:'20px 0' }}>No matchdays found. Sync fixtures first.</div>
                 : displayMatchdays.map(md => (
                   <button key={md}
-                    onClick={() => activate(CHIP_DEFS.find(c => c.id === 'coupon'), { matchday: md })}
+                    onClick={() => activate(defs.find(c => c.id === 'coupon'), { matchday: md })}
                     style={{ padding:'14px 16px', background:'#1a1a1a', border:'1px solid #222', borderRadius:10, color:'#fff', font:'inherit', fontSize:15, fontWeight:700, cursor:'pointer', textAlign:'left', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                     <span>Matchday {md}</span>
                     <span style={{ fontSize:12, color:'#a0a0a0' }}>Worst result rescued</span>

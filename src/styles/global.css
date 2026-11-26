@@ -390,3 +390,6 @@ button:active { transform: scale(.96); }
 .festive .pool-card { border-color: rgba(255,214,10,.22); }
 .festive .md-select { background: #0b120d; border-color: #223126; }
 .festive .board-row { border-color: #223126; }
+
+/* Festive chip names shown under each badge */
+.chip-fest-name { margin-top: 6px; text-align: center; font-size: 11px; font-weight: 700; line-height: 1.25; color: #e3d48f; letter-spacing: .01em; }
