@@ -634,22 +634,8 @@ export default function Landing({ onGetStarted }) {
     const iv = setInterval(() => setLeft(timeLeft(Date.now())), 30000)
     return () => clearInterval(iv)
   }, [])
-  // Advent doors: swing open one by one when the calendar scrolls into view
+  // Advent doors start closed; each opens (and closes) on tap
   const [open, setOpen] = useState([false, false, false, false])
-  useEffect(() => {
-    const el = rootRef.current?.querySelector('#calendar')
-    if (!el) return
-    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const timers = []
-    const io = new IntersectionObserver((entries) => {
-      if (!entries.some(e => e.isIntersecting)) return
-      io.disconnect()
-      DOORS.forEach((_, i) => timers.push(setTimeout(
-        () => setOpen(o => o.map((v, k) => (k === i ? true : v))), still ? 0 : 500 + i * 420)))
-    }, { threshold: 0.35 })
-    io.observe(el)
-    return () => { io.disconnect(); timers.forEach(clearTimeout) }
-  }, [])
   const daysOut = left ? left.d + (left.h || left.m ? 1 : 0) : 0
   const lockText = left ? `locks in ${daysOut} day${daysOut === 1 ? '' : 's'}` : 'under way'
   const rootRef = useRef(null)
