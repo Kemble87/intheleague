@@ -1,7 +1,18 @@
 import { useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react'
 import { ref, onValue, set, update } from 'firebase/database'
 import { rtdb } from '../lib/firebase'
-import { FESTIVE_ROUNDS } from '../lib/constants'
+import { FESTIVE_ROUNDS, isFestiveSeason } from '../lib/constants'
+
+// Little puff of snow and stars over the score boxes when a pick is completed
+function PickBurst() {
+  const fest = isFestiveSeason()
+  return (
+    <span className={'pick-burst' + (fest ? ' fest' : '')} aria-hidden="true">
+      {Array.from({ length: 12 }, (_, i) => <i key={i} style={{ '--a': i * 30 + 'deg', '--d': (34 + (i % 3) * 10) + 'px' }} />)}
+      <b>✓ Saved</b>
+    </span>
+  )
+}
 
 // Team name that always fits its column: starts at full size and steps the font
 // down until no single word (Middlesbrough, Wolverhampton) spills past the edge.
@@ -206,10 +217,16 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, use
   const display = locked && hasRes ? result : pick
   const awayRef = useRef(null)
 
+  const [burst, setBurst] = useState(0)
   function onChange(side, raw) {
     const v = raw.replace(/[^0-9]/g, '').slice(0, 2)
     const n = v === '' ? null : Math.min(99, +v)
-    isOrg && locked ? onResult(side, n) : onPick(side, n)
+    if (isOrg && locked) return onResult(side, n)
+    // Celebrate the moment a prediction becomes complete (both scores in)
+    const other = side === 'h' ? pick?.a : pick?.h
+    const wasComplete = pick?.h != null && pick?.a != null
+    if (n != null && other != null && !wasComplete) setBurst(Date.now())
+    onPick(side, n)
     if (side === 'h' && n != null) awayRef.current?.focus()
   }
 
@@ -245,7 +262,8 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, use
             </div>
           </div>
         </div>
-        <div style={{ display:'flex', alignItems:'center', gap:3, padding:'0 4px' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:3, padding:'0 4px', position:'relative' }}>
+          {burst > 0 && <PickBurst key={burst} />}
           <div style={{ width:44, height:56, background:'#060606', border:'1.5px solid #1a1a1a', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
             <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(0deg,rgba(0,0,0,.1) 0px,rgba(0,0,0,.1) 1px,transparent 1px,transparent 3px)', pointerEvents:'none', zIndex:1 }}/>
             {(!locked || isOrg) && <input inputMode="numeric" value={display?.h ?? ''} onChange={e => onChange('h', e.target.value)} disabled={locked && !isOrg} aria-label={fx.home} style={{ position:'absolute', inset:0, opacity:0, cursor: locked&&!isOrg?'not-allowed':'pointer', zIndex:3, fontSize:32, textAlign:'center', background:'none', border:'none', WebkitAppearance:'none' }}/>}
@@ -409,6 +427,29 @@ const [h2h, setH2h] = useState(null)
     })
     return { uid, name: m.name, pts: p, exact: ex, made: md, isMe: uid === user.uid }
   }).sort((a, b) => b.pts - a.pts || b.exact - a.exact)
+
+  // Leaderboard shuffle: when the order changes, rows glide from their old spot to the new one
+  const boardRef = useRef(null)
+  const boardPos = useRef(null)   // { order, pos } from the previous render
+  const boardOrder = board.map(r => r.uid).join(',')
+  useLayoutEffect(() => {
+    const el = boardRef.current
+    if (!el) { boardPos.current = null; return }
+    const rows = [...el.querySelectorAll('[data-flip]')]
+    const pos = {}
+    rows.forEach(r => { pos[r.dataset.flip] = r.offsetTop })
+    const prev = boardPos.current
+    boardPos.current = { order: boardOrder, pos }
+    if (!prev || prev.order === boardOrder || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    rows.forEach(r => {
+      const from = prev.pos[r.dataset.flip]
+      if (from == null || !r.animate) return
+      const dy = from - r.offsetTop
+      if (Math.abs(dy) < 2) return
+      r.animate([{ transform: `translateY(${dy}px)` }, { transform: 'translateY(0)' }], { duration: 700, easing: 'cubic-bezier(.25,.9,.3,1)' })
+      if (dy > 0) r.animate([{ boxShadow: '0 0 0 1px #FFD60A88, 0 8px 22px -6px #FFD60A66' }, { boxShadow: '0 0 0 0 transparent' }], { duration: 1500, easing: 'ease-out' })
+    })
+  })
   // Matchday wins — chip-aware, only completed matchdays count
   const mdWins = {}
   {
@@ -557,7 +598,7 @@ const [h2h, setH2h] = useState(null)
           ))}
         </>
       ) : (
-        <div className="board">
+        <div className="board" ref={boardRef}>
           {(() => {
             const mds = matchdayScores(fixtures, results, members.map(([uid]) => uid), { ...allPicks, [user.uid]: picks }, allChips)
             const doneMd = Object.entries(mds).filter(([, v]) => v.complete).map(([md]) => Number(md)).sort((a, b) => b - a)[0]
@@ -592,7 +633,7 @@ const [h2h, setH2h] = useState(null)
                 const colors = { 0: '#FFD60A', 1: '#C0C0C0', 2: '#CD7F32' }
                 return (
                   <div key={r.uid} style={{ display:'flex', flexDirection:'column', alignItems:'center', width:92 }}>
-                    {pool.format === 'festive' && pos === 0 && <div aria-hidden="true" style={{ fontSize:20, lineHeight:1, marginBottom:4 }}>🎄</div>}
+                    {pool.format === 'festive' && pos === 0 && <div aria-hidden="true" className="fest-twinkle" style={{ fontSize:20, lineHeight:1, marginBottom:4 }}>🎄</div>}
                     <div style={{ width:40, height:40, borderRadius:'50%', background:colors[pos]+'1a', border:`1.5px solid ${colors[pos]}66`, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:"'Space Grotesk','Inter',sans-serif", fontSize:14, fontWeight:700, color:colors[pos], marginBottom:8 }}>
                       {(r.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
                     </div>
@@ -639,7 +680,7 @@ const [h2h, setH2h] = useState(null)
               }, 0)
             }
             return (
-              <div key={row.uid} onClick={() => !row.isMe && setH2h(row.uid)} className={`board-row${i === 0 && row.pts > 0 ? ' gold' : ''}${row.isMe ? ' me' : ''}`} style={{ cursor: row.isMe ? 'default' : 'pointer' }}>
+              <div key={row.uid} data-flip={row.uid} onClick={() => !row.isMe && setH2h(row.uid)} className={`board-row${i === 0 && row.pts > 0 ? ' gold' : ''}${row.isMe ? ' me' : ''}`} style={{ cursor: row.isMe ? 'default' : 'pointer' }}>
                 <div style={{
                   width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
                   background: i < 3 && row.pts > 0 ? rankColor + '1a' : '#161616',
@@ -661,7 +702,7 @@ const [h2h, setH2h] = useState(null)
                     <span>{row.exact} exact</span>
                     {streak >= 3 && <span style={{ color: '#ff6600', fontWeight: 700 }}>· {streak} on the spin</span>}
                     {i > 0 && gap > 0 && <span style={{ color: '#a8a8a8' }}>· {gap} pt{gap !== 1 ? 's' : ''} behind</span>}
-                    {i === 0 && row.pts > 0 && board.length > 1 && <span style={{ color: '#FFD60A' }}>{pool.format === 'festive' ? '· 🎄 top of the tree' : '· leading'}</span>}
+                    {i === 0 && row.pts > 0 && board.length > 1 && <span style={{ color: '#FFD60A' }}>{pool.format === 'festive' ? <>· <span className="fest-twinkle">🎄</span> top of the tree</> : '· leading'}</span>}
                     {chipsPlayed > 0 && <span style={{ color: '#a0a0a0' }}>· {chipsPlayed} chip{chipsPlayed !== 1 ? 's' : ''} played</span>}
                   </div>
                 </div>
