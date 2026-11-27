@@ -1,7 +1,28 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useMemo, useLayoutEffect } from 'react'
 import { ref, onValue, set, update } from 'firebase/database'
 import { rtdb } from '../lib/firebase'
 import { FESTIVE_ROUNDS } from '../lib/constants'
+
+// Team name that always fits its column: starts at full size and steps the font
+// down until no single word (Middlesbrough, Wolverhampton) spills past the edge.
+function ClubName({ name }) {
+  const ref = useRef(null)
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const fit = () => {
+      el.style.fontSize = ''
+      let size = parseFloat(getComputedStyle(el).fontSize)
+      while (el.scrollWidth > el.clientWidth + 0.5 && size > 9) { size -= 0.5; el.style.fontSize = size + 'px' }
+    }
+    fit()
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(fit) : null
+    if (ro && el.parentElement) ro.observe(el.parentElement)
+    document.fonts?.ready?.then(fit).catch(() => {})
+    return () => ro?.disconnect()
+  }, [name])
+  return <div ref={ref} className="fx-club">{name}</div>
+}
 import { fmtKO, fmtDay, groupDays, countdown, calcPts, abbr, fetchAndStoreFixtures, loadFixtures, matchdayScores, runInStart } from '../lib/helpers'
 import Kit from './Kit'
 import Feed from './Feed'
@@ -216,15 +237,15 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, use
       </div>
       <div className="fx-match">
         <div className="fx-home">
-          <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+          <div className="fx-side">
             <Kit team={teamName(fx.home)} crest={fx.homeCrest} size={24} />
-            <div>
-              <div style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:"clamp(14px,4vw,20px)", color:'#fff', letterSpacing:'.06em', lineHeight:1 }}>{teamName(fx.home)}</div>
+            <div style={{ minWidth:0 }}>
+              <ClubName name={teamName(fx.home)} />
               <div className="fx-team-abbr">{abbr(teamName(fx.home))}</div>
             </div>
           </div>
         </div>
-        <div style={{ display:'flex', alignItems:'center', gap:3, padding:'0 6px' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:3, padding:'0 4px' }}>
           <div style={{ width:44, height:56, background:'#060606', border:'1.5px solid #1a1a1a', borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
             <div style={{ position:'absolute', inset:0, background:'repeating-linear-gradient(0deg,rgba(0,0,0,.1) 0px,rgba(0,0,0,.1) 1px,transparent 1px,transparent 3px)', pointerEvents:'none', zIndex:1 }}/>
             {(!locked || isOrg) && <input inputMode="numeric" value={display?.h ?? ''} onChange={e => onChange('h', e.target.value)} disabled={locked && !isOrg} aria-label={fx.home} style={{ position:'absolute', inset:0, opacity:0, cursor: locked&&!isOrg?'not-allowed':'pointer', zIndex:3, fontSize:32, textAlign:'center', background:'none', border:'none', WebkitAppearance:'none' }}/>}
@@ -244,9 +265,9 @@ function FxCard({ fx, pick, result, now, isOrg, members, allPicks, allChips, use
           </div>
         </div>
         <div className="fx-away">
-          <div style={{ display:'flex', alignItems:'center', gap:6, justifyContent:'flex-end' }}>
-            <div style={{ textAlign:'right' }}>
-              <div style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:"clamp(14px,4vw,20px)", color:'#fff', letterSpacing:'.06em', lineHeight:1 }}>{teamName(fx.away)}</div>
+          <div className="fx-side fx-side-away">
+            <div style={{ textAlign:'right', minWidth:0 }}>
+              <ClubName name={teamName(fx.away)} />
               <div className="fx-team-abbr">{abbr(teamName(fx.away))}</div>
             </div>
             <Kit team={teamName(fx.away)} crest={fx.awayCrest} size={24} flip />

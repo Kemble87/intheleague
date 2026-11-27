@@ -24,6 +24,9 @@ function computeRecap({ fixtures, results, allPicks, allChips, members, userId }
   const md = completed[completed.length - 1]
 
   const uids = members.map(([uid]) => uid)
+  // No recap for a matchday nobody in this pool predicted (e.g. a pool started mid-season)
+  const anyonePlayed = byMd[md].some(f => uids.some(uid => allPicks?.[uid]?.[f.id]?.h != null))
+  if (!anyonePlayed) return null
   const nameOf = uid => {
     const m = members.find(([id]) => id === uid)?.[1]
     return m?.name || m?.displayName || 'Player'
@@ -67,7 +70,6 @@ export default function LastTimeOut({ fixtures, results, allPicks, allChips, mem
       return computeRecap({ fixtures, results, allPicks, allChips, members, userId })
     } catch (e) {
       console.error('LastTimeOut compute failed:', e)
-      alert('LTO error: ' + (e?.message || e))
       return null
     }
   }, [fixtures, results, allPicks, allChips, members, userId])
