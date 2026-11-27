@@ -165,8 +165,8 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
           )}
         </div>
 
-        {/* Matchday progress */}
-        <div>
+        {/* Matchday progress — full-season pools only; a four-round league doesn't need one */}
+        {!festive && <div>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:7 }}>
             <span style={{ fontSize:10, fontWeight:700, letterSpacing:'.12em', textTransform:'uppercase', color:'rgba(255,255,255,.66)' }}>{fullSeason ? 'Season progress' : 'League progress'}</span>
             <span style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,.6)', letterSpacing:'.04em' }}>{fullSeason ? `Matchday ${currentMD} of ${totalMD}` : mdDone ? `Round ${mdDone} of ${totalMD}` : `${totalMD} matchdays`}</span>
@@ -189,7 +189,7 @@ export default function PoolHero({ pool, fixtures, picks, results, members, user
             </span>
           </div>
           )}
-        </div>
+        </div>}
       </div>
         )
       })()}
