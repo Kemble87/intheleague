@@ -764,10 +764,6 @@ export default function Landing({ onGetStarted }) {
                     </div>
                     <div className="stat-rank"><div className="n">2<sup>nd</sup></div><div className="stat-lbl">Your rank</div></div>
                   </div>
-
-                  <div className="prog-top"><span className="l">League progress</span><span className="r">4 matchdays</span></div>
-                  <div className="prog-bar"><span className="fill"></span></div>
-                  <div className="prog-ticks"><span>MD17</span><span>MD18</span><span>MD19</span><span>MD20</span></div>
                 </div>
 
                 <div className="nextpick">
