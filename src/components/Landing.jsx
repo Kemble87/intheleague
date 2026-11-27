@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import SantaHatLetter from './SantaHatLetter'
 
 // InTheLeague — landing / front door.
 // Self-contained: all styles are scoped under .itl-landing so they can't
@@ -761,7 +762,7 @@ export default function Landing({ onGetStarted }) {
       <style>{CSS}</style>
 
       <header className="topbar">
-        <div className="wordmark">InThe<span>League</span></div>
+        <div className="wordmark"><SantaHatLetter />nThe<span>League</span></div>
         <div className="nav-right">
           <button type="button" className="nav-login" onClick={() => onGetStarted('in')}>Log in</button>
           <button type="button" className="nav-cta" onClick={() => onGetStarted('up')}>Start a pool</button>

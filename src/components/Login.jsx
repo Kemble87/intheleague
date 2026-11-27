@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import SantaHatLetter from './SantaHatLetter'
 import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from 'firebase/auth'
 import { auth } from '../lib/firebase'
 
@@ -117,7 +118,7 @@ export default function Login({ initialMode = 'in' }) {
   return (
     <div className="itl-auth">
       <style>{CSS}</style>
-      <div className="auth-logo">In<em>The</em>League</div>
+      <div className="auth-logo"><SantaHatLetter />n<em>The</em>League</div>
       <div className="auth-tag">Your group · Your league · Your rules</div>
       <div className="auth-box">
         <div className="auth-h">{mode === 'in' ? 'Welcome back' : 'Create account'}</div>
