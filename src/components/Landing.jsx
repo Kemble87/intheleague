@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import SantaHatLetter from './SantaHatLetter'
 
 // InTheLeague — landing / front door.
 // Self-contained: all styles are scoped under .itl-landing so they can't
@@ -761,7 +762,7 @@ export default function Landing({ onGetStarted }) {
       <style>{CSS}</style>
 
       <header className="topbar">
-        <div className="wordmark">InThe<span>League</span></div>
+        <div className="wordmark"><SantaHatLetter />nThe<span>League</span></div>
         <div className="nav-right">
           <button type="button" className="nav-login" onClick={() => onGetStarted('in')}>Log in</button>
           <button type="button" className="nav-cta" onClick={() => onGetStarted('up')}>Start a pool</button>
@@ -780,22 +781,25 @@ export default function Landing({ onGetStarted }) {
         <div className="sleigh" aria-hidden="true">
           <svg viewBox="0 0 220 60" width="220" height="60">
             <g className="sl-bob">
-              {/* reindeer */}
+              {/* reindeer — facing left, the way the sleigh travels */}
               {[0, 46].map(x => (
-                <g key={x} transform={`translate(${x},6)`} fill="#F6F5EF">
+                <g key={x} transform={`translate(${x + 44},6) scale(-1,1)`} fill="#F6F5EF">
                   <path d="M10,26 q6,-6 20,-4 l6,-6 2,1 -3,7 q4,3 1,8 l-3,10 h-3 l1,-9 q-8,2 -16,0 l-2,9 h-3 l0,-10 q-4,-3 0,-6 z"/>
                   <path d="M36,16 l-2,-7 m2,7 l3,-7 m-3,4 l-4,-2" stroke="#F6F5EF" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
                 </g>
               ))}
-              <circle cx="84" cy="25" r="2.2" fill="#FF3B5C"/>
+              {/* Rudolph's nose on the lead reindeer */}
+              <circle cx="5" cy="25" r="2.2" fill="#FF3B5C"/>
               {/* reins */}
-              <path d="M40,30 Q70,36 98,30 M86,30 Q110,38 128,34" stroke="#F4B32C" strokeWidth="1" fill="none" opacity=".8"/>
-              {/* sleigh with football */}
-              <circle cx="152" cy="20" r="9" fill="#F6F5EF"/>
-              <path d="M152,13 l4,3 -1.5,4.5 h-5 l-1.5,-4.5 z" fill="#0E120F"/>
-              <path d="M128,26 h44 q6,0 6,8 v4 q0,6 -6,6 h-40 q-6,0 -6,-6 z" fill="#E5484D"/>
-              <path d="M126,50 h50 q10,0 12,-8" stroke="#F4B32C" strokeWidth="2" fill="none" strokeLinecap="round"/>
-              <path d="M136,44 v6 M166,44 v6" stroke="#F4B32C" strokeWidth="2"/>
+              <path d="M10,30 Q30,36 50,30 M56,30 Q90,40 122,34" stroke="#F4B32C" strokeWidth="1" fill="none" opacity=".8"/>
+              {/* sleigh with football — runner curls at the front (left) */}
+              <g transform="translate(306,0) scale(-1,1)">
+                <circle cx="152" cy="20" r="9" fill="#F6F5EF"/>
+                <path d="M152,13 l4,3 -1.5,4.5 h-5 l-1.5,-4.5 z" fill="#0E120F"/>
+                <path d="M128,26 h44 q6,0 6,8 v4 q0,6 -6,6 h-40 q-6,0 -6,-6 z" fill="#E5484D"/>
+                <path d="M126,50 h50 q10,0 12,-8" stroke="#F4B32C" strokeWidth="2" fill="none" strokeLinecap="round"/>
+                <path d="M136,44 v6 M166,44 v6" stroke="#F4B32C" strokeWidth="2"/>
+              </g>
             </g>
             <g className="sl-trail" fill="#F4B32C">
               <circle cx="196" cy="34" r="1.6"/><circle cx="206" cy="30" r="1.2"/><circle cx="214" cy="37" r="1"/>

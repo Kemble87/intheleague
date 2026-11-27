@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import SantaHatLetter from './components/SantaHatLetter'
 import { onAuthStateChanged, getRedirectResult } from 'firebase/auth'
 import { auth } from './lib/firebase'
 import Landing from './components/Landing'
@@ -45,7 +46,7 @@ export default function App() {
       <Backdrop festive={festive} />      <Toast />
       <div style={{ position: 'relative', zIndex: 1 }}>
       <div className="nav">
-        <div className="nav-logo">In<em>The</em>League</div>
+        <div className="nav-logo"><SantaHatLetter />n<em>The</em>League</div>
         <div className="nav-right">
           <SideDrawer
             user={user}
