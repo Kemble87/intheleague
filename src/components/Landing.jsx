@@ -581,6 +581,65 @@ const CSS = `@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@
     .itl-landing .snow i { top: var(--y); }
   }
 
+  /* ---------- live phone demo ---------- */
+  .itl-landing .stat-rank { position: relative; }
+  .itl-landing .tree-chip {
+    position: absolute; right: 2px; top: -20px; font-size: 15px; line-height: 1;
+    opacity: 0; transform: translateY(6px) scale(.4); transition: opacity .3s, transform .45s cubic-bezier(.3,1.6,.5,1);
+  }
+  .itl-landing .tree-chip.on { opacity: 1; transform: translateY(0) scale(1); animation: itlTreeTwinkle 1.6s .5s ease-in-out infinite; }
+  .itl-landing .stat-rank .n.flip { animation: itlFlip .5s ease both, itlGoldGlow 1.4s .5s ease-in-out infinite; }
+  .itl-landing .bump { display: inline-block; animation: itlBump .45s cubic-bezier(.3,1.6,.5,1) both; }
+  .itl-landing .np-boxes { position: relative; flex: none; display: flex; align-items: center; gap: 3px; }
+  .itl-landing .np-box {
+    width: 26px; height: 32px; border-radius: 5px; background: #060606; border: 1px solid #1f2a20;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 18px; color: #2a1a10; transition: color .2s, border-color .2s;
+  }
+  .itl-landing .np-box.on { color: #00ff66; text-shadow: 0 0 8px #00ff4466; border-color: #1e6b35; animation: itlBump .35s cubic-bezier(.3,1.6,.5,1) both; }
+  .itl-landing .nextpick.ft .np-box.on { color: #ff6600; text-shadow: 0 0 8px #ff440066; border-color: #5a2a10; }
+  .itl-landing .np-colon { font-family: var(--mono); color: #5A5F55; font-size: 14px; }
+  .itl-landing .np-when { text-align: center; font-size: 9.5px; color: var(--pmuted); margin: -3px 0 10px; font-weight: 600; }
+  .itl-landing .nextpick.ft .np-when { color: #E7EAE5; }
+  .itl-landing .np-pts { color: #052610; background: var(--pg); border-radius: 999px; padding: 1px 6px; animation: itlBump .4s cubic-bezier(.3,1.6,.5,1) both; }
+  .itl-landing .np-btn { transition: background .3s, color .3s; }
+  .itl-landing .np-btn.saved { background: #F5B301; color: #2a1c00; }
+  .itl-landing .nextpick.ft .np-btn { background: linear-gradient(90deg, #B4232C, #1E7D37); color: #fff; }
+  .itl-landing .np-burst { position: absolute; left: 50%; top: 50%; width: 0; height: 0; }
+  .itl-landing .np-burst i {
+    position: absolute; left: -2.5px; top: -2.5px; width: 5px; height: 5px; border-radius: 50%;
+    background: #fff; box-shadow: 0 0 6px #fff; transform: rotate(var(--a)) translateX(0);
+    animation: itlBurst .7s ease-out both;
+  }
+  .itl-landing .np-burst i:nth-child(even) { background: #F4B32C; box-shadow: 0 0 6px #F4B32C; }
+  @keyframes itlBurst { 0% { transform: rotate(var(--a)) translateX(0) scale(1); opacity: 1; } 100% { transform: rotate(var(--a)) translateX(38px) scale(.3); opacity: 0; } }
+  @keyframes itlBump { 0% { transform: scale(.4); opacity: 0; } 70% { transform: scale(1.18); opacity: 1; } 100% { transform: scale(1); } }
+  @keyframes itlFlip { 0% { transform: rotateX(90deg); opacity: 0; } 100% { transform: rotateX(0); opacity: 1; } }
+  @keyframes itlGoldGlow { 0%, 100% { text-shadow: 0 0 0 transparent; } 50% { text-shadow: 0 0 14px rgba(245,179,1,.7); } }
+  @keyframes itlTreeTwinkle { 0%, 100% { filter: drop-shadow(0 0 0 transparent); transform: scale(1); } 50% { filter: drop-shadow(0 0 6px #F4B32C); transform: scale(1.12); } }
+
+  /* ---------- sleigh flypast ---------- */
+  .itl-landing .sleigh {
+    position: absolute; left: 0; top: 2px; z-index: 1; pointer-events: none; opacity: 0;
+    animation: itlSleigh 24s linear 3s infinite;
+  }
+  .itl-landing .sleigh svg { display: block; width: clamp(150px, 40vw, 180px); height: auto; opacity: .85; }
+  @media (min-width: 700px) { .itl-landing .hero { padding-top: 58px; } }
+  .itl-landing .sl-bob { animation: itlBob 1.1s ease-in-out infinite; }
+  .itl-landing .sl-trail { animation: itlTrail .6s linear infinite; }
+  @keyframes itlSleigh {
+    0%   { transform: translate(110vw, 8px) rotate(-3deg); opacity: 0; }
+    2%   { opacity: 1; }
+    30%  { transform: translate(-260px, -4px) rotate(-3deg); opacity: 1; }
+    31%, 100% { transform: translate(-260px, -4px); opacity: 0; }
+  }
+  @keyframes itlBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+  @keyframes itlTrail { 0% { opacity: 1; } 100% { opacity: .2; } }
+  @media (prefers-reduced-motion: reduce) {
+    .itl-landing .sleigh { display: none; }
+    .itl-landing .tree-chip.on, .itl-landing .stat-rank .n.flip, .itl-landing .bump, .itl-landing .np-box.on, .itl-landing .np-pts { animation: none; }
+  }
+
   @keyframes itlPulse {
     0% { box-shadow: 0 0 0 0 rgba(43,168,74,.5); }
     70% { box-shadow: 0 0 0 8px rgba(43,168,74,0); }
@@ -640,6 +699,28 @@ export default function Landing({ onGetStarted }) {
   const lockText = left ? `locks in ${daysOut} day${daysOut === 1 ? '' : 's'}` : 'under way'
   const rootRef = useRef(null)
 
+  // Live phone demo: a pick goes in, the result lands, Rob goes top of the tree.
+  // 0 idle · 1 home digit · 2 away digit · 3 saved · 4 full time · 5 table moves
+  const [demo, setDemo] = useState(0)
+  useEffect(() => {
+    const phone = rootRef.current?.querySelector('#phone')
+    if (!phone) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { setDemo(5); return }
+    const timers = []
+    const run = () => {
+      const at = [[0, 0], [1, 1300], [2, 2000], [3, 2700], [4, 4300], [5, 5600]]
+      at.forEach(([s, t]) => timers.push(setTimeout(() => setDemo(s), t)))
+      timers.push(setTimeout(run, 10400))
+    }
+    const io = new IntersectionObserver((es) => {
+      if (!es.some(e => e.isIntersecting)) return
+      io.disconnect(); timers.push(setTimeout(run, 700))
+    }, { threshold: 0.4 })
+    io.observe(phone)
+    return () => { io.disconnect(); timers.forEach(clearTimeout) }
+  }, [])
+  const ft = demo >= 4, top = demo >= 5
+
   const scrollToHow = (e) => {
     e.preventDefault()
     const el = rootRef.current?.querySelector('#how')
@@ -672,31 +753,7 @@ export default function Landing({ onGetStarted }) {
     ;['phone', 'coupon-copy', 'checklist', 'backpage-copy', 'backpage-paper', 'closing-copy']
       .forEach((id) => { const el = root.querySelector('#' + id); if (el) io.observe(el) })
 
-    // rotating "Next to pick" fixture (mirrors the dashboard card)
-    const lk = root.dataset.lock || ''
-    const fixtures = [
-      { h: 'Aston Villa', a: 'Leeds',       dt: 'Sat 26 Dec \u00b7 12:30', lk },
-      { h: 'Everton',     a: 'Sunderland',  dt: 'Sat 26 Dec \u00b7 15:00', lk },
-      { h: 'Spurs',       a: 'Bournemouth', dt: 'Sat 26 Dec \u00b7 15:00', lk },
-      { h: 'Fulham',      a: 'Brighton',    dt: 'Sat 26 Dec \u00b7 15:00', lk },
-      { h: 'Hull',        a: 'Liverpool',   dt: 'Sat 26 Dec \u00b7 17:30', lk },
-    ]
-    const q = (id) => root.querySelector('#' + id)
-    const npHome = q('npHome'), npAway = q('npAway'), npDt = q('npDt'), npLk = q('npLk'), npFade = q('npFade')
-    let timer
-    if (npHome) {
-      let idx = 0
-      const paint = (f) => { npHome.textContent = f.h; npAway.textContent = f.a; npDt.textContent = f.dt; npLk.textContent = f.lk }
-      paint(fixtures[0])
-      timer = setInterval(() => {
-        idx = (idx + 1) % fixtures.length
-        if (reduce) { paint(fixtures[idx]); return }
-        npFade.classList.add('fade')
-        setTimeout(() => { paint(fixtures[idx]); npFade.classList.remove('fade') }, 360)
-      }, 3200)
-    }
-
-    return () => { io.disconnect(); if (timer) clearInterval(timer) }
+    return () => { io.disconnect() }
   }, [])
 
   return (
@@ -720,6 +777,31 @@ export default function Landing({ onGetStarted }) {
         <div className="pitch"></div>
         <div className="floodglow"></div>
         <div className="snow" aria-hidden="true">{FLAKES.map((f, i) => <i key={i} style={f} />)}</div>
+        <div className="sleigh" aria-hidden="true">
+          <svg viewBox="0 0 220 60" width="220" height="60">
+            <g className="sl-bob">
+              {/* reindeer */}
+              {[0, 46].map(x => (
+                <g key={x} transform={`translate(${x},6)`} fill="#F6F5EF">
+                  <path d="M10,26 q6,-6 20,-4 l6,-6 2,1 -3,7 q4,3 1,8 l-3,10 h-3 l1,-9 q-8,2 -16,0 l-2,9 h-3 l0,-10 q-4,-3 0,-6 z"/>
+                  <path d="M36,16 l-2,-7 m2,7 l3,-7 m-3,4 l-4,-2" stroke="#F6F5EF" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+                </g>
+              ))}
+              <circle cx="84" cy="25" r="2.2" fill="#FF3B5C"/>
+              {/* reins */}
+              <path d="M40,30 Q70,36 98,30 M86,30 Q110,38 128,34" stroke="#F4B32C" strokeWidth="1" fill="none" opacity=".8"/>
+              {/* sleigh with football */}
+              <circle cx="152" cy="20" r="9" fill="#F6F5EF"/>
+              <path d="M152,13 l4,3 -1.5,4.5 h-5 l-1.5,-4.5 z" fill="#0E120F"/>
+              <path d="M128,26 h44 q6,0 6,8 v4 q0,6 -6,6 h-40 q-6,0 -6,-6 z" fill="#E5484D"/>
+              <path d="M126,50 h50 q10,0 12,-8" stroke="#F4B32C" strokeWidth="2" fill="none" strokeLinecap="round"/>
+              <path d="M136,44 v6 M166,44 v6" stroke="#F4B32C" strokeWidth="2"/>
+            </g>
+            <g className="sl-trail" fill="#F4B32C">
+              <circle cx="196" cy="34" r="1.6"/><circle cx="206" cy="30" r="1.2"/><circle cx="214" cy="37" r="1"/>
+            </g>
+          </svg>
+        </div>
         <div className="wrap hero-inner">
           <div className="eyebrow"><span className="dot"></span> The Festive League · 26 Dec – 7 Jan</div>
           <h1>Top of the tree<br /><span className="keep">at Christmas.</span></h1>
@@ -757,32 +839,36 @@ export default function Landing({ onGetStarted }) {
                   <div className="dash-hr"></div>
 
                   <div className="dash-stats">
-                    <div className="stat-big"><div className="n">{left ? daysOut : 0}</div><div className="stat-lbl">Days to kickoff</div></div>
-                    <div className="stat-mid">
-                      <div className="r"><b>0</b><span>Exact scores</span></div>
-                      <div className="r"><b>4</b><span>Picks made</span></div>
+                    <div className="stat-big">
+                      <div className={'n' + (ft ? ' bump' : '')} key={ft ? 'pts' : 'days'}>{ft ? 3 : (left ? daysOut : 0)}</div>
+                      <div className="stat-lbl">{ft ? 'Points' : 'Days to kickoff'}</div>
                     </div>
-                    <div className="stat-rank"><div className="n">2<sup>nd</sup></div><div className="stat-lbl">Your rank</div></div>
+                    <div className="stat-mid">
+                      <div className="r"><b className={ft ? 'bump' : ''} key={ft ? 'e1' : 'e0'}>{ft ? 1 : 0}</b><span>Exact scores</span></div>
+                      <div className="r"><b className={demo >= 3 ? 'bump' : ''} key={demo >= 3 ? 'p5' : 'p4'}>{demo >= 3 ? 5 : 4}</b><span>Picks made</span></div>
+                    </div>
+                    <div className="stat-rank">
+                      <div className={'tree-chip' + (top ? ' on' : '')} aria-hidden="true">🎄</div>
+                      <div className={'n' + (top ? ' flip' : '')} key={top ? 'r1' : 'r2'}>{top ? <>1<sup>st</sup></> : <>2<sup>nd</sup></>}</div>
+                      <div className="stat-lbl">{top ? 'Top of the tree' : 'Your rank'}</div>
+                    </div>
                   </div>
-
-                  <div className="prog-top"><span className="l">League progress</span><span className="r">4 matchdays</span></div>
-                  <div className="prog-bar"><span className="fill"></span></div>
-                  <div className="prog-ticks"><span>MD17</span><span>MD18</span><span>MD19</span><span>MD20</span></div>
                 </div>
 
-                <div className="nextpick">
-                  <div className="np-label">⏱ Next to pick</div>
-                  <div className="np-fade" id="npFade">
-                    <div className="np-teams">
-                      <b id="npHome">Aston Villa</b>
-                      <span className="np-mid">
-                        <span className="dt" id="npDt">Sat 26 Dec · 12:30</span>
-                        <span className="lk" id="npLk">{lockText}</span>
-                      </span>
-                      <b className="away" id="npAway">Leeds</b>
-                    </div>
+                <div className={'nextpick' + (ft ? ' ft' : '')}>
+                  <div className="np-label">{ft ? <>🏁 Full time · <span className="np-pts">+3 exact</span></> : '⏱ Next to pick'}</div>
+                  <div className="np-teams">
+                    <b>Aston Villa</b>
+                    <span className="np-boxes">
+                      <span className={'np-box' + (demo >= 1 ? ' on' : '')}>{demo >= 1 ? '2' : '–'}</span>
+                      <span className="np-colon">:</span>
+                      <span className={'np-box' + (demo >= 2 ? ' on' : '')}>{demo >= 2 ? '1' : '–'}</span>
+                      {demo === 3 && <span className="np-burst" aria-hidden="true">{[0,1,2,3,4,5,6,7].map(k => <i key={k} style={{ '--a': k * 45 + 'deg' }} />)}</span>}
+                    </span>
+                    <b className="away">Leeds</b>
                   </div>
-                  <div className="np-btn">Pick this match →</div>
+                  <div className="np-when">{ft ? 'Sat 26 Dec · Villa 2–1 Leeds' : `Sat 26 Dec · 12:30 · ${lockText}`}</div>
+                  <div className={'np-btn' + (demo >= 3 ? ' saved' : '')}>{ft ? 'Rob goes top 🎄' : demo >= 3 ? '✓ Pick saved' : 'Pick this match →'}</div>
                 </div>
               </div>
             </div>

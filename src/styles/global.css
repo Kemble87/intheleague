@@ -401,3 +401,22 @@ button:active { transform: scale(.96); }
 .festive .md-select { background: #0b120d; border-color: #223126; }
 .festive .board-row { border-color: #223126; }
 
+
+/* Pick saved: puff of sparks over the score boxes */
+.pick-burst { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; z-index: 5; }
+.pick-burst i { position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: pickBurst .9s cubic-bezier(.2,.8,.3,1) both; }
+.pick-burst i:nth-child(3n) { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+.pick-burst.fest i { background: #fff; box-shadow: 0 0 8px #fff; }
+.pick-burst.fest i:nth-child(3n) { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+.pick-burst.fest i:nth-child(4n) { width: 8px; height: 8px; border-radius: 0; background: none; box-shadow: none; }
+.pick-burst.fest i:nth-child(4n)::before { content: '★'; position: absolute; left: -2px; top: -6px; font-size: 11px; color: var(--gold); }
+.pick-burst b { position: absolute; left: 50%; top: -44px; transform: translateX(-50%); white-space: nowrap; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #000; background: var(--green); padding: 3px 8px; border-radius: 999px; animation: pickSaved 1.3s ease both; }
+.pick-burst.fest b { background: var(--gold); }
+@keyframes pickBurst { 0% { transform: rotate(var(--a)) translateX(0) scale(1); opacity: 1; } 100% { transform: rotate(var(--a)) translateX(calc(var(--d) * 1.5)) scale(.3); opacity: 0; } }
+@keyframes pickSaved { 0% { opacity: 0; transform: translate(-50%, 8px) scale(.7); } 18% { opacity: 1; transform: translate(-50%, 0) scale(1.05); } 30% { transform: translate(-50%, 0) scale(1); } 75% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -6px); } }
+
+/* Leader's tree twinkles */
+.fest-twinkle { display: inline-block; animation: festTreeTwinkle 1.8s ease-in-out infinite; }
+@keyframes festTreeTwinkle { 0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); } 50% { transform: scale(1.14); filter: drop-shadow(0 0 7px #FFD60A); } }
+.board-row { position: relative; }
+@media (prefers-reduced-motion: reduce) { .pick-burst i, .fest-twinkle { animation: none; } .pick-burst b { animation: pickSaved 1.3s steps(1) both; } }
